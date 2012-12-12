@@ -11,20 +11,18 @@
 
 #include <Awesomium/BitmapSurface.h>
 
-
 #include "wrap_core.h"
-
-
-class JSHandler : public Awesomium::JSMethodHandler
-{
-
-};
+#include "webview_listeners.h"
+#include "resinterceptor.h"
+#include "jshandler.h"
 
 
 // pragma message stuff
 #define STRING2(x) #x
 #define STRING(x) STRING2(x)
 
+
+JSHandler _aws_jshandler;
 
 Awesomium::WebConfig wcToAweConf(cWebConf wc);
 Awesomium::WebPreferences wpToAwePrefs(cWebPrefs wp);
@@ -309,72 +307,82 @@ extern "C"
 
 	// ------------ SET LISTENERS
 
-	EXPORT void aws_webview_setViewListener(cWebViewPtr_t webview, void* listener)
+	EXPORT void aws_webview_setViewListener(cWebViewPtr_t webview, cWebView_onViewPtr_t listener)
 	{
 		auto view = reinterpret_cast<Awesomium::WebView*>(webview);
 
 		if ( view ) {
-			auto lst = static_cast<Awesomium::WebViewListener::View*>(listener);
+			auto lst = reinterpret_cast<Awesomium::WebViewListener::View*>(listener);
 			view->set_view_listener(lst);
 		}
 	}
 
-	EXPORT void aws_webview_setProcessListener(cWebViewPtr_t webview, void* listener)
+	EXPORT void aws_webview_setProcessListener(cWebViewPtr_t webview, cWebView_onProcessPtr_t listener)
 	{
 		auto view = reinterpret_cast<Awesomium::WebView*>(webview);
 
 		if ( view ) {
-			auto lst = static_cast<Awesomium::WebViewListener::View*>(listener);
-			view->set_view_listener(lst);
+			auto lst = reinterpret_cast<Awesomium::WebViewListener::Process*>(listener);
+			view->set_process_listener(lst);
 		}
 	}
 
-	EXPORT void aws_webview_setLoadListener(cWebViewPtr_t webview, void* listener)
+	EXPORT void aws_webview_setLoadListener(cWebViewPtr_t webview, cWebView_onLoadPtr_t listener)
 	{
 		auto view = reinterpret_cast<Awesomium::WebView*>(webview);
 
 		if ( view ) {
-			auto lst = static_cast<Awesomium::WebViewListener::Load*>(listener);
+			auto lst = reinterpret_cast<Awesomium::WebViewListener::Load*>(listener);
 			view->set_load_listener(lst);
 		}
 	}
 
-	EXPORT void aws_webview_setMenuListener(cWebViewPtr_t webview, void* listener)
+	EXPORT void aws_webview_setMenuListener(cWebViewPtr_t webview, cWebView_onMenuPtr_t listener)
 	{
 		auto view = reinterpret_cast<Awesomium::WebView*>(webview);
 
 		if ( view ) {
-			auto lst = static_cast<Awesomium::WebViewListener::Menu*>(listener);
+			auto lst = reinterpret_cast<Awesomium::WebViewListener::Menu*>(listener);
 			view->set_menu_listener(lst);
 		}
 	}
 
-	EXPORT void aws_webview_setPrintListener(cWebViewPtr_t webview, void* listener)
+	EXPORT void aws_webview_setDialogListener(cWebViewPtr_t webview, cWebView_onDialogPtr_t listener)
 	{
 		auto view = reinterpret_cast<Awesomium::WebView*>(webview);
 
 		if ( view ) {
-			auto lst = static_cast<Awesomium::WebViewListener::Print*>(listener);
+			auto lst = reinterpret_cast<Awesomium::WebViewListener::Menu*>(listener);
+			view->set_menu_listener(lst);
+		}
+	}
+
+	EXPORT void aws_webview_setPrintListener(cWebViewPtr_t webview, cWebView_onPrintPtr_t listener)
+	{
+		auto view = reinterpret_cast<Awesomium::WebView*>(webview);
+
+		if ( view ) {
+			auto lst = reinterpret_cast<Awesomium::WebViewListener::Print*>(listener);
 			view->set_print_listener(lst);
 		}
 	}
 
-	EXPORT void aws_webview_setDownloadListener(cWebViewPtr_t webview, void* listener)
+	EXPORT void aws_webview_setDownloadListener(cWebViewPtr_t webview, cWebView_onDownloadPtr_t listener)
 	{
 		auto view = reinterpret_cast<Awesomium::WebView*>(webview);
 
 		if ( view ) {
-			auto lst = static_cast<Awesomium::WebViewListener::Download*>(listener);
+			auto lst = reinterpret_cast<Awesomium::WebViewListener::Download*>(listener);
 			view->set_download_listener(lst);
 		}
 	}
 
-	EXPORT void aws_webview_setIMEListener(cWebViewPtr_t webview, void* listener)
+	EXPORT void aws_webview_setIMEListener(cWebViewPtr_t webview, cWebView_onIMEPtr_t listener)
 	{
 		auto view = reinterpret_cast<Awesomium::WebView*>(webview);
 
 		if ( view ) {
-			auto lst = static_cast<Awesomium::WebViewListener::InputMethodEditor*>(listener);
+			auto lst = reinterpret_cast<Awesomium::WebViewListener::InputMethodEditor*>(listener);
 			view->set_input_method_editor_listener(lst);
 		}
 	}
@@ -382,89 +390,89 @@ extern "C"
 
 	// ------------ GET LISTENERS
 
-	EXPORT void* aws_webview_getViewListener(cWebViewPtr_t webview)
+	EXPORT cWebView_onViewPtr_t aws_webview_getViewListener(cWebViewPtr_t webview)
 	{
 		auto view = reinterpret_cast<Awesomium::WebView*>(webview);
 
 		if ( view ) {
-			return view->view_listener();
+			return reinterpret_cast<cWebView_onViewPtr_t>(view->view_listener());
 		}
 
 		return nullptr;
 	}
 
-	EXPORT void* aws_webview_getLoadListener(cWebViewPtr_t webview)
+	EXPORT cWebView_onLoadPtr_t aws_webview_getLoadListener(cWebViewPtr_t webview)
 	{
 		auto view = reinterpret_cast<Awesomium::WebView*>(webview);
 
 		if ( view ) {
-			return view->load_listener();
+			return reinterpret_cast<cWebView_onLoadPtr_t>(view->load_listener());
 		}
 
 		return nullptr;
 	}
 
-	EXPORT void* aws_webview_getProcessListener(cWebViewPtr_t webview)
+	EXPORT cWebView_onProcessPtr_t aws_webview_getProcessListener(cWebViewPtr_t webview)
 	{
 		auto view = reinterpret_cast<Awesomium::WebView*>(webview);
 
 		if ( view ) {
-			return view->process_listener();
+			return reinterpret_cast<cWebView_onProcessPtr_t>(view->process_listener());
 		}
 
 		return nullptr;
 	}
 
-	EXPORT void* aws_webview_getMenuListener(cWebViewPtr_t webview)
+	EXPORT cWebView_onMenuPtr_t aws_webview_getMenuListener(cWebViewPtr_t webview)
 	{
 		auto view = reinterpret_cast<Awesomium::WebView*>(webview);
 
 		if ( view ) {
-			return view->menu_listener();
+			return reinterpret_cast<cWebView_onMenuPtr_t>(view->menu_listener());
 		}
 
 		return nullptr;
 	}
 
-	EXPORT void* aws_webview_getDialogListener(cWebViewPtr_t webview)
+	EXPORT cWebView_onDialogPtr_t aws_webview_getDialogListener(cWebViewPtr_t webview)
 	{
 		auto view = reinterpret_cast<Awesomium::WebView*>(webview);
 
 		if ( view ) {
-			return view->dialog_listener();
+			return reinterpret_cast<cWebView_onDialogPtr_t>(view->dialog_listener());
 		}
 
 		return nullptr;
 	}
 	
-	EXPORT void* aws_webview_getPrintListener(cWebViewPtr_t webview)
+	EXPORT cWebView_onPrintPtr_t aws_webview_getPrintListener(cWebViewPtr_t webview)
 	{
 		auto view = reinterpret_cast<Awesomium::WebView*>(webview);
 
 		if ( view ) {
-			return view->print_listener();
+			return reinterpret_cast<cWebView_onPrintPtr_t>(view->print_listener());
 		}
 
 		return nullptr;
 	}
 
-	EXPORT void* aws_webview_getDownloadListener(cWebViewPtr_t webview)
+	EXPORT cWebView_onDownloadPtr_t aws_webview_getDownloadListener(cWebViewPtr_t webview)
 	{
 		auto view = reinterpret_cast<Awesomium::WebView*>(webview);
 
 		if ( view ) {
-			return view->download_listener();
+			return reinterpret_cast<cWebView_onDownloadPtr_t>(view->download_listener());
 		}
 
 		return nullptr;
 	}
 
-	EXPORT void* aws_webview_getIMEListener(cWebViewPtr_t webview)
+	EXPORT cWebView_onIMEPtr_t aws_webview_getIMEListener(cWebViewPtr_t webview)
 	{
 		auto view = reinterpret_cast<Awesomium::WebView*>(webview);
 
 		if ( view ) {
-			return view->input_method_editor_listener();
+			return reinterpret_cast<cWebView_onIMEPtr_t>(view->input_method_editor_listener());
 		}
 
 		return nullptr;
@@ -726,7 +734,7 @@ extern "C"
 		}
 	}
 
-	EXPORT void aws_webview_injectKeyboardEvent(cWebViewPtr_t webview, void* keyevent)
+	EXPORT void aws_webview_injectKeyboardEvent(cWebViewPtr_t webview, cKeyboardEvtPtr_t keyevent)
 	{
 #pragma message (__FILE__ "[" STRING(__LINE__) "]: function not implemented")
 		auto view = reinterpret_cast<Awesomium::WebView*>(webview);
@@ -737,7 +745,7 @@ extern "C"
 		}
 	}
 
-	EXPORT void aws_webview_injectTouchEvent(cWebViewPtr_t webview, void* touchevent)
+	EXPORT void aws_webview_injectTouchEvent(cWebViewPtr_t webview, cTouchEvtPtr_t touchevent)
 	{
 #pragma message (__FILE__ "[" STRING(__LINE__) "]: function not implemented")
 		auto view = reinterpret_cast<Awesomium::WebView*>(webview);
@@ -906,12 +914,12 @@ extern "C"
 		return nullptr;
 	}
 
-	EXPORT void aws_webview_setJSMethodHandler(cWebViewPtr_t webview, void* jshandler)
+	EXPORT void aws_webview_setJSMethodHandler(cWebViewPtr_t webview, cJSMethodHandlerPtr_t jshandler)
 	{
 		auto view = reinterpret_cast<Awesomium::WebView*>(webview);
 
 		if ( view ) {
-			auto jsh = static_cast<Awesomium::JSMethodHandler*>(jshandler);
+			auto jsh = reinterpret_cast<Awesomium::JSMethodHandler*>(jshandler);
 			view->set_js_method_handler( jsh );
 		}
 	}
@@ -1784,6 +1792,64 @@ extern "C"
 		if ( bs ){
 			Awesomium::BitmapSurfaceFactory bsf;
 			bsf.DestroySurface( bs );
+		}
+	}
+
+	//================================
+	// JS HANDLER STUFF
+
+	EXPORT void aws_webview_setInternalJSHandler(cWebViewPtr_t webview)
+	{
+		auto view = reinterpret_cast<Awesomium::WebView*>(webview);
+
+		if ( view ){
+			view->set_js_method_handler(&_aws_jshandler);
+		}
+	}
+
+	EXPORT void aws_jshandler_addCallback(cWebViewPtr_t webview, jshnd_onMethodCall callback)
+	{
+		auto view = reinterpret_cast<Awesomium::WebView*>(webview);
+
+		if ( view ){
+			_aws_jshandler.addCallback(view, callback);
+		}
+	}
+
+	EXPORT void aws_jshandler_addCallbackValue(cWebViewPtr_t webview, jshnd_onMethodCallValue callback)
+	{
+		auto view = reinterpret_cast<Awesomium::WebView*>(webview);
+
+		if ( view ){
+			_aws_jshandler.addCallback(view, callback);
+		}
+	}
+
+
+	EXPORT void aws_jshandler_removeCallback(cWebViewPtr_t webview, jshnd_onMethodCall callback)
+	{
+		auto view = reinterpret_cast<Awesomium::WebView*>(webview);
+
+		if ( view ){
+			_aws_jshandler.removeCallback(view, callback);
+		}
+	}
+
+	EXPORT void aws_jshandler_removeCallbackAll(cWebViewPtr_t webview)
+	{
+		auto view = reinterpret_cast<Awesomium::WebView*>(webview);
+
+		if ( view ){
+			_aws_jshandler.removeCallbackAll(view);
+		}
+	}
+
+	EXPORT void aws_jshandler_removeCallbackValue (cWebViewPtr_t webview)
+	{
+		auto view = reinterpret_cast<Awesomium::WebView*>(webview);
+
+		if ( view ){
+			_aws_jshandler.removeCallbackValue(view);
 		}
 	}
 

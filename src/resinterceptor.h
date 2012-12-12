@@ -4,4 +4,12 @@
 #include <Awesomium/ResourceInterceptor.h>
 
 
+class ResInterceptor : public Awesomium::ResourceInterceptor
+{
+public:
+
+	virtual Awesomium::ResourceResponse* OnRequest(Awesomium::ResourceRequest* request);
+	virtual ~ResInterceptor() {}
+};
+
 #endif

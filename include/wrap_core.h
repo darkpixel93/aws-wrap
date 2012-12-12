@@ -43,7 +43,7 @@ extern "C" {
 
 	
 	/// null terminated wchar16 string
-	typedef unsigned short* nullstring16_t;
+	typedef unsigned short* nullstr16_t;
 
 
 
@@ -137,6 +137,13 @@ extern "C" {
 
 	typedef struct _cJSValue cJSValue_t, *cJSValuePtr_t;
 
+	typedef struct _cJSMethodHandler *cJSMethodHandlerPtr_t;
+
+
+	typedef struct _cKeyboardEvt *cKeyboardEvtPtr_t;
+
+	typedef struct _cTouchEvt *cTouchEvtPtr_t;
+
 
 	typedef struct _cSurface cSurface_t, *cSurfacePtr_t;
 
@@ -144,11 +151,41 @@ extern "C" {
 
 	typedef struct _cSurfaceFactory cSurfaceFactory_t, *cSurfaceFactoryPtr_t;
 
+
 	typedef struct _cResInterceptor cResInterceptor_t, *cResInterceptorPtr_t;
 
+	typedef struct _cResRequest cResRequest_t, *cResRequestPtr_t;
+
+	typedef struct _cResResponse cResResponse_t, *cResResponsePtr_t;
 
 
-	// WEB STRING
+	typedef struct _cWebView_onView *cWebView_onViewPtr_t;
+
+	typedef struct _cWebView_onLoad *cWebView_onLoadPtr_t;
+
+	typedef struct _cWebView_onProcess *cWebView_onProcessPtr_t;
+
+	typedef struct _cWebView_onMenu *cWebView_onMenuPtr_t;
+
+	typedef struct _cWebView_onDialog *cWebView_onDialogPtr_t;
+
+	typedef struct _cWebView_onPrint *cWebView_onPrintPtr_t;
+
+	typedef struct _cWebView_onDownload *cWebView_onDownloadPtr_t;
+
+	typedef struct _cWebView_onIME *cWebView_onIMEPtr_t;
+
+	// ===== CALLBACKS ======
+
+	/// this method gets called on javascript method call which doesn't return value
+	typedef void (*jshnd_onMethodCall)(cWebViewPtr_t caller, unsigned remoteObjId, cWebStringPtr_t methodName, cJSArrayPtr_t args);
+
+	/// this method gets called on javascript method call which returns value
+	typedef cJSValuePtr_t (*jshnd_onMethodCallValue)(cWebViewPtr_t caller, unsigned remoteObjId, cWebStringPtr_t methodName, cJSArrayPtr_t args);
+
+
+
+	// ====== WEB STRING ======
 	EXPORT   cWebStringPtr_t         aws_webstring_new ();
 	EXPORT   cWebStringPtr_t         aws_webstring_new_substring (cWebStringPtr_t srcstring, unsigned start, unsigned len);
 	EXPORT   cWebStringPtr_t         aws_webstring_new_utf8 (const char* string, unsigned len);
@@ -181,22 +218,23 @@ extern "C" {
 	EXPORT   void*                   aws_webview_getParentWindow (cWebViewPtr_t webview);
 	EXPORT   void*                   aws_webview_getWindow (cWebViewPtr_t webview);
 
-	EXPORT   void                    aws_webview_setViewListener (cWebViewPtr_t webview, void* listener);
-	EXPORT   void                    aws_webview_setLoadListener (cWebViewPtr_t webview, void* listener);
-	EXPORT   void                    aws_webview_setProcessListener (cWebViewPtr_t webview, void* listener);
-	EXPORT   void                    aws_webview_setMenuListener (cWebViewPtr_t webview, void* listener);
-	EXPORT   void                    aws_webview_setPrintListener (cWebViewPtr_t webview, void* listener);
-	EXPORT   void                    aws_webview_setDownloadListener (cWebViewPtr_t webview, void* listener);
-	EXPORT   void                    aws_webview_setIMEListener (cWebViewPtr_t webview, void* listener);
+	EXPORT   void                    aws_webview_setViewListener (cWebViewPtr_t webview, cWebView_onViewPtr_t listener);
+	EXPORT   void                    aws_webview_setLoadListener (cWebViewPtr_t webview, cWebView_onLoadPtr_t listener);
+	EXPORT   void                    aws_webview_setProcessListener (cWebViewPtr_t webview, cWebView_onProcessPtr_t listener);
+	EXPORT   void                    aws_webview_setMenuListener (cWebViewPtr_t webview, cWebView_onMenuPtr_t listener);
+	EXPORT   void                    aws_webview_setDialogListener (cWebViewPtr_t webview, cWebView_onDialogPtr_t listener);
+	EXPORT   void                    aws_webview_setPrintListener (cWebViewPtr_t webview, cWebView_onPrintPtr_t listener);
+	EXPORT   void                    aws_webview_setDownloadListener (cWebViewPtr_t webview, cWebView_onDownloadPtr_t listener);
+	EXPORT   void                    aws_webview_setIMEListener (cWebViewPtr_t webview, cWebView_onIMEPtr_t listener);
 
-	EXPORT   void*                   aws_webview_getViewListener (cWebViewPtr_t webview);
-	EXPORT   void*                   aws_webview_getLoadListener (cWebViewPtr_t webview);
-	EXPORT   void*                   aws_webview_getProcessListener (cWebViewPtr_t webview);
-	EXPORT   void*                   aws_webview_getMenuListener (cWebViewPtr_t webview);
-	EXPORT   void*                   aws_webview_getDialogListener (cWebViewPtr_t webview);
-	EXPORT   void*                   aws_webview_getPrintListener (cWebViewPtr_t webview);
-	EXPORT   void*                   aws_webview_getDownloadListener (cWebViewPtr_t webview);
-	EXPORT   void*                   aws_webview_getIMEListener (cWebViewPtr_t webview);
+	EXPORT   cWebView_onViewPtr_t    aws_webview_getViewListener (cWebViewPtr_t webview);
+	EXPORT   cWebView_onLoadPtr_t    aws_webview_getLoadListener (cWebViewPtr_t webview);
+	EXPORT   cWebView_onProcessPtr_t aws_webview_getProcessListener (cWebViewPtr_t webview);
+	EXPORT   cWebView_onMenuPtr_t    aws_webview_getMenuListener (cWebViewPtr_t webview);
+	EXPORT   cWebView_onDialogPtr_t  aws_webview_getDialogListener (cWebViewPtr_t webview);
+	EXPORT   cWebView_onPrintPtr_t   aws_webview_getPrintListener (cWebViewPtr_t webview);
+	EXPORT   cWebView_onDownloadPtr_t aws_webview_getDownloadListener (cWebViewPtr_t webview);
+	EXPORT   cWebView_onIMEPtr_t     aws_webview_getIMEListener (cWebViewPtr_t webview);
 
 	EXPORT   void                    aws_webview_loadURL (cWebViewPtr_t webview, cWebUrlPtr_t url);
 	EXPORT   void                    aws_webview_goBack (cWebViewPtr_t webview);
@@ -223,8 +261,8 @@ extern "C" {
 	EXPORT   void                    aws_webview_injectMouseMove (cWebViewPtr_t webview, int mx, int my);
 	EXPORT   void                    aws_webview_injectMouseButton (cWebViewPtr_t webview, int button, bool down);
 	EXPORT   void                    aws_webview_injectMouseWheel (cWebViewPtr_t webview, int wx, int wy);
-	EXPORT   void                    aws_webview_injectKeyboardEvent (cWebViewPtr_t webview, void* keyevent);
-	EXPORT   void                    aws_webview_injectTouchEvent (cWebViewPtr_t webview, void* touchevent);
+	EXPORT   void                    aws_webview_injectKeyboardEvent (cWebViewPtr_t webview, cKeyboardEvtPtr_t keyevent);
+	EXPORT   void                    aws_webview_injectTouchEvent (cWebViewPtr_t webview, cTouchEvtPtr_t touchevent);
 	EXPORT   void                    aws_webview_activateIME (cWebViewPtr_t webview, bool state);
 	EXPORT   void                    aws_webview_setIMEComposition (cWebViewPtr_t webview, cString target_string, int cursorpos, int targetstart, int tartgetend);
 	EXPORT   void                    aws_webview_cancelIMEComposition (cWebViewPtr_t webview);
@@ -241,7 +279,7 @@ extern "C" {
 	EXPORT   cJSValuePtr_t           aws_webview_createGlobalJSObject (cWebViewPtr_t webview, cString objname);
 	EXPORT   void                    aws_webview_executeJS (cWebViewPtr_t webview, cString script, cString fxpath);
 	EXPORT   cJSValuePtr_t           aws_webview_executeJSWithResult (cWebViewPtr_t webview, cString script, cString fxpath);
-	EXPORT   void                    aws_webview_setJSMethodHandler (cWebViewPtr_t webview, void* jshandler);
+	EXPORT   void                    aws_webview_setJSMethodHandler (cWebViewPtr_t webview, cJSMethodHandlerPtr_t jshandler);
 	EXPORT   void                    aws_webview_didSelectPopupMenuItem (cWebViewPtr_t webview, int idx);
 	EXPORT   void                    aws_webview_didCancelPopupMenu (cWebViewPtr_t webview);
 	EXPORT   void                    aws_webview_didChooseFiles (cWebViewPtr_t webview, cStringArray arr, bool write);
@@ -359,6 +397,36 @@ extern "C" {
 
 	EXPORT   cSurfacePtr_t           aws_bitmapsurface_create (cWebViewPtr_t webview, int width, int height);
 	EXPORT   void                    aws_bitmapsurface_destroy (cSurfacePtr_t surface);
+
+	//================================
+	// JS HANDLER STUFF
+
+	EXPORT   void                    aws_webview_setInternalJSHandler (cWebViewPtr_t webview);
+
+	EXPORT   void                    aws_jshandler_addCallback (cWebViewPtr_t webview, jshnd_onMethodCall callback);
+	EXPORT   void                    aws_jshandler_addCallbackValue (cWebViewPtr_t webview, jshnd_onMethodCallValue callback);
+
+	EXPORT   void                    aws_jshandler_removeCallback (cWebViewPtr_t webview, jshnd_onMethodCall callback);
+	EXPORT   void                    aws_jshandler_removeCallbackValue (cWebViewPtr_t webview);
+	EXPORT   void                    aws_jshandler_removeCallbackAll (cWebViewPtr_t webview);
+
+	//================================
+	// WEBVIEW HANDLERS STUFF
+
+	// this functions sets internal wrapper listener which allow setting callbacks to that events
+	EXPORT   void                    aws_webview_setInternalLoadHandler (cWebViewPtr_t webview);
+	EXPORT   void                    aws_webview_setInternalViewHandler (cWebViewPtr_t webview);
+	EXPORT   void                    aws_webview_setInternalPrintHandler (cWebViewPtr_t webview);
+	EXPORT   void                    aws_webview_setInternalProcessHandler (cWebViewPtr_t webview);
+	EXPORT   void                    aws_webview_setInternalMenuHandler (cWebViewPtr_t webview);
+	EXPORT   void                    aws_webview_setInternalDownloadHandler (cWebViewPtr_t webview);
+	EXPORT   void                    aws_webview_setInternalIMEHandler (cWebViewPtr_t webview);
+
+	//================================
+	// RESOURCE INTERCEPTOR STUFF
+
+	// ===== RESOURCE REQUEST ======
+	EXPORT   void                    aws_resrequest_cancel (cResRequestPtr_t request);
 
 #ifdef __cplusplus
 }

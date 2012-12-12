@@ -82,7 +82,7 @@
 
   /// This event occurs when a frame fails to load. See error_desc
   /// for additional information.
-   void OnFailLoadingFrame(Awesomium::WebView* caller,
+   void WebViewListener_Load::OnFailLoadingFrame(Awesomium::WebView* caller,
                                   int64 frame_id,
                                   bool is_main_frame,
                                   const Awesomium::WebURL& url,
