@@ -53,6 +53,10 @@
       <AdditionalLibraryDirectories>..\deps\lib</AdditionalLibraryDirectories>
       <AdditionalDependencies>awesomium.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
+    <PostBuildEvent>
+      <Command>coffimplib $(OutDir)$(TargetName).lib $(OutDir)$(TargetName)_omf.lib</Command>
+      <Message>convert import lib to OMF format</Message>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>

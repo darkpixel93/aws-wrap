@@ -9,7 +9,8 @@ Copyright (C) 2012 evilrat
 module awesomium.webcore;
 
 import awesomium.capi, awesomium.util, 
-	awesomium.webview, awesomium.websession;
+	awesomium.webview, awesomium.websession,
+	awesomium.webstring;
 
 class WebCore
 {
@@ -18,7 +19,7 @@ public:
 	{
 		if  ( !_instance ) {
 			_instance = new WebCore();
-			_internal = cast(cWebCore*) aws_webcore_init(conf.toCWebConf);
+			_internal = cast(cWebCorePtr_t) aws_webcore_init(conf.toCWebConf);
 		}
 
 		return _instance;
@@ -35,7 +36,7 @@ public:
 	WebSession CreateWebSession(string path, WebPreferences prefs = WebPreferences.init)
 	{
 		auto ses = new WebSession();
-		ses._internal = aws_webcore_createWebSession( this, path.toCString, prefs.toCWebPrefs );
+		ses._internal = aws_webcore_createWebSession( this, new WebString(path), prefs.toCWebPrefs );
 		return ses;
 	}
 
@@ -44,7 +45,7 @@ public:
 						  WebViewType type = WebViewType.OFFSCREEN)
 	{
 		auto view = new WebView();
-		cWebSession* ses;
+		cWebSessionPtr_t ses;
 
 		if  ( session is null )
 			ses = null;
@@ -82,7 +83,7 @@ package:
 	alias _internal this;
 	this() {}; // better to disable it?
 
-	static cWebCore* _internal;
+	static cWebCorePtr_t _internal;
 	static WebCore _instance;
 }
 

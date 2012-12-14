@@ -12,18 +12,18 @@ Copyright (C) 2012 evilrat
 #if defined(WRAPEXPORT)
 #	ifdef _WIN32
 #		ifdef _MSC_VER
-#			define EXPORT __declspec(dllexport)
+#			define AWS_EXPORT __declspec(dllexport)
 #		endif
 #	else
-#		define EXPORT 
+#		define AWS_EXPORT 
 #	endif
 #else
 #	ifdef _WIN32
 #		ifdef _MSC_VER
-#			define EXPORT __declspec(dllimport)
+#			define AWS_EXPORT __declspec(dllimport)
 #		endif
 #	else
-#		define EXPORT
+#		define AWS_EXPORT
 #	endif
 #endif
 
@@ -117,25 +117,28 @@ extern "C" {
 	// YOU CAN USE THEM IF UR LANGUAGE SUPPORT CPP CLASSES(MUAHAHAH!!)
 	// ---------------------------------------
 
-	typedef struct _cWebView cWebView_t, *cWebViewPtr_t;
+	typedef struct _cWebView *cWebViewPtr_t;
 
-	typedef struct _cWebCore cWebCore_t, *cWebCorePtr_t;
+	typedef struct _cWebCore  *cWebCorePtr_t;
 
-	typedef struct _cWebUrl cWebUrl_t, *cWebUrlPtr_t;
+	typedef struct _cWebUrl  *cWebUrlPtr_t;
 
-	typedef struct _cWebSession cWebSession_t, *cWebSessionPtr_t;
+	typedef struct _cWebSession  *cWebSessionPtr_t;
 
-
-	typedef struct _cWebString cWebString_t, *cWebStringPtr_t;
-
-	typedef struct _cWebStringArray cWebStringArray_t, *cWebStringArrayPtr_t;
+	
+	typedef struct _cDataSource *cDataSourcePtr_t;
 
 
-	typedef struct _cJSObject cJSObject_t, *cJSObjectPtr_t;
+	typedef struct _cWebString  *cWebStringPtr_t;
 
-	typedef struct _cJSArray cJSArray_t, *cJSArrayPtr_t;
+	typedef struct _cWebStringArray  *cWebStringArrayPtr_t;
 
-	typedef struct _cJSValue cJSValue_t, *cJSValuePtr_t;
+
+	typedef struct _cJSObject  *cJSObjectPtr_t;
+
+	typedef struct _cJSArray  *cJSArrayPtr_t;
+
+	typedef struct _cJSValue  *cJSValuePtr_t;
 
 	typedef struct _cJSMethodHandler *cJSMethodHandlerPtr_t;
 
@@ -145,18 +148,20 @@ extern "C" {
 	typedef struct _cTouchEvt *cTouchEvtPtr_t;
 
 
-	typedef struct _cSurface cSurface_t, *cSurfacePtr_t;
+	typedef struct _cSurface  *cSurfacePtr_t;
 
-	typedef struct _cBitSurface cBitSurface_t, *cBitSurfacePtr_t;
+	typedef struct _cBitSurface  *cBitSurfacePtr_t;
 
-	typedef struct _cSurfaceFactory cSurfaceFactory_t, *cSurfaceFactoryPtr_t;
+	typedef struct _cSurfaceFactory  *cSurfaceFactoryPtr_t;
 
 
-	typedef struct _cResInterceptor cResInterceptor_t, *cResInterceptorPtr_t;
+	typedef struct _cResInterceptor  *cResInterceptorPtr_t;
 
-	typedef struct _cResRequest cResRequest_t, *cResRequestPtr_t;
+	typedef struct _cResRequest  *cResRequestPtr_t;
 
-	typedef struct _cResResponse cResResponse_t, *cResResponsePtr_t;
+	typedef struct _cResResponse  *cResResponsePtr_t;
+
+	typedef struct _cUploadElement *cUploadElementPtr_t;
 
 
 	typedef struct _cWebView_onView *cWebView_onViewPtr_t;
@@ -186,247 +191,286 @@ extern "C" {
 
 
 	// ====== WEB STRING ======
-	EXPORT   cWebStringPtr_t         aws_webstring_new ();
-	EXPORT   cWebStringPtr_t         aws_webstring_new_substring (cWebStringPtr_t srcstring, unsigned start, unsigned len);
-	EXPORT   cWebStringPtr_t         aws_webstring_new_utf8 (const char* string, unsigned len);
+	AWS_EXPORT   cWebStringPtr_t         aws_webstring_new ();
+	AWS_EXPORT   cWebStringPtr_t         aws_webstring_new_substring (cWebStringPtr_t srcstring, unsigned start, unsigned len);
+	AWS_EXPORT   cWebStringPtr_t         aws_webstring_new_utf8 (const char* string, unsigned len);
 
-	EXPORT   void                    aws_webstring_delete (cWebStringPtr_t string);
+	AWS_EXPORT   void                    aws_webstring_delete (cWebStringPtr_t string);
 
-	EXPORT   unsigned                aws_webstring_to_utf8 (cWebStringPtr_t string, char* dest);
-	EXPORT   cString                 aws_webstring_to_cstring (cWebStringPtr_t string);
+	AWS_EXPORT   unsigned                aws_webstring_to_utf8 (cWebStringPtr_t string, char* dest);
+	AWS_EXPORT   cString                 aws_webstring_to_cstring (cWebStringPtr_t string);
 
 	// ====== WEB CORE =======
-	EXPORT   const cWebCorePtr_t     aws_webcore_init (cWebConf wc);
-	EXPORT   const cWebCorePtr_t     aws_webcore_initDefault ();
-	EXPORT   void                    aws_webcore_shutdown ();
-	EXPORT   const cWebCorePtr_t     aws_webcore_instance ();
-	EXPORT   cWebSessionPtr_t        aws_webcore_createWebSession (cWebCorePtr_t webcore, cString path, cWebPrefs wp);
-	EXPORT   cWebViewPtr_t           aws_webcore_createWebView (cWebCorePtr_t webcore, int w, int h, cWebSessionPtr_t sess, int type);
-	EXPORT   void                    aws_webcore_setSurfaceFactory (cWebCorePtr_t webcore, cSurfaceFactoryPtr_t factory);
-	EXPORT   cSurfaceFactoryPtr_t    aws_webcore_getSurfaceFactory (cWebCorePtr_t webcore);
-	EXPORT   void                    aws_webcore_setResourceInterceptor (cWebCorePtr_t webcore, cResInterceptorPtr_t interceptor);
-	EXPORT   cResInterceptorPtr_t    aws_webcore_getResourceInterceptor (cWebCorePtr_t webcore);
-	EXPORT   void                    aws_webcore_update (cWebCorePtr_t webcore);
-	EXPORT   const char*             aws_webcore_versionString (cWebCorePtr_t webcore);
+	AWS_EXPORT   const cWebCorePtr_t     aws_webcore_init (cWebConf wc);
+	AWS_EXPORT   const cWebCorePtr_t     aws_webcore_initDefault ();
+	AWS_EXPORT   void                    aws_webcore_shutdown ();
+	AWS_EXPORT   const cWebCorePtr_t     aws_webcore_instance ();
+	AWS_EXPORT   cWebSessionPtr_t        aws_webcore_createWebSession (cWebCorePtr_t webcore, cWebStringPtr_t path, cWebPrefs wp);
+	AWS_EXPORT   cWebViewPtr_t           aws_webcore_createWebView (cWebCorePtr_t webcore, int w, int h, cWebSessionPtr_t sess, int type);
+	AWS_EXPORT   void                    aws_webcore_setSurfaceFactory (cWebCorePtr_t webcore, cSurfaceFactoryPtr_t factory);
+	AWS_EXPORT   cSurfaceFactoryPtr_t    aws_webcore_getSurfaceFactory (cWebCorePtr_t webcore);
+	AWS_EXPORT   void                    aws_webcore_setResourceInterceptor (cWebCorePtr_t webcore, cResInterceptorPtr_t interceptor);
+	AWS_EXPORT   cResInterceptorPtr_t    aws_webcore_getResourceInterceptor (cWebCorePtr_t webcore);
+	AWS_EXPORT   void                    aws_webcore_update (cWebCorePtr_t webcore);
+	AWS_EXPORT   const char*             aws_webcore_versionString (cWebCorePtr_t webcore);
 
 	// ====== WEB VIEW =======
-	EXPORT   void                    aws_webview_destroy (cWebViewPtr_t webview);
-	EXPORT   int                     aws_webview_getType (cWebViewPtr_t webview);
-	EXPORT   int                     aws_webview_getProcId (cWebViewPtr_t webview);
-	EXPORT   void*                   aws_webview_getHandle (cWebViewPtr_t webview);
-	EXPORT   void                    aws_webview_setParentWindow (cWebViewPtr_t webview, void* window);
-	EXPORT   void*                   aws_webview_getParentWindow (cWebViewPtr_t webview);
-	EXPORT   void*                   aws_webview_getWindow (cWebViewPtr_t webview);
+	AWS_EXPORT   void                    aws_webview_destroy (cWebViewPtr_t webview);
+	AWS_EXPORT   int                     aws_webview_getType (cWebViewPtr_t webview);
+	AWS_EXPORT   int                     aws_webview_getProcId (cWebViewPtr_t webview);
+	AWS_EXPORT   void*                   aws_webview_getHandle (cWebViewPtr_t webview);
+	AWS_EXPORT   void                    aws_webview_setParentWindow (cWebViewPtr_t webview, void* window);
+	AWS_EXPORT   void*                   aws_webview_getParentWindow (cWebViewPtr_t webview);
+	AWS_EXPORT   void*                   aws_webview_getWindow (cWebViewPtr_t webview);
 
-	EXPORT   void                    aws_webview_setViewListener (cWebViewPtr_t webview, cWebView_onViewPtr_t listener);
-	EXPORT   void                    aws_webview_setLoadListener (cWebViewPtr_t webview, cWebView_onLoadPtr_t listener);
-	EXPORT   void                    aws_webview_setProcessListener (cWebViewPtr_t webview, cWebView_onProcessPtr_t listener);
-	EXPORT   void                    aws_webview_setMenuListener (cWebViewPtr_t webview, cWebView_onMenuPtr_t listener);
-	EXPORT   void                    aws_webview_setDialogListener (cWebViewPtr_t webview, cWebView_onDialogPtr_t listener);
-	EXPORT   void                    aws_webview_setPrintListener (cWebViewPtr_t webview, cWebView_onPrintPtr_t listener);
-	EXPORT   void                    aws_webview_setDownloadListener (cWebViewPtr_t webview, cWebView_onDownloadPtr_t listener);
-	EXPORT   void                    aws_webview_setIMEListener (cWebViewPtr_t webview, cWebView_onIMEPtr_t listener);
+	AWS_EXPORT   void                    aws_webview_setViewListener (cWebViewPtr_t webview, cWebView_onViewPtr_t listener);
+	AWS_EXPORT   void                    aws_webview_setLoadListener (cWebViewPtr_t webview, cWebView_onLoadPtr_t listener);
+	AWS_EXPORT   void                    aws_webview_setProcessListener (cWebViewPtr_t webview, cWebView_onProcessPtr_t listener);
+	AWS_EXPORT   void                    aws_webview_setMenuListener (cWebViewPtr_t webview, cWebView_onMenuPtr_t listener);
+	AWS_EXPORT   void                    aws_webview_setDialogListener (cWebViewPtr_t webview, cWebView_onDialogPtr_t listener);
+	AWS_EXPORT   void                    aws_webview_setPrintListener (cWebViewPtr_t webview, cWebView_onPrintPtr_t listener);
+	AWS_EXPORT   void                    aws_webview_setDownloadListener (cWebViewPtr_t webview, cWebView_onDownloadPtr_t listener);
+	AWS_EXPORT   void                    aws_webview_setIMEListener (cWebViewPtr_t webview, cWebView_onIMEPtr_t listener);
 
-	EXPORT   cWebView_onViewPtr_t    aws_webview_getViewListener (cWebViewPtr_t webview);
-	EXPORT   cWebView_onLoadPtr_t    aws_webview_getLoadListener (cWebViewPtr_t webview);
-	EXPORT   cWebView_onProcessPtr_t aws_webview_getProcessListener (cWebViewPtr_t webview);
-	EXPORT   cWebView_onMenuPtr_t    aws_webview_getMenuListener (cWebViewPtr_t webview);
-	EXPORT   cWebView_onDialogPtr_t  aws_webview_getDialogListener (cWebViewPtr_t webview);
-	EXPORT   cWebView_onPrintPtr_t   aws_webview_getPrintListener (cWebViewPtr_t webview);
-	EXPORT   cWebView_onDownloadPtr_t aws_webview_getDownloadListener (cWebViewPtr_t webview);
-	EXPORT   cWebView_onIMEPtr_t     aws_webview_getIMEListener (cWebViewPtr_t webview);
+	AWS_EXPORT   cWebView_onViewPtr_t    aws_webview_getViewListener (cWebViewPtr_t webview);
+	AWS_EXPORT   cWebView_onLoadPtr_t    aws_webview_getLoadListener (cWebViewPtr_t webview);
+	AWS_EXPORT   cWebView_onProcessPtr_t aws_webview_getProcessListener (cWebViewPtr_t webview);
+	AWS_EXPORT   cWebView_onMenuPtr_t    aws_webview_getMenuListener (cWebViewPtr_t webview);
+	AWS_EXPORT   cWebView_onDialogPtr_t  aws_webview_getDialogListener (cWebViewPtr_t webview);
+	AWS_EXPORT   cWebView_onPrintPtr_t   aws_webview_getPrintListener (cWebViewPtr_t webview);
+	AWS_EXPORT   cWebView_onDownloadPtr_t aws_webview_getDownloadListener (cWebViewPtr_t webview);
+	AWS_EXPORT   cWebView_onIMEPtr_t     aws_webview_getIMEListener (cWebViewPtr_t webview);
 
-	EXPORT   void                    aws_webview_loadURL (cWebViewPtr_t webview, cWebUrlPtr_t url);
-	EXPORT   void                    aws_webview_goBack (cWebViewPtr_t webview);
-	EXPORT   void                    aws_webview_goForward(cWebViewPtr_t webview);
-	EXPORT   void                    aws_webview_goToHistoryOffset (cWebViewPtr_t webview, int offset);
-	EXPORT   void                    aws_webview_stop (cWebViewPtr_t webview);
-	EXPORT   void                    aws_webview_reload (cWebViewPtr_t webview, bool ignoreCache);
-	EXPORT   bool                    aws_webview_canGoBack (cWebViewPtr_t webview);
-	EXPORT   bool                    aws_webview_canGoForward (cWebViewPtr_t webview);
-	EXPORT   cSurfacePtr_t           aws_webview_getSurface (cWebViewPtr_t webview);
-	EXPORT   cWebUrlPtr_t            aws_webview_getURL (cWebViewPtr_t webview);
-	EXPORT   cWebStringPtr_t         aws_webview_getTitle (cWebViewPtr_t webview);
-	EXPORT   cWebSessionPtr_t        aws_webview_getSession (cWebViewPtr_t webview);
-	EXPORT   bool                    aws_webview_isLoading (cWebViewPtr_t webview);
-	EXPORT   bool                    aws_webview_isCrashed (cWebViewPtr_t webview);
-	EXPORT   void                    aws_webview_resize (cWebViewPtr_t webview, int x, int y);
-	EXPORT   void                    aws_webview_setTransparent (cWebViewPtr_t webview, bool state);
-	EXPORT   bool                    aws_webview_isTransparent (cWebViewPtr_t webview);
-	EXPORT   void                    aws_webview_pauseRendering (cWebViewPtr_t webview);
-	EXPORT   void                    aws_webview_resumeRendering (cWebViewPtr_t webview);
-	EXPORT   void                    aws_webview_focus (cWebViewPtr_t webview);
-	EXPORT   void                    aws_webview_unfocus (cWebViewPtr_t webview);
-	EXPORT   int                     aws_webview_focusedElementType (cWebViewPtr_t webview);
-	EXPORT   void                    aws_webview_injectMouseMove (cWebViewPtr_t webview, int mx, int my);
-	EXPORT   void                    aws_webview_injectMouseButton (cWebViewPtr_t webview, int button, bool down);
-	EXPORT   void                    aws_webview_injectMouseWheel (cWebViewPtr_t webview, int wx, int wy);
-	EXPORT   void                    aws_webview_injectKeyboardEvent (cWebViewPtr_t webview, cKeyboardEvtPtr_t keyevent);
-	EXPORT   void                    aws_webview_injectTouchEvent (cWebViewPtr_t webview, cTouchEvtPtr_t touchevent);
-	EXPORT   void                    aws_webview_activateIME (cWebViewPtr_t webview, bool state);
-	EXPORT   void                    aws_webview_setIMEComposition (cWebViewPtr_t webview, cString target_string, int cursorpos, int targetstart, int tartgetend);
-	EXPORT   void                    aws_webview_cancelIMEComposition (cWebViewPtr_t webview);
-	EXPORT   void                    aws_webview_undo (cWebViewPtr_t webview);
-	EXPORT   void                    aws_webview_redo (cWebViewPtr_t webview);
-	EXPORT   void                    aws_webview_cut (cWebViewPtr_t webview);
-	EXPORT   void                    aws_webview_copy (cWebViewPtr_t webview);
-	EXPORT   void                    aws_webview_copyImageAt (cWebViewPtr_t webview, int x, int y);
-	EXPORT   void                    aws_webview_paste (cWebViewPtr_t webview);
-	EXPORT   void                    aws_webview_pasteAndMatchStyle (cWebViewPtr_t webview);
-	EXPORT   void                    aws_webview_selectAll (cWebViewPtr_t webview);
-	EXPORT   void                    aws_webview_printToFile (cWebViewPtr_t webview, cString outDir, void* printconf);
-	EXPORT   int                     aws_webview_lastError (cWebViewPtr_t webview);
-	EXPORT   cJSValuePtr_t           aws_webview_createGlobalJSObject (cWebViewPtr_t webview, cString objname);
-	EXPORT   void                    aws_webview_executeJS (cWebViewPtr_t webview, cString script, cString fxpath);
-	EXPORT   cJSValuePtr_t           aws_webview_executeJSWithResult (cWebViewPtr_t webview, cString script, cString fxpath);
-	EXPORT   void                    aws_webview_setJSMethodHandler (cWebViewPtr_t webview, cJSMethodHandlerPtr_t jshandler);
-	EXPORT   void                    aws_webview_didSelectPopupMenuItem (cWebViewPtr_t webview, int idx);
-	EXPORT   void                    aws_webview_didCancelPopupMenu (cWebViewPtr_t webview);
-	EXPORT   void                    aws_webview_didChooseFiles (cWebViewPtr_t webview, cStringArray arr, bool write);
-	EXPORT   void                    aws_webview_didLogin (cWebViewPtr_t webview, int reqId, cString uname, cString pwd);
-	EXPORT   void                    aws_webview_didCancelLogin (cWebViewPtr_t webview, int reqId);
-	EXPORT   void                    aws_webview_didChooseDownloadPath (cWebViewPtr_t webview, int downloadId, cString path);
-	EXPORT   void                    aws_webview_didCancelDownload (cWebViewPtr_t webview, int downloadId);
+	AWS_EXPORT   void                    aws_webview_loadURL (cWebViewPtr_t webview, cWebUrlPtr_t url);
+	AWS_EXPORT   void                    aws_webview_goBack (cWebViewPtr_t webview);
+	AWS_EXPORT   void                    aws_webview_goForward(cWebViewPtr_t webview);
+	AWS_EXPORT   void                    aws_webview_goToHistoryOffset (cWebViewPtr_t webview, int offset);
+	AWS_EXPORT   void                    aws_webview_stop (cWebViewPtr_t webview);
+	AWS_EXPORT   void                    aws_webview_reload (cWebViewPtr_t webview, bool ignoreCache);
+	AWS_EXPORT   bool                    aws_webview_canGoBack (cWebViewPtr_t webview);
+	AWS_EXPORT   bool                    aws_webview_canGoForward (cWebViewPtr_t webview);
+	AWS_EXPORT   cSurfacePtr_t           aws_webview_getSurface (cWebViewPtr_t webview);
+	AWS_EXPORT   cWebUrlPtr_t            aws_webview_getURL (cWebViewPtr_t webview);
+	AWS_EXPORT   cWebStringPtr_t         aws_webview_getTitle (cWebViewPtr_t webview);
+	AWS_EXPORT   cWebSessionPtr_t        aws_webview_getSession (cWebViewPtr_t webview);
+	AWS_EXPORT   bool                    aws_webview_isLoading (cWebViewPtr_t webview);
+	AWS_EXPORT   bool                    aws_webview_isCrashed (cWebViewPtr_t webview);
+	AWS_EXPORT   void                    aws_webview_resize (cWebViewPtr_t webview, int x, int y);
+	AWS_EXPORT   void                    aws_webview_setTransparent (cWebViewPtr_t webview, bool state);
+	AWS_EXPORT   bool                    aws_webview_isTransparent (cWebViewPtr_t webview);
+	AWS_EXPORT   void                    aws_webview_pauseRendering (cWebViewPtr_t webview);
+	AWS_EXPORT   void                    aws_webview_resumeRendering (cWebViewPtr_t webview);
+	AWS_EXPORT   void                    aws_webview_focus (cWebViewPtr_t webview);
+	AWS_EXPORT   void                    aws_webview_unfocus (cWebViewPtr_t webview);
+	AWS_EXPORT   int                     aws_webview_focusedElementType (cWebViewPtr_t webview);
+	AWS_EXPORT   void                    aws_webview_injectMouseMove (cWebViewPtr_t webview, int mx, int my);
+	AWS_EXPORT   void                    aws_webview_injectMouseButton (cWebViewPtr_t webview, int button, bool down);
+	AWS_EXPORT   void                    aws_webview_injectMouseWheel (cWebViewPtr_t webview, int wx, int wy);
+	AWS_EXPORT   void                    aws_webview_injectKeyboardEvent (cWebViewPtr_t webview, cKeyboardEvtPtr_t keyevent);
+	AWS_EXPORT   void                    aws_webview_injectTouchEvent (cWebViewPtr_t webview, cTouchEvtPtr_t touchevent);
+	AWS_EXPORT   void                    aws_webview_activateIME (cWebViewPtr_t webview, bool state);
+	AWS_EXPORT   void                    aws_webview_setIMEComposition (cWebViewPtr_t webview, cWebStringPtr_t target_string, int cursorpos, int targetstart, int tartgetend);
+	AWS_EXPORT   void                    aws_webview_cancelIMEComposition (cWebViewPtr_t webview);
+	AWS_EXPORT   void                    aws_webview_undo (cWebViewPtr_t webview);
+	AWS_EXPORT   void                    aws_webview_redo (cWebViewPtr_t webview);
+	AWS_EXPORT   void                    aws_webview_cut (cWebViewPtr_t webview);
+	AWS_EXPORT   void                    aws_webview_copy (cWebViewPtr_t webview);
+	AWS_EXPORT   void                    aws_webview_copyImageAt (cWebViewPtr_t webview, int x, int y);
+	AWS_EXPORT   void                    aws_webview_paste (cWebViewPtr_t webview);
+	AWS_EXPORT   void                    aws_webview_pasteAndMatchStyle (cWebViewPtr_t webview);
+	AWS_EXPORT   void                    aws_webview_selectAll (cWebViewPtr_t webview);
+	AWS_EXPORT   void                    aws_webview_printToFile (cWebViewPtr_t webview, cWebStringPtr_t outDir, void* printconf);
+	AWS_EXPORT   int                     aws_webview_lastError (cWebViewPtr_t webview);
+	AWS_EXPORT   cJSValuePtr_t           aws_webview_createGlobalJSObject (cWebViewPtr_t webview, cWebStringPtr_t objname);
+	AWS_EXPORT   void                    aws_webview_executeJS (cWebViewPtr_t webview, cWebStringPtr_t script, cWebStringPtr_t fxpath);
+	AWS_EXPORT   cJSValuePtr_t           aws_webview_executeJSWithResult (cWebViewPtr_t webview, cWebStringPtr_t script, cWebStringPtr_t fxpath);
+	AWS_EXPORT   void                    aws_webview_setJSMethodHandler (cWebViewPtr_t webview, cJSMethodHandlerPtr_t jshandler);
+	AWS_EXPORT   void                    aws_webview_didSelectPopupMenuItem (cWebViewPtr_t webview, int idx);
+	AWS_EXPORT   void                    aws_webview_didCancelPopupMenu (cWebViewPtr_t webview);
+	AWS_EXPORT   void                    aws_webview_didChooseFiles (cWebViewPtr_t webview, cWebStringArrayPtr_t arr, bool write);
+	AWS_EXPORT   void                    aws_webview_didLogin (cWebViewPtr_t webview, int reqId, cWebStringPtr_t uname, cWebStringPtr_t pwd);
+	AWS_EXPORT   void                    aws_webview_didCancelLogin (cWebViewPtr_t webview, int reqId);
+	AWS_EXPORT   void                    aws_webview_didChooseDownloadPath (cWebViewPtr_t webview, int downloadId, cWebStringPtr_t path);
+	AWS_EXPORT   void                    aws_webview_didCancelDownload (cWebViewPtr_t webview, int downloadId);
 
 	// ====== JS VALUE =======
-	EXPORT   cJSValuePtr_t           aws_jsvalue_new_bool (bool val);
-	EXPORT   cJSValuePtr_t           aws_jsvalue_new_int (int val);
-	EXPORT   cJSValuePtr_t           aws_jsvalue_new_double (double val);
-	EXPORT   cJSValuePtr_t           aws_jsvalue_new_string (cString val);
-	EXPORT   cJSValuePtr_t           aws_jsvalue_new_object (cJSObjectPtr_t val);
-	EXPORT   cJSValuePtr_t           aws_jsvalue_new_array (cJSArrayPtr_t val);
-	EXPORT   cJSValuePtr_t           aws_jsvalue_new_jsvalue (cJSValuePtr_t val);
+	AWS_EXPORT   cJSValuePtr_t           aws_jsvalue_new_bool (bool val);
+	AWS_EXPORT   cJSValuePtr_t           aws_jsvalue_new_int (int val);
+	AWS_EXPORT   cJSValuePtr_t           aws_jsvalue_new_double (double val);
+	AWS_EXPORT   cJSValuePtr_t           aws_jsvalue_new_string (cWebStringPtr_t val);
+	AWS_EXPORT   cJSValuePtr_t           aws_jsvalue_new_object (cJSObjectPtr_t val);
+	AWS_EXPORT   cJSValuePtr_t           aws_jsvalue_new_array (cJSArrayPtr_t val);
+	AWS_EXPORT   cJSValuePtr_t           aws_jsvalue_new_jsvalue (cJSValuePtr_t val);
 
-	EXPORT   void                    aws_jsvalue_delete (cJSValuePtr_t jsvalue);
+	AWS_EXPORT   void                    aws_jsvalue_delete (cJSValuePtr_t jsvalue);
 
-	EXPORT   const cJSValuePtr_t     aws_jsvalue_undefined ();
-	EXPORT   const cJSValuePtr_t     aws_jsvalue_null ();
+	AWS_EXPORT   const cJSValuePtr_t     aws_jsvalue_undefined ();
+	AWS_EXPORT   const cJSValuePtr_t     aws_jsvalue_null ();
 
-	EXPORT   bool                    aws_jsvalue_isBoolean (cJSValuePtr_t jsval);
-	EXPORT   bool                    aws_jsvalue_isInteger (cJSValuePtr_t jsval);
-	EXPORT   bool                    aws_jsvalue_isDouble (cJSValuePtr_t jsval);
-	EXPORT   bool                    aws_jsvalue_isNumber (cJSValuePtr_t jsval);
-	EXPORT   bool                    aws_jsvalue_isString (cJSValuePtr_t jsval);
-	EXPORT   bool                    aws_jsvalue_isArray (cJSValuePtr_t jsval);
-	EXPORT   bool                    aws_jsvalue_isObject (cJSValuePtr_t jsval);
-	EXPORT   bool                    aws_jsvalue_isNull (cJSValuePtr_t jsval);
-	EXPORT   bool                    aws_jsvalue_isUndefined (cJSValuePtr_t jsval);
+	AWS_EXPORT   bool                    aws_jsvalue_isBoolean (cJSValuePtr_t jsval);
+	AWS_EXPORT   bool                    aws_jsvalue_isInteger (cJSValuePtr_t jsval);
+	AWS_EXPORT   bool                    aws_jsvalue_isDouble (cJSValuePtr_t jsval);
+	AWS_EXPORT   bool                    aws_jsvalue_isNumber (cJSValuePtr_t jsval);
+	AWS_EXPORT   bool                    aws_jsvalue_isString (cJSValuePtr_t jsval);
+	AWS_EXPORT   bool                    aws_jsvalue_isArray (cJSValuePtr_t jsval);
+	AWS_EXPORT   bool                    aws_jsvalue_isObject (cJSValuePtr_t jsval);
+	AWS_EXPORT   bool                    aws_jsvalue_isNull (cJSValuePtr_t jsval);
+	AWS_EXPORT   bool                    aws_jsvalue_isUndefined (cJSValuePtr_t jsval);
 
-	EXPORT   cString                 aws_jsvalue_toString (cJSValuePtr_t jsval);
-	EXPORT   int                     aws_jsvalue_toInteger (cJSValuePtr_t jsval);
-	EXPORT   double                  aws_jsvalue_toDouble (cJSValuePtr_t jsval);
-	EXPORT   bool                    aws_jsvalue_toBoolean (cJSValuePtr_t jsval);
-	EXPORT   cJSArrayPtr_t           aws_jsvalue_toArray (cJSValuePtr_t jsval);
-	EXPORT   cJSObjectPtr_t          aws_jsvalue_toObject (cJSValuePtr_t jsval);
+	AWS_EXPORT   cWebStringPtr_t         aws_jsvalue_toString (cJSValuePtr_t jsval);
+	AWS_EXPORT   int                     aws_jsvalue_toInteger (cJSValuePtr_t jsval);
+	AWS_EXPORT   double                  aws_jsvalue_toDouble (cJSValuePtr_t jsval);
+	AWS_EXPORT   bool                    aws_jsvalue_toBoolean (cJSValuePtr_t jsval);
+	AWS_EXPORT   cJSArrayPtr_t           aws_jsvalue_toArray (cJSValuePtr_t jsval);
+	AWS_EXPORT   cJSObjectPtr_t          aws_jsvalue_toObject (cJSValuePtr_t jsval);
 
 	// ====== JS OBJECT =======
-	EXPORT   cJSObjectPtr_t          aws_jsobject_new ();
+	AWS_EXPORT   cJSObjectPtr_t          aws_jsobject_new ();
 
-	EXPORT   void                    aws_jsobject_delete (cJSObjectPtr_t jsobj);
+	AWS_EXPORT   void                    aws_jsobject_delete (cJSObjectPtr_t jsobj);
 
-	EXPORT   unsigned                aws_jsobject_getRemoteId (cJSObjectPtr_t jsobj);
-	EXPORT   int                     aws_jsobject_getRefCount (cJSObjectPtr_t jsobj);
-	EXPORT   int                     aws_jsobject_getType (cJSObjectPtr_t jsobj);
-	EXPORT   const cWebViewPtr_t     aws_jsobject_getOwner (cJSObjectPtr_t jsobj);
+	AWS_EXPORT   unsigned                aws_jsobject_getRemoteId (cJSObjectPtr_t jsobj);
+	AWS_EXPORT   int                     aws_jsobject_getRefCount (cJSObjectPtr_t jsobj);
+	AWS_EXPORT   int                     aws_jsobject_getType (cJSObjectPtr_t jsobj);
+	AWS_EXPORT   const cWebViewPtr_t     aws_jsobject_getOwner (cJSObjectPtr_t jsobj);
 
-	EXPORT   bool                    aws_jsobject_hasProperty (cJSObjectPtr_t jsobj, cString name);
-	EXPORT   cJSValuePtr_t           aws_jsobject_getProperty (cJSObjectPtr_t jsobj, cString name);
-	EXPORT   void                    aws_jsobject_setProperty (cJSObjectPtr_t jsobj, cString name, cJSValuePtr_t jsval);
-	EXPORT   void                    aws_jsobject_removeProperty (cJSObjectPtr_t jsobj, cString name);
+	AWS_EXPORT   bool                    aws_jsobject_hasProperty (cJSObjectPtr_t jsobj, cWebStringPtr_t name);
+	AWS_EXPORT   cJSValuePtr_t           aws_jsobject_getProperty (cJSObjectPtr_t jsobj, cWebStringPtr_t name);
+	AWS_EXPORT   void                    aws_jsobject_setProperty (cJSObjectPtr_t jsobj, cWebStringPtr_t name, cJSValuePtr_t jsval);
+	AWS_EXPORT   void                    aws_jsobject_removeProperty (cJSObjectPtr_t jsobj, cWebStringPtr_t name);
 
-	EXPORT   cJSArrayPtr_t           aws_jsobject_getPropertyNames (cJSObjectPtr_t jsobj);
-	EXPORT   cJSArrayPtr_t           aws_jsobject_getMethodNames (cJSObjectPtr_t jsobj);
-	EXPORT   bool                    aws_jsobject_hasMethod (cJSObjectPtr_t jsobj, cString name);
-	EXPORT   cJSValuePtr_t           aws_jsobject_invoke (cJSObjectPtr_t jsobj, cString name, cJSArrayPtr_t args);
-	EXPORT   cString                 aws_jsobject_toString (cJSObjectPtr_t jsobj);
+	AWS_EXPORT   cJSArrayPtr_t           aws_jsobject_getPropertyNames (cJSObjectPtr_t jsobj);
+	AWS_EXPORT   cJSArrayPtr_t           aws_jsobject_getMethodNames (cJSObjectPtr_t jsobj);
+	AWS_EXPORT   bool                    aws_jsobject_hasMethod (cJSObjectPtr_t jsobj, cWebStringPtr_t name);
+	AWS_EXPORT   cJSValuePtr_t           aws_jsobject_invoke (cJSObjectPtr_t jsobj, cWebStringPtr_t name, cJSArrayPtr_t args);
+	AWS_EXPORT   cWebStringPtr_t         aws_jsobject_toString (cJSObjectPtr_t jsobj);
 
 	// ====== JS ARRAY =======
-	EXPORT   cJSArrayPtr_t           aws_jsarray_new_size (unsigned size);
-	EXPORT   cJSArrayPtr_t           aws_jsarray_new ();
+	AWS_EXPORT   cJSArrayPtr_t           aws_jsarray_new_size (unsigned size);
+	AWS_EXPORT   cJSArrayPtr_t           aws_jsarray_new ();
 
-	EXPORT   void                    aws_jsarray_delete (cJSArrayPtr_t jsarray);
+	AWS_EXPORT   void                    aws_jsarray_delete (cJSArrayPtr_t jsarray);
 
-	EXPORT   unsigned                aws_jsarray_getSize (cJSArrayPtr_t jsarray);
-	EXPORT   unsigned                aws_jsarray_getCapacity (cJSArrayPtr_t jsarray);
-	EXPORT   const cJSValuePtr_t     aws_jsarray_getItemAt (cJSArrayPtr_t jsarray, unsigned pos);
-	EXPORT   void                    aws_jsarray_push (cJSArrayPtr_t jsarray, cJSValuePtr_t item);
-	EXPORT   void                    aws_jsarray_pop (cJSArrayPtr_t jsarray);
-	EXPORT   void                    aws_jsarray_insert (cJSArrayPtr_t jsarray, cJSValuePtr_t item, unsigned pos);
-	EXPORT   void                    aws_jsarray_erase (cJSArrayPtr_t jsarray, unsigned pos);
-	EXPORT   void                    aws_jsarray_clear (cJSArrayPtr_t jsarray);
+	AWS_EXPORT   unsigned                aws_jsarray_getSize (cJSArrayPtr_t jsarray);
+	AWS_EXPORT   unsigned                aws_jsarray_getCapacity (cJSArrayPtr_t jsarray);
+	AWS_EXPORT   const cJSValuePtr_t     aws_jsarray_getItemAt (cJSArrayPtr_t jsarray, unsigned pos);
+	AWS_EXPORT   void                    aws_jsarray_push (cJSArrayPtr_t jsarray, cJSValuePtr_t item);
+	AWS_EXPORT   void                    aws_jsarray_pop (cJSArrayPtr_t jsarray);
+	AWS_EXPORT   void                    aws_jsarray_insert (cJSArrayPtr_t jsarray, cJSValuePtr_t item, unsigned pos);
+	AWS_EXPORT   void                    aws_jsarray_erase (cJSArrayPtr_t jsarray, unsigned pos);
+	AWS_EXPORT   void                    aws_jsarray_clear (cJSArrayPtr_t jsarray);
 
 	// ====== WEB URL =======
-	EXPORT   cWebUrlPtr_t            aws_weburl_new ();
-	EXPORT   cWebUrlPtr_t            aws_weburl_new_string (cString str);
-	EXPORT   cWebUrlPtr_t            aws_weburl_new_webstring (cWebStringPtr_t str);
+	AWS_EXPORT   cWebUrlPtr_t            aws_weburl_new ();
+	AWS_EXPORT   cWebUrlPtr_t            aws_weburl_new_cstring (cString str);
+	AWS_EXPORT   cWebUrlPtr_t            aws_weburl_new_webstring (cWebStringPtr_t str);
 
-	EXPORT   void                    aws_weburl_delete (cWebUrlPtr_t weburl);
+	AWS_EXPORT   void                    aws_weburl_delete (cWebUrlPtr_t weburl);
 	
-	EXPORT   bool                    aws_weburl_isValid (cWebUrlPtr_t weburl);
-	EXPORT   bool                    aws_weburl_isEmpty (cWebUrlPtr_t weburl);
-	EXPORT   cString                 aws_weburl_getSpec (cWebUrlPtr_t weburl);
-	EXPORT   cString                 aws_weburl_getScheme (cWebUrlPtr_t weburl);
-	EXPORT   cString                 aws_weburl_getUsername (cWebUrlPtr_t weburl);
-	EXPORT   cString                 aws_weburl_getPassword (cWebUrlPtr_t weburl);
-	EXPORT   cString                 aws_weburl_getHost (cWebUrlPtr_t weburl);
-	EXPORT   cString                 aws_weburl_getPort (cWebUrlPtr_t weburl);
-	EXPORT   cString                 aws_weburl_getPath (cWebUrlPtr_t weburl);
-	EXPORT   cString                 aws_weburl_getQuery (cWebUrlPtr_t weburl);
-	EXPORT   cString                 aws_weburl_getAnchor (cWebUrlPtr_t weburl);
-	EXPORT   cString                 aws_weburl_getFilename (cWebUrlPtr_t weburl);
+	AWS_EXPORT   bool                    aws_weburl_isValid (cWebUrlPtr_t weburl);
+	AWS_EXPORT   bool                    aws_weburl_isEmpty (cWebUrlPtr_t weburl);
+	AWS_EXPORT   cWebStringPtr_t         aws_weburl_getSpec (cWebUrlPtr_t weburl);
+	AWS_EXPORT   cWebStringPtr_t         aws_weburl_getScheme (cWebUrlPtr_t weburl);
+	AWS_EXPORT   cWebStringPtr_t         aws_weburl_getUsername (cWebUrlPtr_t weburl);
+	AWS_EXPORT   cWebStringPtr_t         aws_weburl_getPassword (cWebUrlPtr_t weburl);
+	AWS_EXPORT   cWebStringPtr_t         aws_weburl_getHost (cWebUrlPtr_t weburl);
+	AWS_EXPORT   cWebStringPtr_t         aws_weburl_getPort (cWebUrlPtr_t weburl);
+	AWS_EXPORT   cWebStringPtr_t         aws_weburl_getPath (cWebUrlPtr_t weburl);
+	AWS_EXPORT   cWebStringPtr_t         aws_weburl_getQuery (cWebUrlPtr_t weburl);
+	AWS_EXPORT   cWebStringPtr_t         aws_weburl_getAnchor (cWebUrlPtr_t weburl);
+	AWS_EXPORT   cWebStringPtr_t         aws_weburl_getFilename (cWebUrlPtr_t weburl);
+
+	// ====== WEB SESSION =======
+	AWS_EXPORT   void                    aws_websession_release (cWebSessionPtr_t sess);
+
+	AWS_EXPORT   bool                    aws_websession_isOnDisk (cWebSessionPtr_t sess);
+	AWS_EXPORT   cWebStringPtr_t         aws_websession_getDataPath (cWebSessionPtr_t sess);
+	AWS_EXPORT   cWebPrefs               aws_websession_getPreferences (cWebSessionPtr_t sess);
+	AWS_EXPORT   void                    aws_websession_addDataSource (cWebSessionPtr_t sess, cWebStringPtr_t asset_host, cDataSourcePtr_t source);
+	AWS_EXPORT   void                    aws_websession_setCookie (cWebSessionPtr_t sess, cWebUrlPtr_t url, cWebStringPtr_t asset_host, bool http_onle, bool force_session);
+	AWS_EXPORT   bool                    aws_websession_clearCookies (cWebSessionPtr_t sess);
+
 
 	// ====== BITMAP SURFACE =======
-	EXPORT   cBitSurfacePtr_t        aws_bitmapsurface_new (int x, int y);
+	AWS_EXPORT   cBitSurfacePtr_t        aws_bitmapsurface_new (int x, int y);
 
-	EXPORT   void                    aws_bitmapsurface_delete (cBitSurfacePtr_t surface);
+	AWS_EXPORT   void                    aws_bitmapsurface_delete (cBitSurfacePtr_t surface);
 
-	EXPORT   const unsigned char*    aws_bitmapsurface_getBuffer (cBitSurfacePtr_t surface);
-	EXPORT   int                     aws_bitmapsurface_getWidth (cBitSurfacePtr_t surface);
-	EXPORT   int                     aws_bitmapsurface_getHeight (cBitSurfacePtr_t surface);
-	EXPORT   int                     aws_bitmapsurface_getRowSpan (cBitSurfacePtr_t surface);
-	EXPORT   bool                    aws_bitmapsurface_isDirty (cBitSurfacePtr_t surface);
-	EXPORT   void                    aws_bitmapsurface_setIsDirty (cBitSurfacePtr_t surface, bool val);
-	EXPORT   void                    aws_bitmapsurface_copyTo (cBitSurfacePtr_t surface, unsigned char* dst_buffer, int dst_row_span, int dst_depth, bool to_rgba, bool flip_y);
-	EXPORT   bool                    aws_bitmapsurface_saveToPNG (cBitSurfacePtr_t surface, cString path, bool preserve_transparency);
-	EXPORT   bool                    aws_bitmapsurface_saveToJPEG (cBitSurfacePtr_t surface, cString path, int quality);
-	EXPORT   unsigned char           aws_bitmapsurface_getAlphaAtPoint (cBitSurfacePtr_t surface, int x, int y);
+	AWS_EXPORT   const unsigned char*    aws_bitmapsurface_getBuffer (cBitSurfacePtr_t surface);
+	AWS_EXPORT   int                     aws_bitmapsurface_getWidth (cBitSurfacePtr_t surface);
+	AWS_EXPORT   int                     aws_bitmapsurface_getHeight (cBitSurfacePtr_t surface);
+	AWS_EXPORT   int                     aws_bitmapsurface_getRowSpan (cBitSurfacePtr_t surface);
+	AWS_EXPORT   bool                    aws_bitmapsurface_isDirty (cBitSurfacePtr_t surface);
+	AWS_EXPORT   void                    aws_bitmapsurface_setIsDirty (cBitSurfacePtr_t surface, bool val);
+	AWS_EXPORT   void                    aws_bitmapsurface_copyTo (cBitSurfacePtr_t surface, unsigned char* dst_buffer, int dst_row_span, int dst_depth, bool to_rgba, bool flip_y);
+	AWS_EXPORT   bool                    aws_bitmapsurface_saveToPNG (cBitSurfacePtr_t surface, cWebStringPtr_t path, bool preserve_transparency);
+	AWS_EXPORT   bool                    aws_bitmapsurface_saveToJPEG (cBitSurfacePtr_t surface, cWebStringPtr_t path, int quality);
+	AWS_EXPORT   unsigned char           aws_bitmapsurface_getAlphaAtPoint (cBitSurfacePtr_t surface, int x, int y);
 
 	// --- factory methods, untested
-	EXPORT   cSurfaceFactoryPtr_t    aws_surfacefactory_new ();
-	EXPORT   void                    aws_surfacefactory_delete (cSurfaceFactoryPtr_t factory);
+	AWS_EXPORT   cSurfaceFactoryPtr_t    aws_surfacefactory_new ();
+	AWS_EXPORT   void                    aws_surfacefactory_delete (cSurfaceFactoryPtr_t factory);
 
-	EXPORT   cSurfacePtr_t           aws_bitmapsurface_create (cWebViewPtr_t webview, int width, int height);
-	EXPORT   void                    aws_bitmapsurface_destroy (cSurfacePtr_t surface);
+	AWS_EXPORT   cSurfacePtr_t           aws_bitmapsurface_create (cWebViewPtr_t webview, int width, int height);
+	AWS_EXPORT   void                    aws_bitmapsurface_destroy (cSurfacePtr_t surface);
 
 	//================================
 	// JS HANDLER STUFF
 
-	EXPORT   void                    aws_webview_setInternalJSHandler (cWebViewPtr_t webview);
+	AWS_EXPORT   void                    aws_webview_setInternalJSHandler (cWebViewPtr_t webview);
 
-	EXPORT   void                    aws_jshandler_addCallback (cWebViewPtr_t webview, jshnd_onMethodCall callback);
-	EXPORT   void                    aws_jshandler_addCallbackValue (cWebViewPtr_t webview, jshnd_onMethodCallValue callback);
+	AWS_EXPORT   void                    aws_jshandler_addCallback (cWebViewPtr_t webview, jshnd_onMethodCall callback);
+	AWS_EXPORT   void                    aws_jshandler_addCallbackValue (cWebViewPtr_t webview, jshnd_onMethodCallValue callback);
 
-	EXPORT   void                    aws_jshandler_removeCallback (cWebViewPtr_t webview, jshnd_onMethodCall callback);
-	EXPORT   void                    aws_jshandler_removeCallbackValue (cWebViewPtr_t webview);
-	EXPORT   void                    aws_jshandler_removeCallbackAll (cWebViewPtr_t webview);
+	AWS_EXPORT   void                    aws_jshandler_removeCallback (cWebViewPtr_t webview, jshnd_onMethodCall callback);
+	AWS_EXPORT   void                    aws_jshandler_removeCallbackValue (cWebViewPtr_t webview);
+	AWS_EXPORT   void                    aws_jshandler_removeCallbackAll (cWebViewPtr_t webview);
 
 	//================================
 	// WEBVIEW HANDLERS STUFF
 
 	// this functions sets internal wrapper listener which allow setting callbacks to that events
-	EXPORT   void                    aws_webview_setInternalLoadHandler (cWebViewPtr_t webview);
-	EXPORT   void                    aws_webview_setInternalViewHandler (cWebViewPtr_t webview);
-	EXPORT   void                    aws_webview_setInternalPrintHandler (cWebViewPtr_t webview);
-	EXPORT   void                    aws_webview_setInternalProcessHandler (cWebViewPtr_t webview);
-	EXPORT   void                    aws_webview_setInternalMenuHandler (cWebViewPtr_t webview);
-	EXPORT   void                    aws_webview_setInternalDownloadHandler (cWebViewPtr_t webview);
-	EXPORT   void                    aws_webview_setInternalIMEHandler (cWebViewPtr_t webview);
+	AWS_EXPORT   void                    aws_webview_setInternalLoadHandler (cWebViewPtr_t webview);
+	AWS_EXPORT   void                    aws_webview_setInternalViewHandler (cWebViewPtr_t webview);
+	AWS_EXPORT   void                    aws_webview_setInternalPrintHandler (cWebViewPtr_t webview);
+	AWS_EXPORT   void                    aws_webview_setInternalProcessHandler (cWebViewPtr_t webview);
+	AWS_EXPORT   void                    aws_webview_setInternalMenuHandler (cWebViewPtr_t webview);
+	AWS_EXPORT   void                    aws_webview_setInternalDownloadHandler (cWebViewPtr_t webview);
+	AWS_EXPORT   void                    aws_webview_setInternalIMEHandler (cWebViewPtr_t webview);
 
 	//================================
 	// RESOURCE INTERCEPTOR STUFF
 
+	// this is callback, remove it
+	AWS_EXPORT   cResResponsePtr_t       aws_resrinterceptor_onRequest (cResInterceptorPtr_t resinterceptor, cResRequestPtr_t request);
+
+	// ===== RESOURCE RESPONSE ======
+	AWS_EXPORT   cResResponsePtr_t       aws_resresponse_create (unsigned numBytes, unsigned char* buffer, cWebStringPtr_t mimeType);
+	AWS_EXPORT   cResResponsePtr_t       aws_resresponse_create_path (cWebStringPtr_t filePath);
+
 	// ===== RESOURCE REQUEST ======
-	EXPORT   void                    aws_resrequest_cancel (cResRequestPtr_t request);
+	AWS_EXPORT   void                    aws_resrequest_cancel (cResRequestPtr_t request);
+	AWS_EXPORT   unsigned                aws_resrequest_originProcId (cResRequestPtr_t request);
+	AWS_EXPORT   cWebUrlPtr_t            aws_resrequest_getUrl (cResRequestPtr_t request);
+	AWS_EXPORT   cWebStringPtr_t         aws_resrequest_getMethod (cResRequestPtr_t request);
+	AWS_EXPORT   void                    aws_resrequest_setMethod (cResRequestPtr_t request, cWebStringPtr_t method);
+	AWS_EXPORT   cWebStringPtr_t         aws_resrequest_getReferrer (cResRequestPtr_t request);
+	AWS_EXPORT   void                    aws_resrequest_setReferrer (cResRequestPtr_t request, cWebStringPtr_t referrer);
+	AWS_EXPORT   cWebStringPtr_t         aws_resrequest_getExtraHeaders (cResRequestPtr_t request);
+	AWS_EXPORT   void                    aws_resrequest_setExtraHeaders (cResRequestPtr_t request, cWebStringPtr_t headers);
+	AWS_EXPORT   void                    aws_resrequest_appendExtraHeader (cResRequestPtr_t request, cWebStringPtr_t name, cWebStringPtr_t value);
+	AWS_EXPORT   unsigned                aws_resrequest_getNumUploadedElements (cResRequestPtr_t request);
+	AWS_EXPORT   cUploadElementPtr_t     aws_resrequest_getUploadElement (cResRequestPtr_t request);
+	AWS_EXPORT   void                    aws_resrequest_clearUploadElements (cResRequestPtr_t request);
+	AWS_EXPORT   void                    aws_resrequest_appendUploadFilePath (cResRequestPtr_t request, cWebStringPtr_t filePath);
+	AWS_EXPORT   void                    aws_resrequest_appendUploadBytes (cResRequestPtr_t request, unsigned char* bytes, unsigned numBytes);
+
+	// ===== UPLOAD ELEMENT ======
+	AWS_EXPORT   bool                    aws_uploadelem_isFilePath (cUploadElementPtr_t upelem);
+	AWS_EXPORT   bool                    aws_uploadelem_isBytes (cUploadElementPtr_t upelem);
+	AWS_EXPORT   unsigned                aws_uploadelem_getNumBytes (cUploadElementPtr_t upelem);
+	AWS_EXPORT   unsigned char*          aws_uploadelem_getBytes (cUploadElementPtr_t upelem);
+	AWS_EXPORT   cWebStringPtr_t         aws_uploadelem_getFilePath (cUploadElementPtr_t upelem);
 
 #ifdef __cplusplus
 }

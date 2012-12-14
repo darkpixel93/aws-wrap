@@ -72,97 +72,119 @@ struct cWebPrefs
 }
 
 
-// WEB VIEW
-struct cWebView;
-alias cWebView cWebView_t;
-alias cWebView* cWebViewPtr_t;
+struct _cWebView;
+alias _cWebView* cWebViewPtr_t;
 
-// WEB CORE
-struct cWebCore;
-alias cWebCore cWebCore_t;
-alias cWebCore* cWebCorePtr_t;
+struct _cWebCore;
+alias _cWebCore* cWebCorePtr_t;
 
-// WEB URL
-struct cWebUrl;
-alias cWebUrl cWebUrl_t;
-alias cWebUrl* cWebUrlPtr_t;
+struct _cWebUrl;
+alias _cWebUrl* cWebUrlPtr_t;
 
-// WEB STRING
-struct cWebString;
-alias cWebString cWebString_t;
-alias cWebString* cWebStringPtr_t;
+struct _cWebSession;
+alias _cWebSession* cWebSessionPtr_t;
 
-// WEB STRING ARRAY
-struct cWebStringArray;
-alias cWebStringArray cWebStringArray_t;
-alias cWebStringArray* cWebStringArrayPtr_t;
 
-// WEB SESSION
-struct cWebSession;
-alias cWebSession cWebSession_t;
-alias cWebSession* cWebSessionPtr_t;
+struct _cWebString;
+alias _cWebString* cWebStringPtr_t;
 
-// JS OBJECT
-struct cJSObject;
-alias cJSObject cJSObject_t;
-alias cJSObject* cJSObjectPtr_t;
+struct _cWebStringArray;
+alias _cWebStringArray* cWebStringArrayPtr_t;
 
-// JS ARRAY
-struct cJSArray;
-alias cJSArray cJSArray_t;
-alias cJSArray* cJSArrayPtr_t;
 
-// JS VALUE
-struct cJSValue;
-alias cJSValue cJSValue_t;
-alias cJSValue* cJSValuePtr_t;
+struct _cJSObject;
+alias _cJSObject* cJSObjectPtr_t;
 
-// this and below disabled due to some problems with struct sizes 
-// SURFACE
-version(none) 
-{
-struct cSurface;
-alias cSurface cSurface_t;
-alias cSurface* cSurfacePtr_t;
-}
+struct _cJSArray; 
+alias _cJSArray* cJSArrayPtr_t;
+
+struct _cJSValue;
+alias _cJSValue* cJSValuePtr_t;
+
+struct _cJSMethodHandler;
+alias _cJSMethodHandler* cJSMethodHandlerPtr_t;
+
+
+struct _cKeyboardEvt;
+alias _cKeyboardEvt* cKeyboardEvtPtr_t;
+
+struct _cTouchEvt;
+alias _cTouchEvt* cTouchEvtPtr_t;
+
+
 alias void* cSurfacePtr_t;
-
-// BIT SURFACE
-version(none)
-{
-struct cBitSurface;
-alias cBitSurface cBitSurface_t;
-alias cBitSurface* cBitSurfacePtr_t;
-}
 
 alias void* cBitSurfacePtr_t;
 
-// SURFACE FACTORY
-struct cSurfaceFactory;
-//alias cSurfaceFactory cSurfaceFactory_t;
-alias cSurfaceFactory* cSurfaceFactoryPtr_t;
-
-// RESOURCE INSPECTOR
-struct cResInterceptor;
-alias cResInterceptor cResInterceptor_t;
-alias cResInterceptor* cResInterceptorPtr_t;
+alias void* cSurfaceFactoryPtr_t;
 
 
-// UTIL
-cWebStringPtr_t         aws_webstring_new_utf8 (const(char)* string, uint len);
+struct _cResInterceptor;
+alias _cResInterceptor* cResInterceptorPtr_t;
+
+struct _cResRequest;
+alias _cResRequest* cResRequestPtr_t;
+
+struct _cResResponse;
+alias _cResResponse* cResResponsePtr_t;
+
+struct _cUploadElement;
+alias _cUploadElement* cUploadElementPtr_t;
+
+struct _cDataSource;
+alias _cDataSource* cDataSourcePtr_t;
+
+
+struct _cWebView_onView;
+alias _cWebView_onView* cWebView_onViewPtr_t;
+
+struct _cWebView_onLoad;
+alias _cWebView_onLoad* cWebView_onLoadPtr_t;
+
+struct _cWebView_onProcess;
+alias _cWebView_onProcess* cWebView_onProcessPtr_t;
+
+struct _cWebView_onMenu;
+alias _cWebView_onMenu* cWebView_onMenuPtr_t;
+
+struct _cWebView_onDialog;
+alias _cWebView_onDialog* cWebView_onDialogPtr_t;
+
+struct _cWebView_onPrint;
+alias _cWebView_onPrint* cWebView_onPrintPtr_t;
+
+struct _cWebView_onDownload;
+alias _cWebView_onDownload* cWebView_onDownloadPtr_t;
+
+struct _cWebView_onIME;
+alias _cWebView_onIME* cWebView_onIMEPtr_t;
+
+// ===== CALLBACKS ======
+
+/// this method gets called on javascript method call which doesn't return value
+alias void function(cWebViewPtr_t caller, uint remoteObjId, cWebStringPtr_t methodName, cJSArrayPtr_t args) jshnd_onMethodCall;
+
+/// this method gets called on javascript method call which returns value
+alias cJSValuePtr_t function(cWebViewPtr_t caller, uint remoteObjId, cWebStringPtr_t methodName, cJSArrayPtr_t args) jshnd_onMethodCallValue;
+
+
+
+// ====== WEB STRING ======
+cWebStringPtr_t         aws_webstring_new ();
+cWebStringPtr_t         aws_webstring_new_substring (cWebStringPtr_t srcstring, uint start, uint len);
+cWebStringPtr_t         aws_webstring_new_utf8 (const char* string, uint len);
+
+void                    aws_webstring_delete (cWebStringPtr_t string);
+
 uint                    aws_webstring_to_utf8 (cWebStringPtr_t string, char* dest);
-
 cString                 aws_webstring_to_cstring (cWebStringPtr_t string);
-
-/// call this when you are done with string to release buffer
-void                    aws_cstring_release (cString str);
 
 // ====== WEB CORE =======
 const(cWebCorePtr_t)    aws_webcore_init (cWebConf wc);
 const(cWebCorePtr_t)    aws_webcore_initDefault ();
 void                    aws_webcore_shutdown ();
 const(cWebCorePtr_t)    aws_webcore_instance ();
-cWebSessionPtr_t        aws_webcore_createWebSession (cWebCorePtr_t webcore, cString path, cWebPrefs wp);
+cWebSessionPtr_t        aws_webcore_createWebSession (cWebCorePtr_t webcore, cWebStringPtr_t path, cWebPrefs wp);
 cWebViewPtr_t           aws_webcore_createWebView (cWebCorePtr_t webcore, int w, int h, cWebSessionPtr_t sess, int type);
 void                    aws_webcore_setSurfaceFactory (cWebCorePtr_t webcore, cSurfaceFactoryPtr_t factory);
 cSurfaceFactoryPtr_t    aws_webcore_getSurfaceFactory (cWebCorePtr_t webcore);
@@ -180,22 +202,23 @@ void                    aws_webview_setParentWindow (cWebViewPtr_t webview, void
 void*                   aws_webview_getParentWindow (cWebViewPtr_t webview);
 void*                   aws_webview_getWindow (cWebViewPtr_t webview);
 
-void                    aws_webview_setViewListener (cWebViewPtr_t webview, void* listener);
-void                    aws_webview_setLoadListener (cWebViewPtr_t webview, void* listener);
-void                    aws_webview_setProcessListener (cWebViewPtr_t webview, void* listener);
-void                    aws_webview_setMenuListener (cWebViewPtr_t webview, void* listener);
-void                    aws_webview_setPrintListener (cWebViewPtr_t webview, void* listener);
-void                    aws_webview_setDownloadListener (cWebViewPtr_t webview, void* listener);
-void                    aws_webview_setIMEListener (cWebViewPtr_t webview, void* listener);
+void                    aws_webview_setViewListener (cWebViewPtr_t webview, cWebView_onViewPtr_t listener);
+void                    aws_webview_setLoadListener (cWebViewPtr_t webview, cWebView_onLoadPtr_t listener);
+void                    aws_webview_setProcessListener (cWebViewPtr_t webview, cWebView_onProcessPtr_t listener);
+void                    aws_webview_setMenuListener (cWebViewPtr_t webview, cWebView_onMenuPtr_t listener);
+void                    aws_webview_setDialogListener (cWebViewPtr_t webview, cWebView_onDialogPtr_t listener);
+void                    aws_webview_setPrintListener (cWebViewPtr_t webview, cWebView_onPrintPtr_t listener);
+void                    aws_webview_setDownloadListener (cWebViewPtr_t webview, cWebView_onDownloadPtr_t listener);
+void                    aws_webview_setIMEListener (cWebViewPtr_t webview, cWebView_onIMEPtr_t listener);
 
-void*                   aws_webview_getViewListener (cWebViewPtr_t webview);
-void*                   aws_webview_getLoadListener (cWebViewPtr_t webview);
-void*                   aws_webview_getProcessListener (cWebViewPtr_t webview);
-void*                   aws_webview_getMenuListener (cWebViewPtr_t webview);
-void*                   aws_webview_getDialogListener (cWebViewPtr_t webview);
-void*                   aws_webview_getPrintListener (cWebViewPtr_t webview);
-void*                   aws_webview_getDownloadListener (cWebViewPtr_t webview);
-void*                   aws_webview_getIMEListener (cWebViewPtr_t webview);
+cWebView_onViewPtr_t    aws_webview_getViewListener (cWebViewPtr_t webview);
+cWebView_onLoadPtr_t    aws_webview_getLoadListener (cWebViewPtr_t webview);
+cWebView_onProcessPtr_t aws_webview_getProcessListener (cWebViewPtr_t webview);
+cWebView_onMenuPtr_t    aws_webview_getMenuListener (cWebViewPtr_t webview);
+cWebView_onDialogPtr_t  aws_webview_getDialogListener (cWebViewPtr_t webview);
+cWebView_onPrintPtr_t   aws_webview_getPrintListener (cWebViewPtr_t webview);
+cWebView_onDownloadPtr_t aws_webview_getDownloadListener (cWebViewPtr_t webview);
+cWebView_onIMEPtr_t     aws_webview_getIMEListener (cWebViewPtr_t webview);
 
 void                    aws_webview_loadURL (cWebViewPtr_t webview, cWebUrlPtr_t url);
 void                    aws_webview_goBack (cWebViewPtr_t webview);
@@ -222,10 +245,10 @@ int                     aws_webview_focusedElementType (cWebViewPtr_t webview);
 void                    aws_webview_injectMouseMove (cWebViewPtr_t webview, int mx, int my);
 void                    aws_webview_injectMouseButton (cWebViewPtr_t webview, int button, bool down);
 void                    aws_webview_injectMouseWheel (cWebViewPtr_t webview, int wx, int wy);
-void                    aws_webview_injectKeyboardEvent (cWebViewPtr_t webview, void* keyevent);
-void                    aws_webview_injectTouchEvent (cWebViewPtr_t webview, void* touchevent);
+void                    aws_webview_injectKeyboardEvent (cWebViewPtr_t webview, cKeyboardEvtPtr_t keyevent);
+void                    aws_webview_injectTouchEvent (cWebViewPtr_t webview, cTouchEvtPtr_t touchevent);
 void                    aws_webview_activateIME (cWebViewPtr_t webview, bool state);
-void                    aws_webview_setIMEComposition (cWebViewPtr_t webview, cString target_string, int cursorpos, int targetstart, int tartgetend);
+void                    aws_webview_setIMEComposition (cWebViewPtr_t webview, cWebStringPtr_t target_string, int cursorpos, int targetstart, int tartgetend);
 void                    aws_webview_cancelIMEComposition (cWebViewPtr_t webview);
 void                    aws_webview_undo (cWebViewPtr_t webview);
 void                    aws_webview_redo (cWebViewPtr_t webview);
@@ -235,25 +258,25 @@ void                    aws_webview_copyImageAt (cWebViewPtr_t webview, int x, i
 void                    aws_webview_paste (cWebViewPtr_t webview);
 void                    aws_webview_pasteAndMatchStyle (cWebViewPtr_t webview);
 void                    aws_webview_selectAll (cWebViewPtr_t webview);
-void                    aws_webview_printToFile (cWebViewPtr_t webview, cString outDir, void* printconf);
+void                    aws_webview_printToFile (cWebViewPtr_t webview, cWebStringPtr_t outDir, void* printconf);
 int                     aws_webview_lastError (cWebViewPtr_t webview);
-cJSValuePtr_t           aws_webview_createGlobalJSObject (cWebViewPtr_t webview, cString objname);
-void                    aws_webview_executeJS (cWebViewPtr_t webview, cString script, cString fxpath);
-cJSValuePtr_t           aws_webview_executeJSWithResult (cWebViewPtr_t webview, cString script, cString fxpath);
-void                    aws_webview_setJSMethodHandler (cWebViewPtr_t webview, void* jshandler);
+cJSValuePtr_t           aws_webview_createGlobalJSObject (cWebViewPtr_t webview, cWebStringPtr_t objname);
+void                    aws_webview_executeJS (cWebViewPtr_t webview, cWebStringPtr_t script, cWebStringPtr_t fxpath);
+cJSValuePtr_t           aws_webview_executeJSWithResult (cWebViewPtr_t webview, cWebStringPtr_t script, cWebStringPtr_t fxpath);
+void                    aws_webview_setJSMethodHandler (cWebViewPtr_t webview, cJSMethodHandlerPtr_t jshandler);
 void                    aws_webview_didSelectPopupMenuItem (cWebViewPtr_t webview, int idx);
 void                    aws_webview_didCancelPopupMenu (cWebViewPtr_t webview);
-void                    aws_webview_didChooseFiles (cWebViewPtr_t webview, cStringArray arr, bool write);
-void                    aws_webview_didLogin (cWebViewPtr_t webview, int reqId, cString uname, cString pwd);
+void                    aws_webview_didChooseFiles (cWebViewPtr_t webview, cWebStringArrayPtr_t arr, bool write);
+void                    aws_webview_didLogin (cWebViewPtr_t webview, int reqId, cWebStringPtr_t uname, cWebStringPtr_t pwd);
 void                    aws_webview_didCancelLogin (cWebViewPtr_t webview, int reqId);
-void                    aws_webview_didChooseDownloadPath (cWebViewPtr_t webview, int downloadId, cString path);
+void                    aws_webview_didChooseDownloadPath (cWebViewPtr_t webview, int downloadId, cWebStringPtr_t path);
 void                    aws_webview_didCancelDownload (cWebViewPtr_t webview, int downloadId);
 
 // ====== JS VALUE =======
 cJSValuePtr_t           aws_jsvalue_new_bool (bool val);
 cJSValuePtr_t           aws_jsvalue_new_int (int val);
 cJSValuePtr_t           aws_jsvalue_new_double (double val);
-cJSValuePtr_t           aws_jsvalue_new_string (cString val);
+cJSValuePtr_t           aws_jsvalue_new_string (cWebStringPtr_t val);
 cJSValuePtr_t           aws_jsvalue_new_object (cJSObjectPtr_t val);
 cJSValuePtr_t           aws_jsvalue_new_array (cJSArrayPtr_t val);
 cJSValuePtr_t           aws_jsvalue_new_jsvalue (cJSValuePtr_t val);
@@ -273,7 +296,7 @@ bool                    aws_jsvalue_isObject (cJSValuePtr_t jsval);
 bool                    aws_jsvalue_isNull (cJSValuePtr_t jsval);
 bool                    aws_jsvalue_isUndefined (cJSValuePtr_t jsval);
 
-cString                 aws_jsvalue_toString (cJSValuePtr_t jsval);
+cWebStringPtr_t         aws_jsvalue_toString (cJSValuePtr_t jsval);
 int                     aws_jsvalue_toInteger (cJSValuePtr_t jsval);
 double                  aws_jsvalue_toDouble (cJSValuePtr_t jsval);
 bool                    aws_jsvalue_toBoolean (cJSValuePtr_t jsval);
@@ -290,16 +313,16 @@ int                     aws_jsobject_getRefCount (cJSObjectPtr_t jsobj);
 int                     aws_jsobject_getType (cJSObjectPtr_t jsobj);
 const(cWebViewPtr_t)    aws_jsobject_getOwner (cJSObjectPtr_t jsobj);
 
-bool                    aws_jsobject_hasProperty (cJSObjectPtr_t jsobj, cString name);
-cJSValuePtr_t           aws_jsobject_getProperty (cJSObjectPtr_t jsobj, cString name);
-void                    aws_jsobject_setProperty (cJSObjectPtr_t jsobj, cString name, cJSValuePtr_t jsval);
-void                    aws_jsobject_removeProperty (cJSObjectPtr_t jsobj, cString name);
+bool                    aws_jsobject_hasProperty (cJSObjectPtr_t jsobj, cWebStringPtr_t name);
+cJSValuePtr_t           aws_jsobject_getProperty (cJSObjectPtr_t jsobj, cWebStringPtr_t name);
+void                    aws_jsobject_setProperty (cJSObjectPtr_t jsobj, cWebStringPtr_t name, cJSValuePtr_t jsval);
+void                    aws_jsobject_removeProperty (cJSObjectPtr_t jsobj, cWebStringPtr_t name);
 
 cJSArrayPtr_t           aws_jsobject_getPropertyNames (cJSObjectPtr_t jsobj);
 cJSArrayPtr_t           aws_jsobject_getMethodNames (cJSObjectPtr_t jsobj);
-bool                    aws_jsobject_hasMethod (cJSObjectPtr_t jsobj, cString name);
-cJSValuePtr_t           aws_jsobject_invoke (cJSObjectPtr_t jsobj, cString name, cJSArrayPtr_t args);
-cString                 aws_jsobject_toString (cJSObjectPtr_t jsobj);
+bool                    aws_jsobject_hasMethod (cJSObjectPtr_t jsobj, cWebStringPtr_t name);
+cJSValuePtr_t           aws_jsobject_invoke (cJSObjectPtr_t jsobj, cWebStringPtr_t name, cJSArrayPtr_t args);
+cWebStringPtr_t         aws_jsobject_toString (cJSObjectPtr_t jsobj);
 
 // ====== JS ARRAY =======
 cJSArrayPtr_t           aws_jsarray_new_size (uint size);
@@ -318,38 +341,49 @@ void                    aws_jsarray_clear (cJSArrayPtr_t jsarray);
 
 // ====== WEB URL =======
 cWebUrlPtr_t            aws_weburl_new ();
-cWebUrlPtr_t            aws_weburl_new_string (cString str);
+cWebUrlPtr_t            aws_weburl_new_cstring (cString str);
 cWebUrlPtr_t            aws_weburl_new_webstring (cWebStringPtr_t str);
 
 void                    aws_weburl_delete (cWebUrlPtr_t weburl);
 
 bool                    aws_weburl_isValid (cWebUrlPtr_t weburl);
 bool                    aws_weburl_isEmpty (cWebUrlPtr_t weburl);
-cString                 aws_weburl_getSpec (cWebUrlPtr_t weburl);
-cString                 aws_weburl_getScheme (cWebUrlPtr_t weburl);
-cString                 aws_weburl_getUsername (cWebUrlPtr_t weburl);
-cString                 aws_weburl_getPassword (cWebUrlPtr_t weburl);
-cString                 aws_weburl_getHost (cWebUrlPtr_t weburl);
-cString                 aws_weburl_getPort (cWebUrlPtr_t weburl);
-cString                 aws_weburl_getPath (cWebUrlPtr_t weburl);
-cString                 aws_weburl_getQuery (cWebUrlPtr_t weburl);
-cString                 aws_weburl_getAnchor (cWebUrlPtr_t weburl);
-cString                 aws_weburl_getFilename (cWebUrlPtr_t weburl);
+cWebStringPtr_t         aws_weburl_getSpec (cWebUrlPtr_t weburl);
+cWebStringPtr_t         aws_weburl_getScheme (cWebUrlPtr_t weburl);
+cWebStringPtr_t         aws_weburl_getUsername (cWebUrlPtr_t weburl);
+cWebStringPtr_t         aws_weburl_getPassword (cWebUrlPtr_t weburl);
+cWebStringPtr_t         aws_weburl_getHost (cWebUrlPtr_t weburl);
+cWebStringPtr_t         aws_weburl_getPort (cWebUrlPtr_t weburl);
+cWebStringPtr_t         aws_weburl_getPath (cWebUrlPtr_t weburl);
+cWebStringPtr_t         aws_weburl_getQuery (cWebUrlPtr_t weburl);
+cWebStringPtr_t         aws_weburl_getAnchor (cWebUrlPtr_t weburl);
+cWebStringPtr_t         aws_weburl_getFilename (cWebUrlPtr_t weburl);
+
+// ====== WEB SESSION =======
+void                    aws_websession_release (cWebSessionPtr_t sess);
+
+bool                    aws_websession_isOnDisk (cWebSessionPtr_t sess);
+cWebStringPtr_t         aws_websession_getDataPath (cWebSessionPtr_t sess);
+cWebPrefs               aws_websession_getPreferences (cWebSessionPtr_t sess);
+void                    aws_websession_addDataSource (cWebSessionPtr_t sess, cWebStringPtr_t asset_host, cDataSourcePtr_t source);
+void                    aws_websession_setCookie (cWebSessionPtr_t sess, cWebUrlPtr_t url, cWebStringPtr_t asset_host, bool http_onle, bool force_session);
+bool                    aws_websession_clearCookies (cWebSessionPtr_t sess);
+
 
 // ====== BITMAP SURFACE =======
 cBitSurfacePtr_t        aws_bitmapsurface_new (int x, int y);
 
 void                    aws_bitmapsurface_delete (cBitSurfacePtr_t surface);
 
-const(ubyte)*           aws_bitmapsurface_getBuffer (cBitSurfacePtr_t surface);
+const (ubyte)*          aws_bitmapsurface_getBuffer (cBitSurfacePtr_t surface);
 int                     aws_bitmapsurface_getWidth (cBitSurfacePtr_t surface);
 int                     aws_bitmapsurface_getHeight (cBitSurfacePtr_t surface);
 int                     aws_bitmapsurface_getRowSpan (cBitSurfacePtr_t surface);
 bool                    aws_bitmapsurface_isDirty (cBitSurfacePtr_t surface);
 void                    aws_bitmapsurface_setIsDirty (cBitSurfacePtr_t surface, bool val);
 void                    aws_bitmapsurface_copyTo (cBitSurfacePtr_t surface, ubyte* dst_buffer, int dst_row_span, int dst_depth, bool to_rgba, bool flip_y);
-bool                    aws_bitmapsurface_saveToPNG (cBitSurfacePtr_t surface, cString path, bool preserve_transparency);
-bool                    aws_bitmapsurface_saveToJPEG (cBitSurfacePtr_t surface, cString path, int quality);
+bool                    aws_bitmapsurface_saveToPNG (cBitSurfacePtr_t surface, cWebStringPtr_t path, bool preserve_transparency);
+bool                    aws_bitmapsurface_saveToJPEG (cBitSurfacePtr_t surface, cWebStringPtr_t path, int quality);
 ubyte                   aws_bitmapsurface_getAlphaAtPoint (cBitSurfacePtr_t surface, int x, int y);
 
 // --- factory methods, untested
@@ -358,3 +392,61 @@ void                    aws_surfacefactory_delete (cSurfaceFactoryPtr_t factory)
 
 cSurfacePtr_t           aws_bitmapsurface_create (cWebViewPtr_t webview, int width, int height);
 void                    aws_bitmapsurface_destroy (cSurfacePtr_t surface);
+
+//================================
+// JS HANDLER STUFF
+
+void                    aws_webview_setInternalJSHandler (cWebViewPtr_t webview);
+
+void                    aws_jshandler_addCallback (cWebViewPtr_t webview, jshnd_onMethodCall callback);
+void                    aws_jshandler_addCallbackValue (cWebViewPtr_t webview, jshnd_onMethodCallValue callback);
+
+void                    aws_jshandler_removeCallback (cWebViewPtr_t webview, jshnd_onMethodCall callback);
+void                    aws_jshandler_removeCallbackValue (cWebViewPtr_t webview);
+void                    aws_jshandler_removeCallbackAll (cWebViewPtr_t webview);
+
+//================================
+// WEBVIEW HANDLERS STUFF
+
+// this functions sets internal wrapper listener which allow setting callbacks to that events
+void                    aws_webview_setInternalLoadHandler (cWebViewPtr_t webview);
+void                    aws_webview_setInternalViewHandler (cWebViewPtr_t webview);
+void                    aws_webview_setInternalPrintHandler (cWebViewPtr_t webview);
+void                    aws_webview_setInternalProcessHandler (cWebViewPtr_t webview);
+void                    aws_webview_setInternalMenuHandler (cWebViewPtr_t webview);
+void                    aws_webview_setInternalDownloadHandler (cWebViewPtr_t webview);
+void                    aws_webview_setInternalIMEHandler (cWebViewPtr_t webview);
+
+//================================
+// RESOURCE INTERCEPTOR STUFF
+
+// this is callback, remove it
+cResResponsePtr_t       aws_resrinterceptor_onRequest (cResInterceptorPtr_t resinterceptor, cResRequestPtr_t request);
+
+// ===== RESOURCE RESPONSE ======
+cResResponsePtr_t       aws_resresponse_create (uint numBytes, ubyte* buffer, cWebStringPtr_t mimeType);
+cResResponsePtr_t       aws_resresponse_create_path (cWebStringPtr_t filePath);
+
+// ===== RESOURCE REQUEST ======
+void                    aws_resrequest_cancel (cResRequestPtr_t request);
+uint                    aws_resrequest_originProcId (cResRequestPtr_t request);
+cWebUrlPtr_t            aws_resrequest_getUrl (cResRequestPtr_t request);
+cWebStringPtr_t         aws_resrequest_getMethod (cResRequestPtr_t request);
+void                    aws_resrequest_setMethod (cResRequestPtr_t request, cWebStringPtr_t method);
+cWebStringPtr_t         aws_resrequest_getReferrer (cResRequestPtr_t request);
+void                    aws_resrequest_setReferrer (cResRequestPtr_t request, cWebStringPtr_t referrer);
+cWebStringPtr_t         aws_resrequest_getExtraHeaders (cResRequestPtr_t request);
+void                    aws_resrequest_setExtraHeaders (cResRequestPtr_t request, cWebStringPtr_t headers);
+void                    aws_resrequest_appendExtraHeader (cResRequestPtr_t request, cWebStringPtr_t name, cWebStringPtr_t value);
+uint                    aws_resrequest_getNumUploadedElements (cResRequestPtr_t request);
+cUploadElementPtr_t     aws_resrequest_getUploadElement (cResRequestPtr_t request);
+void                    aws_resrequest_clearUploadElements (cResRequestPtr_t request);
+void                    aws_resrequest_appendUploadFilePath (cResRequestPtr_t request, cWebStringPtr_t filePath);
+void                    aws_resrequest_appendUploadBytes (cResRequestPtr_t request, ubyte* bytes, uint numBytes);
+
+// ===== UPLOAD ELEMENT ======
+bool                    aws_uploadelem_isFilePath (cUploadElementPtr_t upelem);
+bool                    aws_uploadelem_isBytes (cUploadElementPtr_t upelem);
+uint                    aws_uploadelem_getNumBytes (cUploadElementPtr_t upelem);
+ubyte*                  aws_uploadelem_getBytes (cUploadElementPtr_t upelem);
+cWebStringPtr_t         aws_uploadelem_getFilePath (cUploadElementPtr_t upelem);

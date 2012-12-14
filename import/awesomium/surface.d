@@ -8,10 +8,9 @@ Copyright (C) 2012 evilrat
 
 module awesomium.surface;
 
-import awesomium.capi, 
-	awesomium.common, 
-	awesomium.util,
-	awesomium.webview;
+import awesomium.capi, awesomium.common,
+	awesomium.util, awesomium.webview,
+	awesomium.webstring;
 
 
 ///
@@ -153,7 +152,7 @@ public:
 	bool SaveToPNG(string file_path,
                  bool preserve_transparency = false)
 	{
-		return aws_bitmapsurface_saveToPNG(this, file_path.toCString, preserve_transparency);
+		return aws_bitmapsurface_saveToPNG(this, new WebString(file_path), preserve_transparency);
 	}
 	
 	///
@@ -168,7 +167,7 @@ public:
 	///
 	bool SaveToJPEG(string file_path, int quality = 90)
 	{
-		return aws_bitmapsurface_saveToJPEG(this, file_path.toCString, quality);
+		return aws_bitmapsurface_saveToJPEG(this, new WebString(file_path), quality);
 	}
 	
 	/// Get the opacity (0-255) of a certain point (in pixels).

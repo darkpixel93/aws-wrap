@@ -1,6 +1,7 @@
 #include <Awesomium/WebCore.h>
 #include <Awesomium/WebConfig.h>
 #include <Awesomium/WebPreferences.h>
+#include <Awesomium/WebSession.h>
 
 #include <Awesomium/JSArray.h>
 #include <Awesomium/JSObject.h>
@@ -60,19 +61,26 @@ extern "C"
 		return ls;
 	}
 
-	EXPORT cString aws_webstring_to_cstring (cWebStringPtr_t string)
+	AWS_EXPORT cString aws_webstring_to_cstring (cWebStringPtr_t string)
 	{
 		return fromAweString(*reinterpret_cast<Awesomium::WebString*>(string));
 	}
 
-	EXPORT cWebStringPtr_t aws_webstring_new()
+	AWS_EXPORT cWebStringPtr_t aws_webstring_new()
 	{
 		return reinterpret_cast<cWebStringPtr_t>(
 				new Awesomium::WebString()
 			);
 	}
 
-	EXPORT void aws_webstring_delete(cWebStringPtr_t string)
+	AWS_EXPORT cWebStringPtr_t aws_webstring_new_cstring(cString str)
+	{
+		return reinterpret_cast<cWebStringPtr_t>(
+			new Awesomium::WebString( Awesomium::WebString::CreateFromUTF8(str.str, str.len) )
+		);
+	}
+
+	AWS_EXPORT void aws_webstring_delete(cWebStringPtr_t string)
 	{
 		auto str = reinterpret_cast<Awesomium::WebString*>(string);
 
@@ -81,7 +89,7 @@ extern "C"
 		}
 	}
 
-	EXPORT cWebStringPtr_t aws_webstring_new_utf8(const char* string, unsigned len)
+	AWS_EXPORT cWebStringPtr_t aws_webstring_new_utf8(const char* string, unsigned len)
 	{
 		return reinterpret_cast<cWebStringPtr_t>(
 				new Awesomium::WebString(
@@ -90,7 +98,7 @@ extern "C"
 			);
 	}
 
-	EXPORT unsigned aws_webstring_to_utf8(cWebStringPtr_t string, char* dest)
+	AWS_EXPORT unsigned aws_webstring_to_utf8(cWebStringPtr_t string, char* dest)
 	{
 		auto str = reinterpret_cast<Awesomium::WebString*>(string);
 
@@ -102,7 +110,7 @@ extern "C"
 		return 0;
 	}
 
-	EXPORT cWebStringPtr_t aws_webstring_new_substring (cWebStringPtr_t srcstring, unsigned start, unsigned len)
+	AWS_EXPORT cWebStringPtr_t aws_webstring_new_substring (cWebStringPtr_t srcstring, unsigned start, unsigned len)
 	{
 		auto str = reinterpret_cast<Awesomium::WebString*>(srcstring);
 
@@ -116,38 +124,38 @@ extern "C"
 	// ===============================================
 	// WEB CORE
 
-	EXPORT const cWebCorePtr_t aws_webcore_init(cWebConf wc)
+	AWS_EXPORT const cWebCorePtr_t aws_webcore_init(cWebConf wc)
 	{
 		return reinterpret_cast<cWebCorePtr_t>(Awesomium::WebCore::Initialize( wcToAweConf(wc) ));
 	}
 
-	EXPORT const cWebCorePtr_t aws_webcore_initDefault()
+	AWS_EXPORT const cWebCorePtr_t aws_webcore_initDefault()
 	{
 		return reinterpret_cast<cWebCorePtr_t>(Awesomium::WebCore::Initialize( Awesomium::WebConfig() ));
 	}
 
-	EXPORT void aws_webcore_shutdown()
+	AWS_EXPORT void aws_webcore_shutdown()
 	{
 		Awesomium::WebCore::Shutdown();
 	}
 
-	EXPORT const cWebCorePtr_t aws_webcore_instance()
+	AWS_EXPORT const cWebCorePtr_t aws_webcore_instance()
 	{
 		return reinterpret_cast<cWebCorePtr_t>(Awesomium::WebCore::instance());
 	}
 
-	EXPORT cWebSessionPtr_t aws_webcore_createWebSession(cWebCorePtr_t webcore, cString path, cWebPrefs wp)
+	AWS_EXPORT cWebSessionPtr_t aws_webcore_createWebSession(cWebCorePtr_t webcore, cWebStringPtr_t path, cWebPrefs wp)
 	{
 		auto wc = reinterpret_cast<Awesomium::WebCore*>(webcore);
 
 		if ( wc ) {
-			return reinterpret_cast<cWebSessionPtr_t>( wc->CreateWebSession(toAweString(path), wpToAwePrefs(wp)) );
+			return reinterpret_cast<cWebSessionPtr_t>( wc->CreateWebSession(*reinterpret_cast<Awesomium::WebString*>(path), wpToAwePrefs(wp)) );
 		}
 		
 		return nullptr;
 	}
 
-	EXPORT cWebViewPtr_t aws_webcore_createWebView(cWebCorePtr_t webcore, int w, int h, cWebSessionPtr_t sess, int type)
+	AWS_EXPORT cWebViewPtr_t aws_webcore_createWebView(cWebCorePtr_t webcore, int w, int h, cWebSessionPtr_t sess, int type)
 	{
 		auto wc = reinterpret_cast<Awesomium::WebCore*>(webcore);
 
@@ -164,7 +172,7 @@ extern "C"
 		return nullptr;
 	}
 
-	EXPORT void aws_webcore_setSurfaceFactory(cWebCorePtr_t webcore, cSurfaceFactoryPtr_t factory)
+	AWS_EXPORT void aws_webcore_setSurfaceFactory(cWebCorePtr_t webcore, cSurfaceFactoryPtr_t factory)
 	{
 		auto wc = reinterpret_cast<Awesomium::WebCore*>(webcore);
 
@@ -175,7 +183,7 @@ extern "C"
 		}
 	}
 
-	EXPORT cSurfaceFactoryPtr_t aws_webcore_getSurfaceFactory(cWebCorePtr_t webcore)
+	AWS_EXPORT cSurfaceFactoryPtr_t aws_webcore_getSurfaceFactory(cWebCorePtr_t webcore)
 	{
 		auto wc = reinterpret_cast<Awesomium::WebCore*>(webcore);
 
@@ -186,7 +194,7 @@ extern "C"
 		return nullptr;
 	}
 
-	EXPORT void aws_webcore_setResourceInterceptor(cWebCorePtr_t webcore, cResInterceptorPtr_t interceptor)
+	AWS_EXPORT void aws_webcore_setResourceInterceptor(cWebCorePtr_t webcore, cResInterceptorPtr_t interceptor)
 	{
 		auto wc = reinterpret_cast<Awesomium::WebCore*>(webcore);
 
@@ -197,7 +205,7 @@ extern "C"
 		}
 	}
 
-	EXPORT cResInterceptorPtr_t aws_webcore_getResourceInterceptor(cWebCorePtr_t webcore)
+	AWS_EXPORT cResInterceptorPtr_t aws_webcore_getResourceInterceptor(cWebCorePtr_t webcore)
 	{
 		auto wc = reinterpret_cast<Awesomium::WebCore*>(webcore);
 
@@ -208,7 +216,7 @@ extern "C"
 		return nullptr;
 	}
 
-	EXPORT void aws_webcore_update(cWebCorePtr_t webcore)
+	AWS_EXPORT void aws_webcore_update(cWebCorePtr_t webcore)
 	{
 		auto wc = reinterpret_cast<Awesomium::WebCore*>(webcore);
 
@@ -217,7 +225,7 @@ extern "C"
 		}
 	}
 
-	EXPORT const char* aws_webcore_versionString(cWebCorePtr_t webcore)
+	AWS_EXPORT const char* aws_webcore_versionString(cWebCorePtr_t webcore)
 	{
 		auto wc = reinterpret_cast<Awesomium::WebCore*>(webcore);
 
@@ -231,7 +239,7 @@ extern "C"
 	// ===============================================
 	// WEB VIEW
 
-	EXPORT void aws_webview_destroy(cWebViewPtr_t webview)
+	AWS_EXPORT void aws_webview_destroy(cWebViewPtr_t webview)
 	{
 		auto view = reinterpret_cast<Awesomium::WebView*>(webview);
 
@@ -240,7 +248,7 @@ extern "C"
 		}
 	}
 
-	EXPORT int aws_webview_getType(cWebViewPtr_t webview)
+	AWS_EXPORT int aws_webview_getType(cWebViewPtr_t webview)
 	{
 		auto view = reinterpret_cast<Awesomium::WebView*>(webview);
 
@@ -251,7 +259,7 @@ extern "C"
 		return -1;
 	}
 
-	EXPORT int aws_webview_getProcId(cWebViewPtr_t webview)
+	AWS_EXPORT int aws_webview_getProcId(cWebViewPtr_t webview)
 	{
 		auto view = reinterpret_cast<Awesomium::WebView*>(webview);
 
@@ -262,7 +270,7 @@ extern "C"
 		return -1;
 	}
 
-	EXPORT void* aws_webview_getHandle(cWebViewPtr_t webview)
+	AWS_EXPORT void* aws_webview_getHandle(cWebViewPtr_t webview)
 	{
 		auto view = reinterpret_cast<Awesomium::WebView*>(webview);
 
@@ -273,7 +281,7 @@ extern "C"
 		return nullptr;
 	}
 
-	EXPORT void aws_webview_setParentWindow(cWebViewPtr_t webview, void* window)
+	AWS_EXPORT void aws_webview_setParentWindow(cWebViewPtr_t webview, void* window)
 	{
 		auto view = reinterpret_cast<Awesomium::WebView*>(webview);
 
@@ -283,7 +291,7 @@ extern "C"
 		}
 	}
 
-	EXPORT void* aws_webview_getParentWindow(cWebViewPtr_t webview)
+	AWS_EXPORT void* aws_webview_getParentWindow(cWebViewPtr_t webview)
 	{
 		auto view = reinterpret_cast<Awesomium::WebView*>(webview);
 
@@ -294,7 +302,7 @@ extern "C"
 		return nullptr;
 	}
 
-	EXPORT void* aws_webview_getWindow(cWebViewPtr_t webview)
+	AWS_EXPORT void* aws_webview_getWindow(cWebViewPtr_t webview)
 	{
 		auto view = reinterpret_cast<Awesomium::WebView*>(webview);
 
@@ -307,7 +315,7 @@ extern "C"
 
 	// ------------ SET LISTENERS
 
-	EXPORT void aws_webview_setViewListener(cWebViewPtr_t webview, cWebView_onViewPtr_t listener)
+	AWS_EXPORT void aws_webview_setViewListener(cWebViewPtr_t webview, cWebView_onViewPtr_t listener)
 	{
 		auto view = reinterpret_cast<Awesomium::WebView*>(webview);
 
@@ -317,7 +325,7 @@ extern "C"
 		}
 	}
 
-	EXPORT void aws_webview_setProcessListener(cWebViewPtr_t webview, cWebView_onProcessPtr_t listener)
+	AWS_EXPORT void aws_webview_setProcessListener(cWebViewPtr_t webview, cWebView_onProcessPtr_t listener)
 	{
 		auto view = reinterpret_cast<Awesomium::WebView*>(webview);
 
@@ -327,7 +335,7 @@ extern "C"
 		}
 	}
 
-	EXPORT void aws_webview_setLoadListener(cWebViewPtr_t webview, cWebView_onLoadPtr_t listener)
+	AWS_EXPORT void aws_webview_setLoadListener(cWebViewPtr_t webview, cWebView_onLoadPtr_t listener)
 	{
 		auto view = reinterpret_cast<Awesomium::WebView*>(webview);
 
@@ -337,7 +345,7 @@ extern "C"
 		}
 	}
 
-	EXPORT void aws_webview_setMenuListener(cWebViewPtr_t webview, cWebView_onMenuPtr_t listener)
+	AWS_EXPORT void aws_webview_setMenuListener(cWebViewPtr_t webview, cWebView_onMenuPtr_t listener)
 	{
 		auto view = reinterpret_cast<Awesomium::WebView*>(webview);
 
@@ -347,7 +355,7 @@ extern "C"
 		}
 	}
 
-	EXPORT void aws_webview_setDialogListener(cWebViewPtr_t webview, cWebView_onDialogPtr_t listener)
+	AWS_EXPORT void aws_webview_setDialogListener(cWebViewPtr_t webview, cWebView_onDialogPtr_t listener)
 	{
 		auto view = reinterpret_cast<Awesomium::WebView*>(webview);
 
@@ -357,7 +365,7 @@ extern "C"
 		}
 	}
 
-	EXPORT void aws_webview_setPrintListener(cWebViewPtr_t webview, cWebView_onPrintPtr_t listener)
+	AWS_EXPORT void aws_webview_setPrintListener(cWebViewPtr_t webview, cWebView_onPrintPtr_t listener)
 	{
 		auto view = reinterpret_cast<Awesomium::WebView*>(webview);
 
@@ -367,7 +375,7 @@ extern "C"
 		}
 	}
 
-	EXPORT void aws_webview_setDownloadListener(cWebViewPtr_t webview, cWebView_onDownloadPtr_t listener)
+	AWS_EXPORT void aws_webview_setDownloadListener(cWebViewPtr_t webview, cWebView_onDownloadPtr_t listener)
 	{
 		auto view = reinterpret_cast<Awesomium::WebView*>(webview);
 
@@ -377,7 +385,7 @@ extern "C"
 		}
 	}
 
-	EXPORT void aws_webview_setIMEListener(cWebViewPtr_t webview, cWebView_onIMEPtr_t listener)
+	AWS_EXPORT void aws_webview_setIMEListener(cWebViewPtr_t webview, cWebView_onIMEPtr_t listener)
 	{
 		auto view = reinterpret_cast<Awesomium::WebView*>(webview);
 
@@ -390,7 +398,7 @@ extern "C"
 
 	// ------------ GET LISTENERS
 
-	EXPORT cWebView_onViewPtr_t aws_webview_getViewListener(cWebViewPtr_t webview)
+	AWS_EXPORT cWebView_onViewPtr_t aws_webview_getViewListener(cWebViewPtr_t webview)
 	{
 		auto view = reinterpret_cast<Awesomium::WebView*>(webview);
 
@@ -401,7 +409,7 @@ extern "C"
 		return nullptr;
 	}
 
-	EXPORT cWebView_onLoadPtr_t aws_webview_getLoadListener(cWebViewPtr_t webview)
+	AWS_EXPORT cWebView_onLoadPtr_t aws_webview_getLoadListener(cWebViewPtr_t webview)
 	{
 		auto view = reinterpret_cast<Awesomium::WebView*>(webview);
 
@@ -412,7 +420,7 @@ extern "C"
 		return nullptr;
 	}
 
-	EXPORT cWebView_onProcessPtr_t aws_webview_getProcessListener(cWebViewPtr_t webview)
+	AWS_EXPORT cWebView_onProcessPtr_t aws_webview_getProcessListener(cWebViewPtr_t webview)
 	{
 		auto view = reinterpret_cast<Awesomium::WebView*>(webview);
 
@@ -423,7 +431,7 @@ extern "C"
 		return nullptr;
 	}
 
-	EXPORT cWebView_onMenuPtr_t aws_webview_getMenuListener(cWebViewPtr_t webview)
+	AWS_EXPORT cWebView_onMenuPtr_t aws_webview_getMenuListener(cWebViewPtr_t webview)
 	{
 		auto view = reinterpret_cast<Awesomium::WebView*>(webview);
 
@@ -434,7 +442,7 @@ extern "C"
 		return nullptr;
 	}
 
-	EXPORT cWebView_onDialogPtr_t aws_webview_getDialogListener(cWebViewPtr_t webview)
+	AWS_EXPORT cWebView_onDialogPtr_t aws_webview_getDialogListener(cWebViewPtr_t webview)
 	{
 		auto view = reinterpret_cast<Awesomium::WebView*>(webview);
 
@@ -445,7 +453,7 @@ extern "C"
 		return nullptr;
 	}
 	
-	EXPORT cWebView_onPrintPtr_t aws_webview_getPrintListener(cWebViewPtr_t webview)
+	AWS_EXPORT cWebView_onPrintPtr_t aws_webview_getPrintListener(cWebViewPtr_t webview)
 	{
 		auto view = reinterpret_cast<Awesomium::WebView*>(webview);
 
@@ -456,7 +464,7 @@ extern "C"
 		return nullptr;
 	}
 
-	EXPORT cWebView_onDownloadPtr_t aws_webview_getDownloadListener(cWebViewPtr_t webview)
+	AWS_EXPORT cWebView_onDownloadPtr_t aws_webview_getDownloadListener(cWebViewPtr_t webview)
 	{
 		auto view = reinterpret_cast<Awesomium::WebView*>(webview);
 
@@ -467,7 +475,7 @@ extern "C"
 		return nullptr;
 	}
 
-	EXPORT cWebView_onIMEPtr_t aws_webview_getIMEListener(cWebViewPtr_t webview)
+	AWS_EXPORT cWebView_onIMEPtr_t aws_webview_getIMEListener(cWebViewPtr_t webview)
 	{
 		auto view = reinterpret_cast<Awesomium::WebView*>(webview);
 
@@ -480,7 +488,7 @@ extern "C"
 
 	// -------------------------------
 
-	EXPORT void aws_webview_loadURL(cWebViewPtr_t webview, cWebUrlPtr_t url)
+	AWS_EXPORT void aws_webview_loadURL(cWebViewPtr_t webview, cWebUrlPtr_t url)
 	{
 		auto view = reinterpret_cast<Awesomium::WebView*>(webview);
 
@@ -490,7 +498,7 @@ extern "C"
 		}
 	}
 
-	EXPORT void aws_webview_goBack(cWebViewPtr_t webview)
+	AWS_EXPORT void aws_webview_goBack(cWebViewPtr_t webview)
 	{
 		auto view = reinterpret_cast<Awesomium::WebView*>(webview);
 
@@ -499,7 +507,7 @@ extern "C"
 		}
 	}
 
-	EXPORT void aws_webview_goForward(cWebViewPtr_t webview)
+	AWS_EXPORT void aws_webview_goForward(cWebViewPtr_t webview)
 	{
 		auto view = reinterpret_cast<Awesomium::WebView*>(webview);
 
@@ -508,7 +516,7 @@ extern "C"
 		}
 	}
 
-	EXPORT void aws_webview_goToHistoryOffset(cWebViewPtr_t webview, int offset)
+	AWS_EXPORT void aws_webview_goToHistoryOffset(cWebViewPtr_t webview, int offset)
 	{
 		auto view = reinterpret_cast<Awesomium::WebView*>(webview);
 
@@ -517,7 +525,7 @@ extern "C"
 		}
 	}
 
-	EXPORT void aws_webview_stop(cWebViewPtr_t webview)
+	AWS_EXPORT void aws_webview_stop(cWebViewPtr_t webview)
 	{
 		auto view = reinterpret_cast<Awesomium::WebView*>(webview);
 
@@ -526,7 +534,7 @@ extern "C"
 		}
 	}
 
-	EXPORT void aws_webview_reload(cWebViewPtr_t webview, bool ignoreCache)
+	AWS_EXPORT void aws_webview_reload(cWebViewPtr_t webview, bool ignoreCache)
 	{
 		auto view = reinterpret_cast<Awesomium::WebView*>(webview);
 
@@ -535,7 +543,7 @@ extern "C"
 		}
 	}
 
-	EXPORT bool aws_webview_canGoBack(cWebViewPtr_t webview)
+	AWS_EXPORT bool aws_webview_canGoBack(cWebViewPtr_t webview)
 	{
 		auto view = reinterpret_cast<Awesomium::WebView*>(webview);
 
@@ -546,7 +554,7 @@ extern "C"
 		return false;
 	}
 
-	EXPORT bool aws_webview_canGoForward(cWebViewPtr_t webview)
+	AWS_EXPORT bool aws_webview_canGoForward(cWebViewPtr_t webview)
 	{
 		auto view = reinterpret_cast<Awesomium::WebView*>(webview);
 
@@ -557,7 +565,7 @@ extern "C"
 		return false;
 	}
 
-	EXPORT cSurfacePtr_t aws_webview_getSurface(cWebViewPtr_t webview)
+	AWS_EXPORT cSurfacePtr_t aws_webview_getSurface(cWebViewPtr_t webview)
 	{
 		auto view = reinterpret_cast<Awesomium::WebView*>(webview);
 
@@ -568,7 +576,7 @@ extern "C"
 		return nullptr;
 	}
 
-	EXPORT cWebUrlPtr_t aws_webview_getURL(cWebViewPtr_t webview)
+	AWS_EXPORT cWebUrlPtr_t aws_webview_getURL(cWebViewPtr_t webview)
 	{
 		auto view = reinterpret_cast<Awesomium::WebView*>(webview);
 
@@ -581,7 +589,7 @@ extern "C"
 		return nullptr;
 	}
 
-	EXPORT cWebStringPtr_t aws_webview_getTitle(cWebViewPtr_t webview)
+	AWS_EXPORT cWebStringPtr_t aws_webview_getTitle(cWebViewPtr_t webview)
 	{
 		auto view = reinterpret_cast<Awesomium::WebView*>(webview);
 
@@ -594,7 +602,7 @@ extern "C"
 		return nullptr;
 	}
 
-	EXPORT cWebSessionPtr_t aws_webview_getSession(cWebViewPtr_t webview)
+	AWS_EXPORT cWebSessionPtr_t aws_webview_getSession(cWebViewPtr_t webview)
 	{
 		auto view = reinterpret_cast<Awesomium::WebView*>(webview);
 
@@ -605,7 +613,7 @@ extern "C"
 		return nullptr;
 	}
 
-	EXPORT bool aws_webview_isLoading(cWebViewPtr_t webview)
+	AWS_EXPORT bool aws_webview_isLoading(cWebViewPtr_t webview)
 	{
 		auto view = reinterpret_cast<Awesomium::WebView*>(webview);
 
@@ -616,7 +624,7 @@ extern "C"
 		return false;
 	}
 
-	EXPORT bool aws_webview_isCrashed(cWebViewPtr_t webview)
+	AWS_EXPORT bool aws_webview_isCrashed(cWebViewPtr_t webview)
 	{
 		auto view = reinterpret_cast<Awesomium::WebView*>(webview);
 
@@ -627,7 +635,7 @@ extern "C"
 		return false;
 	}
 
-	EXPORT void aws_webview_resize(cWebViewPtr_t webview, int x, int y)
+	AWS_EXPORT void aws_webview_resize(cWebViewPtr_t webview, int x, int y)
 	{
 		auto view = reinterpret_cast<Awesomium::WebView*>(webview);
 
@@ -636,7 +644,7 @@ extern "C"
 		}
 	}
 
-	EXPORT void aws_webview_setTransparent(cWebViewPtr_t webview, bool state)
+	AWS_EXPORT void aws_webview_setTransparent(cWebViewPtr_t webview, bool state)
 	{
 		auto view = reinterpret_cast<Awesomium::WebView*>(webview);
 
@@ -645,7 +653,7 @@ extern "C"
 		}
 	}
 
-	EXPORT bool aws_webview_isTransparent(cWebViewPtr_t webview)
+	AWS_EXPORT bool aws_webview_isTransparent(cWebViewPtr_t webview)
 	{
 		auto view = reinterpret_cast<Awesomium::WebView*>(webview);
 
@@ -656,7 +664,7 @@ extern "C"
 		return false;
 	}
 
-	EXPORT void aws_webview_pauseRendering(cWebViewPtr_t webview)
+	AWS_EXPORT void aws_webview_pauseRendering(cWebViewPtr_t webview)
 	{
 		auto view = reinterpret_cast<Awesomium::WebView*>(webview);
 
@@ -665,7 +673,7 @@ extern "C"
 		}
 	}
 
-	EXPORT void aws_webview_resumeRendering(cWebViewPtr_t webview)
+	AWS_EXPORT void aws_webview_resumeRendering(cWebViewPtr_t webview)
 	{
 		auto view = reinterpret_cast<Awesomium::WebView*>(webview);
 
@@ -674,7 +682,7 @@ extern "C"
 		}
 	}
 
-	EXPORT void aws_webview_focus(cWebViewPtr_t webview)
+	AWS_EXPORT void aws_webview_focus(cWebViewPtr_t webview)
 	{
 		auto view = reinterpret_cast<Awesomium::WebView*>(webview);
 
@@ -683,7 +691,7 @@ extern "C"
 		}
 	}
 
-	EXPORT void aws_webview_unfocus(cWebViewPtr_t webview)
+	AWS_EXPORT void aws_webview_unfocus(cWebViewPtr_t webview)
 	{
 		auto view = reinterpret_cast<Awesomium::WebView*>(webview);
 
@@ -692,7 +700,7 @@ extern "C"
 		}
 	}
 
-	EXPORT int aws_webview_focusedElementType(cWebViewPtr_t webview)
+	AWS_EXPORT int aws_webview_focusedElementType(cWebViewPtr_t webview)
 	{
 		auto view = reinterpret_cast<Awesomium::WebView*>(webview);
 
@@ -703,7 +711,7 @@ extern "C"
 		return -1;
 	}
 
-	EXPORT void aws_webview_injectMouseMove(cWebViewPtr_t webview, int mx, int my)
+	AWS_EXPORT void aws_webview_injectMouseMove(cWebViewPtr_t webview, int mx, int my)
 	{
 		auto view = reinterpret_cast<Awesomium::WebView*>(webview);
 
@@ -712,7 +720,7 @@ extern "C"
 		}
 	}
 
-	EXPORT void aws_webview_injectMouseButton(cWebViewPtr_t webview, int button, bool down)
+	AWS_EXPORT void aws_webview_injectMouseButton(cWebViewPtr_t webview, int button, bool down)
 	{
 		auto view = reinterpret_cast<Awesomium::WebView*>(webview);
 
@@ -725,7 +733,7 @@ extern "C"
 		}
 	}
 
-	EXPORT void aws_webview_injectMouseWheel(cWebViewPtr_t webview, int wx, int wy)
+	AWS_EXPORT void aws_webview_injectMouseWheel(cWebViewPtr_t webview, int wx, int wy)
 	{
 		auto view = reinterpret_cast<Awesomium::WebView*>(webview);
 
@@ -734,7 +742,7 @@ extern "C"
 		}
 	}
 
-	EXPORT void aws_webview_injectKeyboardEvent(cWebViewPtr_t webview, cKeyboardEvtPtr_t keyevent)
+	AWS_EXPORT void aws_webview_injectKeyboardEvent(cWebViewPtr_t webview, cKeyboardEvtPtr_t keyevent)
 	{
 #pragma message (__FILE__ "[" STRING(__LINE__) "]: function not implemented")
 		auto view = reinterpret_cast<Awesomium::WebView*>(webview);
@@ -745,7 +753,7 @@ extern "C"
 		}
 	}
 
-	EXPORT void aws_webview_injectTouchEvent(cWebViewPtr_t webview, cTouchEvtPtr_t touchevent)
+	AWS_EXPORT void aws_webview_injectTouchEvent(cWebViewPtr_t webview, cTouchEvtPtr_t touchevent)
 	{
 #pragma message (__FILE__ "[" STRING(__LINE__) "]: function not implemented")
 		auto view = reinterpret_cast<Awesomium::WebView*>(webview);
@@ -756,7 +764,7 @@ extern "C"
 		}
 	}
 
-	EXPORT void aws_webview_activateIME(cWebViewPtr_t webview, bool state)
+	AWS_EXPORT void aws_webview_activateIME(cWebViewPtr_t webview, bool state)
 	{
 		auto view = reinterpret_cast<Awesomium::WebView*>(webview);
 
@@ -765,16 +773,16 @@ extern "C"
 		}
 	}
 
-	EXPORT void aws_webview_setIMEComposition(cWebViewPtr_t webview, cString target_string, int cursorpos, int targetstart, int tartgetend)
+	AWS_EXPORT void aws_webview_setIMEComposition(cWebViewPtr_t webview, cWebStringPtr_t target_string, int cursorpos, int targetstart, int tartgetend)
 	{
 		auto view = reinterpret_cast<Awesomium::WebView*>(webview);
 
 		if ( view ) {
-			view->SetIMEComposition( toAweString(target_string), cursorpos, targetstart, tartgetend);
+			view->SetIMEComposition( *reinterpret_cast<Awesomium::WebString*>(target_string), cursorpos, targetstart, tartgetend);
 		}
 	}
 
-	EXPORT void aws_webview_cancelIMEComposition(cWebViewPtr_t webview)
+	AWS_EXPORT void aws_webview_cancelIMEComposition(cWebViewPtr_t webview)
 	{
 		auto view = reinterpret_cast<Awesomium::WebView*>(webview);
 
@@ -783,7 +791,7 @@ extern "C"
 		}
 	}
 
-	EXPORT void aws_webview_undo(cWebViewPtr_t webview)
+	AWS_EXPORT void aws_webview_undo(cWebViewPtr_t webview)
 	{
 		auto view = reinterpret_cast<Awesomium::WebView*>(webview);
 
@@ -792,7 +800,7 @@ extern "C"
 		}
 	}
 
-	EXPORT void aws_webview_redo(cWebViewPtr_t webview)
+	AWS_EXPORT void aws_webview_redo(cWebViewPtr_t webview)
 	{
 		auto view = reinterpret_cast<Awesomium::WebView*>(webview);
 
@@ -801,7 +809,7 @@ extern "C"
 		}
 	}
 
-	EXPORT void aws_webview_cut(cWebViewPtr_t webview)
+	AWS_EXPORT void aws_webview_cut(cWebViewPtr_t webview)
 	{
 		auto view = reinterpret_cast<Awesomium::WebView*>(webview);
 
@@ -810,7 +818,7 @@ extern "C"
 		}
 	}
 
-	EXPORT void aws_webview_copy(cWebViewPtr_t webview)
+	AWS_EXPORT void aws_webview_copy(cWebViewPtr_t webview)
 	{
 		auto view = reinterpret_cast<Awesomium::WebView*>(webview);
 
@@ -819,7 +827,7 @@ extern "C"
 		}
 	}
 
-	EXPORT void aws_webview_copyImageAt(cWebViewPtr_t webview, int x, int y)
+	AWS_EXPORT void aws_webview_copyImageAt(cWebViewPtr_t webview, int x, int y)
 	{
 		auto view = reinterpret_cast<Awesomium::WebView*>(webview);
 
@@ -828,7 +836,7 @@ extern "C"
 		}
 	}
 
-	EXPORT void aws_webview_paste(cWebViewPtr_t webview)
+	AWS_EXPORT void aws_webview_paste(cWebViewPtr_t webview)
 	{
 		auto view = reinterpret_cast<Awesomium::WebView*>(webview);
 
@@ -837,7 +845,7 @@ extern "C"
 		}
 	}
 
-	EXPORT void aws_webview_pasteAndMatchStyle(cWebViewPtr_t webview)
+	AWS_EXPORT void aws_webview_pasteAndMatchStyle(cWebViewPtr_t webview)
 	{
 		auto view = reinterpret_cast<Awesomium::WebView*>(webview);
 
@@ -846,7 +854,7 @@ extern "C"
 		}
 	}
 
-	EXPORT void aws_webview_selectAll(cWebViewPtr_t webview)
+	AWS_EXPORT void aws_webview_selectAll(cWebViewPtr_t webview)
 	{
 		auto view = reinterpret_cast<Awesomium::WebView*>(webview);
 
@@ -855,18 +863,18 @@ extern "C"
 		}
 	}
 
-	EXPORT void aws_webview_printToFile(cWebViewPtr_t webview, cString outDir, void* printconf)
+	AWS_EXPORT void aws_webview_printToFile(cWebViewPtr_t webview, cWebStringPtr_t outDir, void* printconf)
 	{
 #pragma message (__FILE__ "[" STRING(__LINE__) "]: function not implemented")
 		auto view = reinterpret_cast<Awesomium::WebView*>(webview);
 
 		if ( view ) {
 			auto pconf = Awesomium::PrintConfig();
-			view->PrintToFile( toAweString(outDir), pconf );
+			view->PrintToFile( *reinterpret_cast<Awesomium::WebString*>(outDir), pconf );
 		}
 	}
 
-	EXPORT int aws_webview_lastError(cWebViewPtr_t webview)
+	AWS_EXPORT int aws_webview_lastError(cWebViewPtr_t webview)
 	{
 		auto view = reinterpret_cast<Awesomium::WebView*>(webview);
 
@@ -877,36 +885,37 @@ extern "C"
 		return -1;
 	}
 
-	EXPORT cJSValuePtr_t aws_webview_createGlobalJSObject(cWebViewPtr_t webview, cString objname)
+	AWS_EXPORT cJSValuePtr_t aws_webview_createGlobalJSObject(cWebViewPtr_t webview, cWebStringPtr_t objname)
 	{
 		auto view = reinterpret_cast<Awesomium::WebView*>(webview);
 
 		if ( view ) {
 			return reinterpret_cast <cJSValuePtr_t>(
-				new Awesomium::JSValue(view->CreateGlobalJavascriptObject( toAweString(objname) ))
+				new Awesomium::JSValue(view->CreateGlobalJavascriptObject( *reinterpret_cast<Awesomium::WebString*>(objname) ))
 			);
 		}
 
 		return nullptr;
 	}
 
-	EXPORT void aws_webview_executeJS(cWebViewPtr_t webview, cString script, cString fxpath)
+	AWS_EXPORT void aws_webview_executeJS(cWebViewPtr_t webview, cWebStringPtr_t script, cWebStringPtr_t fxpath)
 	{
 		auto view = reinterpret_cast<Awesomium::WebView*>(webview);
 
 		if ( view ) {
-			view->ExecuteJavascript( toAweString(script), toAweString(fxpath) );
+			view->ExecuteJavascript( *reinterpret_cast<Awesomium::WebString*>(script), *reinterpret_cast<Awesomium::WebString*>(fxpath) );
 		}
 	}
 
-	EXPORT cJSValuePtr_t aws_webview_executeJSWithResult(cWebViewPtr_t webview, cString script, cString fxpath)
+	AWS_EXPORT cJSValuePtr_t aws_webview_executeJSWithResult(cWebViewPtr_t webview, cWebStringPtr_t script, cWebStringPtr_t fxpath)
 	{
 		auto view = reinterpret_cast<Awesomium::WebView*>(webview);
 
 		if ( view ) {
 			return reinterpret_cast<cJSValuePtr_t>(
 					new Awesomium::JSValue(
-						view->ExecuteJavascriptWithResult( toAweString(script), toAweString(fxpath) )
+						view->ExecuteJavascriptWithResult( *reinterpret_cast<Awesomium::WebString*>(script), 
+							*reinterpret_cast<Awesomium::WebString*>(fxpath) )
 					)
 				);
 		}
@@ -914,7 +923,7 @@ extern "C"
 		return nullptr;
 	}
 
-	EXPORT void aws_webview_setJSMethodHandler(cWebViewPtr_t webview, cJSMethodHandlerPtr_t jshandler)
+	AWS_EXPORT void aws_webview_setJSMethodHandler(cWebViewPtr_t webview, cJSMethodHandlerPtr_t jshandler)
 	{
 		auto view = reinterpret_cast<Awesomium::WebView*>(webview);
 
@@ -924,7 +933,7 @@ extern "C"
 		}
 	}
 
-	EXPORT void aws_webview_didSelectPopupMenuItem(cWebViewPtr_t webview, int idx)
+	AWS_EXPORT void aws_webview_didSelectPopupMenuItem(cWebViewPtr_t webview, int idx)
 	{
 		auto view = reinterpret_cast<Awesomium::WebView*>(webview);
 
@@ -933,7 +942,7 @@ extern "C"
 		}
 	}
 
-	EXPORT void aws_webview_didCancelPopupMenu(cWebViewPtr_t webview)
+	AWS_EXPORT void aws_webview_didCancelPopupMenu(cWebViewPtr_t webview)
 	{
 		auto view = reinterpret_cast<Awesomium::WebView*>(webview);
 
@@ -942,25 +951,25 @@ extern "C"
 		}
 	}
 
-	EXPORT void aws_webview_didChooseFiles(cWebViewPtr_t webview, cStringArray arr, bool write)
+	AWS_EXPORT void aws_webview_didChooseFiles(cWebViewPtr_t webview, cWebStringArrayPtr_t arr, bool write)
 	{
 		auto view = reinterpret_cast<Awesomium::WebView*>(webview);
 
 		if ( view ) {
-			view->DidChooseFiles( toAweStrArray(arr), write );
+			view->DidChooseFiles( *reinterpret_cast<Awesomium::WebStringArray*>(arr), write );
 		}
 	}
 
-	EXPORT void aws_webview_didLogin(cWebViewPtr_t webview, int reqId, cString uname, cString pwd)
+	AWS_EXPORT void aws_webview_didLogin(cWebViewPtr_t webview, int reqId, cWebStringPtr_t uname, cWebStringPtr_t pwd)
 	{
 		auto view = reinterpret_cast<Awesomium::WebView*>(webview);
 
 		if ( view ) {
-			view->DidLogin( reqId, toAweString(uname), toAweString(pwd) );
+			view->DidLogin( reqId, *reinterpret_cast<Awesomium::WebString*>(uname), *reinterpret_cast<Awesomium::WebString*>(pwd) );
 		}
 	}
 
-	EXPORT void aws_webview_didCancelLogin(cWebViewPtr_t webview, int reqId)
+	AWS_EXPORT void aws_webview_didCancelLogin(cWebViewPtr_t webview, int reqId)
 	{
 		auto view = reinterpret_cast<Awesomium::WebView*>(webview);
 
@@ -969,16 +978,16 @@ extern "C"
 		}
 	}
 
-	EXPORT void aws_webview_didChooseDownloadPath(cWebViewPtr_t webview, int downloadId, cString path)
+	AWS_EXPORT void aws_webview_didChooseDownloadPath(cWebViewPtr_t webview, int downloadId, cWebStringPtr_t path)
 	{
 		auto view = reinterpret_cast<Awesomium::WebView*>(webview);
 
 		if ( view ) {
-			view->DidChooseDownloadPath( downloadId, toAweString(path) );
+			view->DidChooseDownloadPath( downloadId, *reinterpret_cast<Awesomium::WebString*>(path) );
 		}
 	}
 
-	EXPORT void aws_webview_didCancelDownload(cWebViewPtr_t webview, int downloadId)
+	AWS_EXPORT void aws_webview_didCancelDownload(cWebViewPtr_t webview, int downloadId)
 	{
 		auto view = reinterpret_cast<Awesomium::WebView*>(webview);
 
@@ -990,45 +999,45 @@ extern "C"
 	// ===============================================
 	// JSVALUE
 
-	EXPORT cJSValuePtr_t aws_jsvalue_new_bool(bool val)
+	AWS_EXPORT cJSValuePtr_t aws_jsvalue_new_bool(bool val)
 	{
 		return reinterpret_cast<cJSValuePtr_t>(new Awesomium::JSValue( val ));
 	}
 
-	EXPORT cJSValuePtr_t aws_jsvalue_new_int(int val)
+	AWS_EXPORT cJSValuePtr_t aws_jsvalue_new_int(int val)
 	{
 		return reinterpret_cast<cJSValuePtr_t>(new Awesomium::JSValue( val ));
 	}
 
-	EXPORT cJSValuePtr_t aws_jsvalue_new_double(double val)
+	AWS_EXPORT cJSValuePtr_t aws_jsvalue_new_double(double val)
 	{
 		return reinterpret_cast<cJSValuePtr_t>(new Awesomium::JSValue( val ));
 	}
 
-	EXPORT cJSValuePtr_t aws_jsvalue_new_string(cString val)
+	AWS_EXPORT cJSValuePtr_t aws_jsvalue_new_string(cWebStringPtr_t val)
 	{
-		return reinterpret_cast<cJSValuePtr_t>(new Awesomium::JSValue( toAweString(val) ));
+		return reinterpret_cast<cJSValuePtr_t>(new Awesomium::JSValue( *reinterpret_cast<Awesomium::WebString*>(val) ));
 	}
 
-	EXPORT cJSValuePtr_t aws_jsvalue_new_object(cJSObjectPtr_t val)
+	AWS_EXPORT cJSValuePtr_t aws_jsvalue_new_object(cJSObjectPtr_t val)
 	{
 		auto obj = reinterpret_cast<Awesomium::JSObject*>(val);
 		return reinterpret_cast<cJSValuePtr_t>(new Awesomium::JSValue( *obj ));
 	}
 
-	EXPORT cJSValuePtr_t aws_jsvalue_new_array(cJSArrayPtr_t val)
+	AWS_EXPORT cJSValuePtr_t aws_jsvalue_new_array(cJSArrayPtr_t val)
 	{
 		auto arr = reinterpret_cast<Awesomium::JSArray*>(val);
 		return reinterpret_cast<cJSValuePtr_t>(new Awesomium::JSValue( *arr ));
 	}
 
-	EXPORT cJSValuePtr_t aws_jsvalue_new_jsvalue(cJSValuePtr_t val)
+	AWS_EXPORT cJSValuePtr_t aws_jsvalue_new_jsvalue(cJSValuePtr_t val)
 	{
 		auto obj = reinterpret_cast<Awesomium::JSValue*>(val);
 		return reinterpret_cast<cJSValuePtr_t>(new Awesomium::JSValue( *obj ));
 	}
 
-	EXPORT void aws_jsvalue_delete(cJSValuePtr_t jsvalue)
+	AWS_EXPORT void aws_jsvalue_delete(cJSValuePtr_t jsvalue)
 	{
 		auto obj = reinterpret_cast<Awesomium::JSValue*>(jsvalue);
 
@@ -1037,17 +1046,17 @@ extern "C"
 		}
 	}
 
-	EXPORT const cJSValuePtr_t aws_jsvalue_undefined()
+	AWS_EXPORT const cJSValuePtr_t aws_jsvalue_undefined()
 	{
 		return reinterpret_cast<cJSValuePtr_t>(const_cast<Awesomium::JSValue*>(&Awesomium::JSValue::Undefined()));
 	}
 
-	EXPORT const cJSValuePtr_t aws_jsvalue_null()
+	AWS_EXPORT const cJSValuePtr_t aws_jsvalue_null()
 	{
 		return reinterpret_cast<cJSValuePtr_t>(const_cast<Awesomium::JSValue*>(&Awesomium::JSValue::Null()));
 	}
 
-	EXPORT bool aws_jsvalue_isBoolean(cJSValuePtr_t jsval)
+	AWS_EXPORT bool aws_jsvalue_isBoolean(cJSValuePtr_t jsval)
 	{
 		auto jsv = reinterpret_cast<Awesomium::JSValue*>(jsval);
 
@@ -1058,7 +1067,7 @@ extern "C"
 		return false;
 	}
 
-	EXPORT bool aws_jsvalue_isInteger(cJSValuePtr_t jsval)
+	AWS_EXPORT bool aws_jsvalue_isInteger(cJSValuePtr_t jsval)
 	{
 		auto jsv = reinterpret_cast<Awesomium::JSValue*>(jsval);
 
@@ -1069,7 +1078,7 @@ extern "C"
 		return false;
 	}
 
-	EXPORT bool aws_jsvalue_isDouble(cJSValuePtr_t jsval)
+	AWS_EXPORT bool aws_jsvalue_isDouble(cJSValuePtr_t jsval)
 	{
 		auto jsv = reinterpret_cast<Awesomium::JSValue*>(jsval);
 
@@ -1080,7 +1089,7 @@ extern "C"
 		return false;
 	}
 
-	EXPORT bool aws_jsvalue_isNumber(cJSValuePtr_t jsval)
+	AWS_EXPORT bool aws_jsvalue_isNumber(cJSValuePtr_t jsval)
 	{
 		auto jsv = reinterpret_cast<Awesomium::JSValue*>(jsval);
 
@@ -1091,7 +1100,7 @@ extern "C"
 		return false;
 	}
 
-	EXPORT bool aws_jsvalue_isString(cJSValuePtr_t jsval)
+	AWS_EXPORT bool aws_jsvalue_isString(cJSValuePtr_t jsval)
 	{
 		auto jsv = reinterpret_cast<Awesomium::JSValue*>(jsval);
 
@@ -1102,7 +1111,7 @@ extern "C"
 		return false;
 	}
 
-	EXPORT bool aws_jsvalue_isArray(cJSValuePtr_t jsval)
+	AWS_EXPORT bool aws_jsvalue_isArray(cJSValuePtr_t jsval)
 	{
 		auto jsv = reinterpret_cast<Awesomium::JSValue*>(jsval);
 
@@ -1113,7 +1122,7 @@ extern "C"
 		return false;
 	}
 
-	EXPORT bool aws_jsvalue_isObject(cJSValuePtr_t jsval)
+	AWS_EXPORT bool aws_jsvalue_isObject(cJSValuePtr_t jsval)
 	{
 		auto jsv = reinterpret_cast<Awesomium::JSValue*>(jsval);
 
@@ -1124,7 +1133,7 @@ extern "C"
 		return false;
 	}
 
-	EXPORT bool aws_jsvalue_isNull(cJSValuePtr_t jsval)
+	AWS_EXPORT bool aws_jsvalue_isNull(cJSValuePtr_t jsval)
 	{
 		auto jsv = reinterpret_cast<Awesomium::JSValue*>(jsval);
 
@@ -1135,7 +1144,7 @@ extern "C"
 		return false;
 	}
 
-	EXPORT bool aws_jsvalue_isUndefined(cJSValuePtr_t jsval)
+	AWS_EXPORT bool aws_jsvalue_isUndefined(cJSValuePtr_t jsval)
 	{
 		auto jsv = reinterpret_cast<Awesomium::JSValue*>(jsval);
 
@@ -1146,18 +1155,18 @@ extern "C"
 		return false;
 	}
 
-	EXPORT cString aws_jsvalue_toString(cJSValuePtr_t jsval)
+	AWS_EXPORT cWebStringPtr_t aws_jsvalue_toString(cJSValuePtr_t jsval)
 	{
 		auto jsv = reinterpret_cast<Awesomium::JSValue*>(jsval);
 
 		if ( jsv ) {
-			return fromAweString( jsv->ToString() );
+			return reinterpret_cast<cWebStringPtr_t>( new Awesomium::WebString(jsv->ToString()) );
 		}
 
-		return cString();
+		return nullptr;
 	}
 
-	EXPORT int aws_jsvalue_toInteger(cJSValuePtr_t jsval)
+	AWS_EXPORT int aws_jsvalue_toInteger(cJSValuePtr_t jsval)
 	{
 		auto jsv = reinterpret_cast<Awesomium::JSValue*>(jsval);
 
@@ -1168,7 +1177,7 @@ extern "C"
 		return (unsigned)-1;
 	}
 
-	EXPORT double aws_jsvalue_toDouble(cJSValuePtr_t jsval)
+	AWS_EXPORT double aws_jsvalue_toDouble(cJSValuePtr_t jsval)
 	{
 		auto jsv = reinterpret_cast<Awesomium::JSValue*>(jsval);
 
@@ -1179,7 +1188,7 @@ extern "C"
 		return 0;
 	}
 
-	EXPORT bool aws_jsvalue_toBoolean(cJSValuePtr_t jsval)
+	AWS_EXPORT bool aws_jsvalue_toBoolean(cJSValuePtr_t jsval)
 	{
 		auto jsv = reinterpret_cast<Awesomium::JSValue*>(jsval);
 
@@ -1190,7 +1199,7 @@ extern "C"
 		return false;
 	}
 
-	EXPORT cJSArrayPtr_t aws_jsvalue_toArray(cJSValuePtr_t jsval)
+	AWS_EXPORT cJSArrayPtr_t aws_jsvalue_toArray(cJSValuePtr_t jsval)
 	{
 		auto jsv = reinterpret_cast<Awesomium::JSValue*>(jsval);
 
@@ -1203,7 +1212,7 @@ extern "C"
 		return nullptr;
 	}
 
-	EXPORT cJSObjectPtr_t aws_jsvalue_toObject(cJSValuePtr_t jsval)
+	AWS_EXPORT cJSObjectPtr_t aws_jsvalue_toObject(cJSValuePtr_t jsval)
 	{
 		auto jsv = reinterpret_cast<Awesomium::JSValue*>(jsval);
 
@@ -1219,12 +1228,12 @@ extern "C"
 	// =========================
 	// JS OBJECT
 
-	EXPORT cJSObjectPtr_t aws_jsobject_new()
+	AWS_EXPORT cJSObjectPtr_t aws_jsobject_new()
 	{
 		return reinterpret_cast<cJSObjectPtr_t>(new Awesomium::JSObject());
 	}
 
-	EXPORT void aws_jsobject_delete(cJSObjectPtr_t jsobj)
+	AWS_EXPORT void aws_jsobject_delete(cJSObjectPtr_t jsobj)
 	{
 		auto jso = reinterpret_cast<Awesomium::JSObject*>(jsobj);
 
@@ -1233,7 +1242,7 @@ extern "C"
 		}
 	}
 
-	EXPORT unsigned aws_jsobject_getRemoteId(cJSObjectPtr_t jsobj)
+	AWS_EXPORT unsigned aws_jsobject_getRemoteId(cJSObjectPtr_t jsobj)
 	{
 		auto jso = reinterpret_cast<Awesomium::JSObject*>(jsobj);
 
@@ -1244,7 +1253,7 @@ extern "C"
 		return -1;
 	}
 
-	EXPORT int aws_jsobject_getRefCount(cJSObjectPtr_t jsobj)
+	AWS_EXPORT int aws_jsobject_getRefCount(cJSObjectPtr_t jsobj)
 	{
 		auto jso = reinterpret_cast<Awesomium::JSObject*>(jsobj);
 
@@ -1255,7 +1264,7 @@ extern "C"
 		return -1;
 	}
 
-	EXPORT int aws_jsobject_getType(cJSObjectPtr_t jsobj)
+	AWS_EXPORT int aws_jsobject_getType(cJSObjectPtr_t jsobj)
 	{
 		auto jso = reinterpret_cast<Awesomium::JSObject*>(jsobj);
 
@@ -1266,7 +1275,7 @@ extern "C"
 		return -1;
 	}
 
-	EXPORT const cWebViewPtr_t aws_jsobject_getOwner(cJSObjectPtr_t jsobj)
+	AWS_EXPORT const cWebViewPtr_t aws_jsobject_getOwner(cJSObjectPtr_t jsobj)
 	{
 		auto jso = reinterpret_cast<Awesomium::JSObject*>(jsobj);
 
@@ -1277,50 +1286,50 @@ extern "C"
 		return nullptr;
 	}
 
-	EXPORT bool aws_jsobject_hasProperty(cJSObjectPtr_t jsobj, cString name)
+	AWS_EXPORT bool aws_jsobject_hasProperty(cJSObjectPtr_t jsobj, cWebStringPtr_t name)
 	{
 		auto jso = reinterpret_cast<Awesomium::JSObject*>(jsobj);
 
 		if ( jso ) {
-			return jso->HasProperty( toAweString(name) );
+			return jso->HasProperty( *reinterpret_cast<Awesomium::WebString*>(name) );
 		}
 
 		return false;
 	}
 
-	EXPORT cJSValuePtr_t aws_jsobject_getProperty(cJSObjectPtr_t jsobj, cString name)
+	AWS_EXPORT cJSValuePtr_t aws_jsobject_getProperty(cJSObjectPtr_t jsobj, cWebStringPtr_t name)
 	{
 		auto jso = reinterpret_cast<Awesomium::JSObject*>(jsobj);
 
 		if ( jso ) {
 			return reinterpret_cast<cJSValuePtr_t>(
-					new Awesomium::JSValue(jso->GetProperty( toAweString(name) ))
+					new Awesomium::JSValue(jso->GetProperty( *reinterpret_cast<Awesomium::WebString*>(name) ))
 				);
 		}
 
 		return nullptr;
 	}
 
-	EXPORT void aws_jsobject_setProperty(cJSObjectPtr_t jsobj, cString name, cJSValuePtr_t jsval)
+	AWS_EXPORT void aws_jsobject_setProperty(cJSObjectPtr_t jsobj, cWebStringPtr_t name, cJSValuePtr_t jsval)
 	{
 		auto jso = reinterpret_cast<Awesomium::JSObject*>(jsobj);
 
 		if ( jso ) {
 			auto val = reinterpret_cast<Awesomium::JSValue*>(jsval);
-			jso->SetProperty( toAweString(name), *val );
+			jso->SetProperty( *reinterpret_cast<Awesomium::WebString*>(name), *val );
 		}
 	}
 
-	EXPORT void aws_jsobject_removeProperty(cJSObjectPtr_t jsobj, cString name)
+	AWS_EXPORT void aws_jsobject_removeProperty(cJSObjectPtr_t jsobj, cWebStringPtr_t name)
 	{
 		auto jso = reinterpret_cast<Awesomium::JSObject*>(jsobj);
 
 		if ( jso ) {
-			jso->RemoveProperty( toAweString(name) );
+			jso->RemoveProperty( *reinterpret_cast<Awesomium::WebString*>(name) );
 		}
 	}
 
-	EXPORT cJSArrayPtr_t aws_jsobject_getPropertyNames(cJSObjectPtr_t jsobj)
+	AWS_EXPORT cJSArrayPtr_t aws_jsobject_getPropertyNames(cJSObjectPtr_t jsobj)
 	{
 		auto jso = reinterpret_cast<Awesomium::JSObject*>(jsobj);
 
@@ -1333,7 +1342,7 @@ extern "C"
 		return nullptr;
 	}
 
-	EXPORT cJSArrayPtr_t aws_jsobject_getMethodNames(cJSObjectPtr_t jsobj)
+	AWS_EXPORT cJSArrayPtr_t aws_jsobject_getMethodNames(cJSObjectPtr_t jsobj)
 	{
 		auto jso = reinterpret_cast<Awesomium::JSObject*>(jsobj);
 
@@ -1346,18 +1355,18 @@ extern "C"
 		return nullptr;
 	}
 
-	EXPORT bool aws_jsobject_hasMethod(cJSObjectPtr_t jsobj, cString name)
+	AWS_EXPORT bool aws_jsobject_hasMethod(cJSObjectPtr_t jsobj, cWebStringPtr_t name)
 	{
 		auto jso = reinterpret_cast<Awesomium::JSObject*>(jsobj);
 
 		if ( jso ) {
-			return jso->HasMethod( toAweString(name) );
+			return jso->HasMethod( *reinterpret_cast<Awesomium::WebString*>(name) );
 		}
 
 		return false;
 	}
 
-	EXPORT cJSValuePtr_t aws_jsobject_invoke(cJSObjectPtr_t jsobj, cString name, cJSArrayPtr_t args)
+	AWS_EXPORT cJSValuePtr_t aws_jsobject_invoke(cJSObjectPtr_t jsobj, cWebStringPtr_t name, cJSArrayPtr_t args)
 	{
 		auto jso = reinterpret_cast<Awesomium::JSObject*>(jsobj);
 
@@ -1365,38 +1374,38 @@ extern "C"
 			auto arg = Awesomium::JSArray();
 
 			return reinterpret_cast<cJSValuePtr_t>(
-						new Awesomium::JSValue(jso->Invoke( toAweString(name), arg ))
+						new Awesomium::JSValue(jso->Invoke( *reinterpret_cast<Awesomium::WebString*>(name), arg ))
 					);
 		}
 
 		return nullptr;
 	}
 
-	EXPORT cString aws_jsobject_toString(cJSObjectPtr_t jsobj)
+	AWS_EXPORT cWebStringPtr_t aws_jsobject_toString(cJSObjectPtr_t jsobj)
 	{
 		auto jso = reinterpret_cast<Awesomium::JSObject*>(jsobj);
 
 		if ( jso ) {
-			return fromAweString(jso->ToString());
+			return reinterpret_cast<cWebStringPtr_t>( new Awesomium::WebString(jso->ToString()) );
 		}
 
-		return cString();
+		return nullptr;
 	}
 
 	// =========================
 	// JS ARRAY
 
-	EXPORT cJSArrayPtr_t aws_jsarray_new_size(unsigned size)
+	AWS_EXPORT cJSArrayPtr_t aws_jsarray_new_size(unsigned size)
 	{
 		return reinterpret_cast<cJSArrayPtr_t>(new Awesomium::JSArray(size));
 	}
 
-	EXPORT cJSArrayPtr_t aws_jsarray_new()
+	AWS_EXPORT cJSArrayPtr_t aws_jsarray_new()
 	{
 		return reinterpret_cast<cJSArrayPtr_t>(new Awesomium::JSArray());
 	}
 
-	EXPORT void aws_jsarray_size(cJSArrayPtr_t jsarray)
+	AWS_EXPORT void aws_jsarray_size(cJSArrayPtr_t jsarray)
 	{
 		auto jsa = reinterpret_cast<Awesomium::JSArray*>(jsarray);
 
@@ -1405,7 +1414,7 @@ extern "C"
 		}
 	}
 
-	EXPORT unsigned aws_jsarray_getSize(cJSArrayPtr_t jsarray)
+	AWS_EXPORT unsigned aws_jsarray_getSize(cJSArrayPtr_t jsarray)
 	{
 		auto jsa = reinterpret_cast<Awesomium::JSArray*>(jsarray);
 
@@ -1416,7 +1425,7 @@ extern "C"
 		return (unsigned)-1;
 	}
 
-	EXPORT unsigned aws_jsarray_getCapacity(cJSArrayPtr_t jsarray)
+	AWS_EXPORT unsigned aws_jsarray_getCapacity(cJSArrayPtr_t jsarray)
 	{
 		auto jsa = reinterpret_cast<Awesomium::JSArray*>(jsarray);
 
@@ -1427,7 +1436,7 @@ extern "C"
 		return (unsigned)-1;
 	}
 
-	EXPORT const cJSValuePtr_t aws_jsarray_getItemAt(cJSArrayPtr_t jsarray, unsigned pos)
+	AWS_EXPORT const cJSValuePtr_t aws_jsarray_getItemAt(cJSArrayPtr_t jsarray, unsigned pos)
 	{
 		auto jsa = reinterpret_cast<Awesomium::JSArray*>(jsarray);
 
@@ -1438,7 +1447,7 @@ extern "C"
 		return nullptr;
 	}
 
-	EXPORT void aws_jsarray_push(cJSArrayPtr_t jsarray, cJSValuePtr_t item)
+	AWS_EXPORT void aws_jsarray_push(cJSArrayPtr_t jsarray, cJSValuePtr_t item)
 	{
 		auto jsa = reinterpret_cast<Awesomium::JSArray*>(jsarray);
 
@@ -1448,7 +1457,7 @@ extern "C"
 		}
 	}
 
-	EXPORT void aws_jsarray_pop(cJSArrayPtr_t jsarray)
+	AWS_EXPORT void aws_jsarray_pop(cJSArrayPtr_t jsarray)
 	{
 		auto jsa = reinterpret_cast<Awesomium::JSArray*>(jsarray);
 
@@ -1457,7 +1466,7 @@ extern "C"
 		}
 	}
 
-	EXPORT void aws_jsarray_insert(cJSArrayPtr_t jsarray, cJSValuePtr_t item, unsigned pos)
+	AWS_EXPORT void aws_jsarray_insert(cJSArrayPtr_t jsarray, cJSValuePtr_t item, unsigned pos)
 	{
 		auto jsa = reinterpret_cast<Awesomium::JSArray*>(jsarray);
 
@@ -1467,7 +1476,7 @@ extern "C"
 		}
 	}
 
-	EXPORT void aws_jsarray_erase(cJSArrayPtr_t jsarray, unsigned pos)
+	AWS_EXPORT void aws_jsarray_erase(cJSArrayPtr_t jsarray, unsigned pos)
 	{
 		auto jsa = reinterpret_cast<Awesomium::JSArray*>(jsarray);
 
@@ -1476,7 +1485,7 @@ extern "C"
 		}
 	}
 
-	EXPORT void aws_jsarray_clear(cJSArrayPtr_t jsarray)
+	AWS_EXPORT void aws_jsarray_clear(cJSArrayPtr_t jsarray)
 	{
 		auto jsa = reinterpret_cast<Awesomium::JSArray*>(jsarray);
 
@@ -1488,12 +1497,12 @@ extern "C"
 	// =========================
 	// WEB URL
 
-	EXPORT cWebUrlPtr_t aws_weburl_new()
+	AWS_EXPORT cWebUrlPtr_t aws_weburl_new()
 	{
 		return reinterpret_cast<cWebUrlPtr_t>(new Awesomium::WebURL());
 	}
 
-	EXPORT void aws_weburl_delete(cWebUrlPtr_t weburl)
+	AWS_EXPORT void aws_weburl_delete(cWebUrlPtr_t weburl)
 	{
 		auto url = reinterpret_cast<Awesomium::WebURL*>(weburl);
 
@@ -1502,12 +1511,12 @@ extern "C"
 		}
 	}
 
-	EXPORT cWebUrlPtr_t aws_weburl_new_string(cString str)
+	AWS_EXPORT cWebUrlPtr_t aws_weburl_new_cstring(cString str)
 	{
 		return reinterpret_cast<cWebUrlPtr_t>(new Awesomium::WebURL( toAweString(str) ));
 	}
 
-	EXPORT cWebUrlPtr_t aws_weburl_new_webstring(cWebStringPtr_t str)
+	AWS_EXPORT cWebUrlPtr_t aws_weburl_new_webstring(cWebStringPtr_t str)
 	{
 		return reinterpret_cast<cWebUrlPtr_t>(
 				new Awesomium::WebURL(
@@ -1516,7 +1525,7 @@ extern "C"
 			);
 	}
 
-	EXPORT bool aws_weburl_isValid(cWebUrlPtr_t weburl)
+	AWS_EXPORT bool aws_weburl_isValid(cWebUrlPtr_t weburl)
 	{
 		auto url = reinterpret_cast<Awesomium::WebURL*>(weburl);
 
@@ -1527,7 +1536,7 @@ extern "C"
 		return false;
 	}
 
-	EXPORT bool aws_weburl_isEmpty(cWebUrlPtr_t weburl)
+	AWS_EXPORT bool aws_weburl_isEmpty(cWebUrlPtr_t weburl)
 	{
 		auto url = reinterpret_cast<Awesomium::WebURL*>(weburl);
 
@@ -1538,125 +1547,125 @@ extern "C"
 		return false;
 	}
 
-	EXPORT cString aws_weburl_getSpec(cWebUrlPtr_t weburl)
+	AWS_EXPORT cWebStringPtr_t aws_weburl_getSpec(cWebUrlPtr_t weburl)
 	{
 		auto url = reinterpret_cast<Awesomium::WebURL*>(weburl);
 
 		if ( url ) {
-			return fromAweString(url->spec());
+			return reinterpret_cast<cWebStringPtr_t>( new Awesomium::WebString(url->spec()) );
 		}
 
-		return cString();
+		return nullptr;
 	}
 
-	EXPORT cString aws_weburl_getScheme(cWebUrlPtr_t weburl)
+	AWS_EXPORT cWebStringPtr_t aws_weburl_getScheme(cWebUrlPtr_t weburl)
 	{
 		auto url = reinterpret_cast<Awesomium::WebURL*>(weburl);
 
 		if ( url ) {
-			return fromAweString(url->scheme());
+			return reinterpret_cast<cWebStringPtr_t>( new Awesomium::WebString(url->scheme()) );
 		}
 
-		return cString();
+		return nullptr;
 	}
 
-	EXPORT cString aws_weburl_getUsername(cWebUrlPtr_t weburl)
+	AWS_EXPORT cWebStringPtr_t aws_weburl_getUsername(cWebUrlPtr_t weburl)
 	{
 		auto url = reinterpret_cast<Awesomium::WebURL*>(weburl);
 
 		if ( url ) {
-			return fromAweString(url->username());
+			return reinterpret_cast<cWebStringPtr_t>( new Awesomium::WebString(url->username()) );
 		}
 
-		return cString();
+		return nullptr;
 	}
 
-	EXPORT cString aws_weburl_getPassword(cWebUrlPtr_t weburl)
+	AWS_EXPORT cWebStringPtr_t aws_weburl_getPassword(cWebUrlPtr_t weburl)
 	{
 		auto url = reinterpret_cast<Awesomium::WebURL*>(weburl);
 
 		if ( url ) {
-			return fromAweString(url->password());
+			return reinterpret_cast<cWebStringPtr_t>( new Awesomium::WebString(url->password()) );
 		}
 
-		return cString();
+		return nullptr;
 	}
 
-	EXPORT cString aws_weburl_getHost(cWebUrlPtr_t weburl)
+	AWS_EXPORT cWebStringPtr_t aws_weburl_getHost(cWebUrlPtr_t weburl)
 	{
 		auto url = reinterpret_cast<Awesomium::WebURL*>(weburl);
 
 		if ( url ) {
-			return fromAweString(url->host());
+			return reinterpret_cast<cWebStringPtr_t>( new Awesomium::WebString(url->host()) );
 		}
 
-		return cString();
+		return nullptr;
 	}
 
-	EXPORT cString aws_weburl_getPort(cWebUrlPtr_t weburl)
+	AWS_EXPORT cWebStringPtr_t aws_weburl_getPort(cWebUrlPtr_t weburl)
 	{
 		auto url = reinterpret_cast<Awesomium::WebURL*>(weburl);
 
 		if ( url ) {
-			return fromAweString(url->port());
+			return reinterpret_cast<cWebStringPtr_t>( new Awesomium::WebString(url->port()) );
 		}
 
-		return cString();
+		return nullptr;
 	}
 
-	EXPORT cString aws_weburl_getPath(cWebUrlPtr_t weburl)
+	AWS_EXPORT cWebStringPtr_t aws_weburl_getPath(cWebUrlPtr_t weburl)
 	{
 		auto url = reinterpret_cast<Awesomium::WebURL*>(weburl);
 
 		if ( url ) {
-			return fromAweString(url->path());
+			return reinterpret_cast<cWebStringPtr_t>( new Awesomium::WebString(url->path()) );
 		}
 
-		return cString();
+		return nullptr;
 	}
 
-	EXPORT cString aws_weburl_getQuery(cWebUrlPtr_t weburl)
+	AWS_EXPORT cWebStringPtr_t aws_weburl_getQuery(cWebUrlPtr_t weburl)
 	{
 		auto url = reinterpret_cast<Awesomium::WebURL*>(weburl);
 
 		if ( url ) {
-			return fromAweString(url->query());
+			return reinterpret_cast<cWebStringPtr_t>( new Awesomium::WebString((url->query())) );
 		}
 
-		return cString();
+		return nullptr;
 	}
 
-	EXPORT cString aws_weburl_getAnchor(cWebUrlPtr_t weburl)
+	AWS_EXPORT cWebStringPtr_t aws_weburl_getAnchor(cWebUrlPtr_t weburl)
 	{
 		auto url = reinterpret_cast<Awesomium::WebURL*>(weburl);
 
 		if ( url ) {
-			return fromAweString(url->anchor());
+			return reinterpret_cast<cWebStringPtr_t>( new Awesomium::WebString(url->anchor()) );
 		}
 
-		return cString();
+		return nullptr;
 	}
 
-	EXPORT cString aws_weburl_getFilename(cWebUrlPtr_t weburl)
+	AWS_EXPORT cWebStringPtr_t aws_weburl_getFilename(cWebUrlPtr_t weburl)
 	{
 		auto url = reinterpret_cast<Awesomium::WebURL*>(weburl);
 
 		if ( url ) {
-			return fromAweString(url->filename());
+			return reinterpret_cast<cWebStringPtr_t>( new Awesomium::WebString((url->filename())) );
 		}
 
-		return cString();
+		return nullptr;
 	}
 
 	// =========================
 	// BITMAP SURFACE
 
-	EXPORT cBitSurfacePtr_t aws_bitmapsurface_new(int x, int y)
+	AWS_EXPORT cBitSurfacePtr_t aws_bitmapsurface_new(int x, int y)
 	{
 		return reinterpret_cast<cBitSurfacePtr_t>(new Awesomium::BitmapSurface(x,y));
 	}
 
-	EXPORT void aws_bitmapsurface_delete(cBitSurfacePtr_t surface)
+	AWS_EXPORT void aws_bitmapsurface_delete(cBitSurfacePtr_t surface)
 	{
 		auto bs = reinterpret_cast<Awesomium::BitmapSurface*>(surface);
 
@@ -1665,7 +1674,7 @@ extern "C"
 		}
 	}
 
-	EXPORT const unsigned char* aws_bitmapsurface_getBuffer(cBitSurfacePtr_t surface)
+	AWS_EXPORT const unsigned char* aws_bitmapsurface_getBuffer(cBitSurfacePtr_t surface)
 	{
 		auto bs = reinterpret_cast<Awesomium::BitmapSurface*>(surface);
 
@@ -1676,7 +1685,7 @@ extern "C"
 		return nullptr;
 	}
 
-	EXPORT int aws_bitmapsurface_getWidth(cBitSurfacePtr_t surface)
+	AWS_EXPORT int aws_bitmapsurface_getWidth(cBitSurfacePtr_t surface)
 	{
 		auto bs = reinterpret_cast<Awesomium::BitmapSurface*>(surface);
 
@@ -1687,7 +1696,7 @@ extern "C"
 		return -1;
 	}
 
-	EXPORT int aws_bitmapsurface_getHeight(cBitSurfacePtr_t surface)
+	AWS_EXPORT int aws_bitmapsurface_getHeight(cBitSurfacePtr_t surface)
 	{
 		auto bs = reinterpret_cast<Awesomium::BitmapSurface*>(surface);
 
@@ -1698,7 +1707,7 @@ extern "C"
 		return -1;
 	}
 
-	EXPORT int aws_bitmapsurface_getRowSpan(cBitSurfacePtr_t surface)
+	AWS_EXPORT int aws_bitmapsurface_getRowSpan(cBitSurfacePtr_t surface)
 	{
 		auto bs = reinterpret_cast<Awesomium::BitmapSurface*>(surface);
 
@@ -1709,7 +1718,7 @@ extern "C"
 		return -1;
 	}
 
-	EXPORT bool aws_bitmapsurface_isDirty(cBitSurfacePtr_t surface)
+	AWS_EXPORT bool aws_bitmapsurface_isDirty(cBitSurfacePtr_t surface)
 	{
 		auto bs = reinterpret_cast<Awesomium::BitmapSurface*>(surface);
 
@@ -1720,7 +1729,7 @@ extern "C"
 		return false;
 	}
 
-	EXPORT void aws_bitmapsurface_setIsDirty(cBitSurfacePtr_t surface, bool val)
+	AWS_EXPORT void aws_bitmapsurface_setIsDirty(cBitSurfacePtr_t surface, bool val)
 	{
 		auto bs = reinterpret_cast<Awesomium::BitmapSurface*>(surface);
 
@@ -1729,7 +1738,7 @@ extern "C"
 		}
 	}
 
-	EXPORT void aws_bitmapsurface_copyTo(cBitSurfacePtr_t surface, unsigned char* dst_buffer, int dst_row_span, int dst_depth, bool to_rgba, bool flip_y)
+	AWS_EXPORT void aws_bitmapsurface_copyTo(cBitSurfacePtr_t surface, unsigned char* dst_buffer, int dst_row_span, int dst_depth, bool to_rgba, bool flip_y)
 	{
 		auto bs = reinterpret_cast<Awesomium::BitmapSurface*>(surface);
 
@@ -1738,29 +1747,29 @@ extern "C"
 		}
 	}
 
-	EXPORT bool aws_bitmapsurface_saveToPNG(cBitSurfacePtr_t surface, cString path, bool preserve_transparency)
+	AWS_EXPORT bool aws_bitmapsurface_saveToPNG(cBitSurfacePtr_t surface, cWebStringPtr_t path, bool preserve_transparency)
 	{
 		auto bs = reinterpret_cast<Awesomium::BitmapSurface*>(surface);
 
 		if ( bs ) {
-			return bs->SaveToPNG( toAweString(path), preserve_transparency );
+			return bs->SaveToPNG( *reinterpret_cast<Awesomium::WebString*>(path), preserve_transparency );
 		}
 
 		return false;
 	}
 
-	EXPORT bool aws_bitmapsurface_saveToJPEG(cBitSurfacePtr_t surface, cString path, int quality)
+	AWS_EXPORT bool aws_bitmapsurface_saveToJPEG(cBitSurfacePtr_t surface, cWebStringPtr_t path, int quality)
 	{
 		auto bs = reinterpret_cast<Awesomium::BitmapSurface*>(surface);
 
 		if ( bs ) {
-			return bs->SaveToJPEG( toAweString(path), quality );
+			return bs->SaveToJPEG( *reinterpret_cast<Awesomium::WebString*>(path), quality );
 		}
 
 		return false;
 	}
 
-	EXPORT unsigned char aws_bitmapsurface_getAlphaAtPoint(cBitSurfacePtr_t surface, int x, int y)
+	AWS_EXPORT unsigned char aws_bitmapsurface_getAlphaAtPoint(cBitSurfacePtr_t surface, int x, int y)
 	{
 		auto bs = reinterpret_cast<Awesomium::BitmapSurface*>(surface);
 
@@ -1773,7 +1782,7 @@ extern "C"
 
 	// ----------------------------------
 	// BitmapSurfaceFactory 
-	EXPORT cSurfacePtr_t aws_bitmapsurfacefactory_create(cWebViewPtr_t webview, int width, int height)
+	AWS_EXPORT cSurfacePtr_t aws_bitmapsurfacefactory_create(cWebViewPtr_t webview, int width, int height)
 	{
 		auto view = reinterpret_cast<Awesomium::WebView*>(webview);
 
@@ -1785,7 +1794,7 @@ extern "C"
 		return nullptr;
 	}
 
-	EXPORT void aws_bitmapsurfacefactory_destroy(cSurfacePtr_t surface)
+	AWS_EXPORT void aws_bitmapsurfacefactory_destroy(cSurfacePtr_t surface)
 	{
 		auto bs = reinterpret_cast<Awesomium::BitmapSurface*>(surface);
 
@@ -1798,7 +1807,7 @@ extern "C"
 	//================================
 	// JS HANDLER STUFF
 
-	EXPORT void aws_webview_setInternalJSHandler(cWebViewPtr_t webview)
+	AWS_EXPORT void aws_webview_setInternalJSHandler(cWebViewPtr_t webview)
 	{
 		auto view = reinterpret_cast<Awesomium::WebView*>(webview);
 
@@ -1807,7 +1816,7 @@ extern "C"
 		}
 	}
 
-	EXPORT void aws_jshandler_addCallback(cWebViewPtr_t webview, jshnd_onMethodCall callback)
+	AWS_EXPORT void aws_jshandler_addCallback(cWebViewPtr_t webview, jshnd_onMethodCall callback)
 	{
 		auto view = reinterpret_cast<Awesomium::WebView*>(webview);
 
@@ -1816,7 +1825,7 @@ extern "C"
 		}
 	}
 
-	EXPORT void aws_jshandler_addCallbackValue(cWebViewPtr_t webview, jshnd_onMethodCallValue callback)
+	AWS_EXPORT void aws_jshandler_addCallbackValue(cWebViewPtr_t webview, jshnd_onMethodCallValue callback)
 	{
 		auto view = reinterpret_cast<Awesomium::WebView*>(webview);
 
@@ -1826,7 +1835,7 @@ extern "C"
 	}
 
 
-	EXPORT void aws_jshandler_removeCallback(cWebViewPtr_t webview, jshnd_onMethodCall callback)
+	AWS_EXPORT void aws_jshandler_removeCallback(cWebViewPtr_t webview, jshnd_onMethodCall callback)
 	{
 		auto view = reinterpret_cast<Awesomium::WebView*>(webview);
 
@@ -1835,7 +1844,7 @@ extern "C"
 		}
 	}
 
-	EXPORT void aws_jshandler_removeCallbackAll(cWebViewPtr_t webview)
+	AWS_EXPORT void aws_jshandler_removeCallbackAll(cWebViewPtr_t webview)
 	{
 		auto view = reinterpret_cast<Awesomium::WebView*>(webview);
 
@@ -1844,7 +1853,7 @@ extern "C"
 		}
 	}
 
-	EXPORT void aws_jshandler_removeCallbackValue (cWebViewPtr_t webview)
+	AWS_EXPORT void aws_jshandler_removeCallbackValue (cWebViewPtr_t webview)
 	{
 		auto view = reinterpret_cast<Awesomium::WebView*>(webview);
 

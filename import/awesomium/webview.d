@@ -10,7 +10,8 @@ module awesomium.webview;
 
 import awesomium.capi, awesomium.util, 
 	awesomium.inputevt, awesomium.websession,
-	awesomium.surface;
+	awesomium.surface, awesomium.webstring;
+
 import std.c.string : strlen;
 
 
@@ -55,7 +56,7 @@ public:
 	///
 	void loadURL(string url)
 	{
-		auto weburl = aws_weburl_new_string(url.toCString);
+		auto weburl = aws_weburl_new_cstring(url.toCString);
 		aws_webview_loadURL( this, weburl );
 		aws_weburl_delete(weburl);
 	}
@@ -297,7 +298,7 @@ public:
 		auto ws = aws_webview_getTitle(this);
 		auto cs = aws_webstring_to_cstring(ws);
 
-		auto len = strlen(cs.str);
+		auto len = cs.len;
 
 		char[] tmp;
 		tmp.length = len;
@@ -691,7 +692,8 @@ public:
 	///
 	void ExecuteJavascript(string script, string frame_xpath)
 	{
-		aws_webview_executeJS(this, script.toCString, frame_xpath.toCString);
+		//aws_webview_executeJS(this, script.toCString, frame_xpath.toCString);
+		aws_webview_executeJS(this, new WebString(script), new WebString(frame_xpath) );
 	}
 
 	///
@@ -789,7 +791,7 @@ public:
 	///
 	void DidLogin(int request_id, string username, string password)
 	{
-		aws_webview_didLogin(this, request_id, username.toCString, password.toCString);
+		aws_webview_didLogin(this, request_id, new WebString(username), new WebString(password));
 	}
 
 	///
@@ -819,7 +821,7 @@ public:
 	///
 	void DidChooseDownloadPath(int download_id, string path)
 	{
-		aws_webview_didChooseDownloadPath(this, download_id, path.toCString);
+		aws_webview_didChooseDownloadPath(this, download_id, new WebString(path));
 	}
 
 	///
@@ -837,7 +839,7 @@ public:
 
 package:
 	alias _internal this;
-	cWebView* _internal;
+	cWebViewPtr_t _internal;
 }
 
 

@@ -18,14 +18,9 @@ package @property cString toWebString(string str)
 
 package @property cString toCString(string str)
 {
-	//import core.memory;
-
 	cString cs;
 
 	cs.len = str.length;
-
-	//cs.str = cast(char*) core.memory.GC.malloc(str.length * char.sizeof);
-
 	cs.str = cast(char*)str.ptr;
 
 	return cs;
@@ -93,9 +88,6 @@ package cStringArray toCStringArray(string[] args)
 
 package @property cWebConf toCWebConf(WebConfig wc)
 {
-
-	
-
 	cWebConf cw;
 
 	cw.child_process_path = wc.child_process_path.toCString;

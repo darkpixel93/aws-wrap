@@ -15,5 +15,5 @@ class WebSession
 public:
 
 package:
-	cWebSession* _internal;
+	cWebSessionPtr_t _internal;
 }
