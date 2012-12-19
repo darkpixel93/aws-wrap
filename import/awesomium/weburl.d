@@ -1,7 +1,18 @@
+/*
+This file is a part of aws_wrap library.
+Read LICENSE.TXT and README.TXT provided 
+within this package for more information.
+
+Copyright (C) 2012 evilrat
+*/
+
 module awesomium.weburl;
 
 import awesomium.capi, awesomium.util,
 	awesomium.webstring;
+
+/// alias to match C++ Awesomium::WebURL name
+alias WebUrl WebURL;
 
 ///
 /// @brief  This class represents a parsed URL. It provides convenience methods
@@ -105,4 +116,12 @@ public:
 package:
 	alias _internal this;
 	cWebUrlPtr_t _internal;
+	bool _owner = true;
+
+	/// reference constructor to already exising object
+	this(cWebUrlPtr_t other)
+	{
+		_internal = other;
+		_owner = false;
+	}
 }

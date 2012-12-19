@@ -25,10 +25,13 @@
 
 JSHandler _aws_jshandler;
 
+WebViewListener_View viewLst;
+
 Awesomium::WebConfig wcToAweConf(cWebConf wc);
 Awesomium::WebPreferences wpToAwePrefs(cWebPrefs wp);
 Awesomium::WebString toAweString(cString str);
 Awesomium::WebStringArray toAweStrArray(cStringArray sa);
+cWebPrefs awePrefsToWebPrefs(const Awesomium::WebPreferences& awp);
 
 Awesomium::WebString toAweString(cString str)
 {
@@ -996,6 +999,120 @@ extern "C"
 		}
 	}
 
+	// webview handlers
+
+	AWS_EXPORT void aws_webview_setInternalLoadHandler (cWebViewPtr_t webview) 
+	{
+		auto view = reinterpret_cast<Awesomium::WebView*>(webview);
+
+		if ( view ) {
+			//view->set_load_listener(&loadLst);
+		}
+	}
+
+	
+	AWS_EXPORT void aws_webview_setInternalViewHandler (cWebViewPtr_t webview)
+	{
+		auto view = reinterpret_cast<Awesomium::WebView*>(webview);
+
+		if ( view ) {
+			view->set_view_listener(&viewLst);
+		}
+	}
+	/*
+	AWS_EXPORT void aws_webview_setInternalPrintHandler (cWebViewPtr_t webview);
+	AWS_EXPORT void aws_webview_setInternalProcessHandler (cWebViewPtr_t webview);
+	AWS_EXPORT void aws_webview_setInternalMenuHandler (cWebViewPtr_t webview);
+	AWS_EXPORT void aws_webview_setInternalDownloadHandler (cWebViewPtr_t webview);
+	AWS_EXPORT void aws_webview_setInternalIMEHandler (cWebViewPtr_t webview);
+	*/
+
+	// set view callbacks
+	AWS_EXPORT void aws_webview_setListenerView (cWebViewPtr_t webview, cWebView_View viewclbks)
+	{
+		viewLst.addCallback(reinterpret_cast<Awesomium::WebView*>(webview), viewclbks);
+	}
+
+	// ===============================================
+	// WEB SESSION
+
+	AWS_EXPORT void aws_websession_release(cWebSessionPtr_t websession)
+	{
+		auto sess = reinterpret_cast<Awesomium::WebSession*>(websession);
+
+		if ( sess ) {
+			sess->Release();
+		}
+	}
+
+	AWS_EXPORT bool aws_websession_isOnDisk(cWebSessionPtr_t websession)
+	{
+		auto sess = reinterpret_cast<Awesomium::WebSession*>(websession);
+
+		if ( sess ) {
+			return sess->IsOnDisk();
+		}
+
+		return false;
+	}
+
+	AWS_EXPORT cWebStringPtr_t aws_websession_getDataPath(cWebSessionPtr_t websession)
+	{
+		auto sess = reinterpret_cast<Awesomium::WebSession*>(websession);
+
+		if ( sess ) {
+			return reinterpret_cast<cWebStringPtr_t>(new Awesomium::WebString(sess->data_path()));
+		}
+
+		return nullptr;
+	}
+
+	AWS_EXPORT cWebPrefs aws_websession_getPreferences(cWebSessionPtr_t websession)
+	{
+		auto sess = reinterpret_cast<Awesomium::WebSession*>(websession);
+
+		if ( sess ) {
+			return awePrefsToWebPrefs( sess->preferences() );
+		}
+
+		return cWebPrefs();
+	}
+
+	AWS_EXPORT void aws_websession_addDataSource(cWebSessionPtr_t websession, cWebStringPtr_t asset_host, cDataSourcePtr_t source)
+	{
+		auto sess = reinterpret_cast<Awesomium::WebSession*>(websession);
+
+		if ( sess ) {
+			sess->AddDataSource(
+				*reinterpret_cast<Awesomium::WebString*>(asset_host), 
+				reinterpret_cast<Awesomium::DataSource*>(source)
+				);
+		}
+	}
+
+	AWS_EXPORT void aws_websession_setCookie(cWebSessionPtr_t websession, cWebUrlPtr_t url, cWebStringPtr_t asset_host, bool http_only, bool force_session)
+	{
+		auto sess = reinterpret_cast<Awesomium::WebSession*>(websession);
+
+		if ( sess ) {
+			sess->SetCookie(
+				*reinterpret_cast<Awesomium::WebURL*>(url),
+				*reinterpret_cast<Awesomium::WebString*>(asset_host),
+				http_only,
+				force_session
+				);
+		}
+	}
+
+	AWS_EXPORT void aws_websession_clearCookies(cWebSessionPtr_t websession)
+	{
+		auto sess = reinterpret_cast<Awesomium::WebSession*>(websession);
+
+		if ( sess ) {
+			sess->ClearCookies();
+		}
+	}
+
 	// ===============================================
 	// JSVALUE
 
@@ -1930,4 +2047,40 @@ Awesomium::WebPreferences wpToAwePrefs(cWebPrefs wp)
 	awp.user_stylesheet = toAweString ( wp.user_stylesheet );
 
 	return awp;
+}
+
+cWebPrefs awePrefsToWebPrefs(const Awesomium::WebPreferences& awp)
+{
+	cWebPrefs cw;
+
+	cw.accept_charset = fromAweString ( awp.accept_charset );
+	cw.accept_language = fromAweString ( awp.accept_language );
+
+	cw.allow_file_access_from_file_url = awp.allow_file_access_from_file_url;
+	cw.allow_running_insecure_content = awp.allow_running_insecure_content;
+	cw.allow_scripts_to_access_clipboard = awp.allow_scripts_to_access_clipboard;
+	cw.allow_scripts_to_close_windows = awp.allow_scripts_to_close_windows;
+	cw.allow_scripts_to_open_windows = awp.allow_scripts_to_open_windows;
+	cw.allow_universal_access_from_file_url = awp.allow_universal_access_from_file_url;
+
+	cw.default_encoding = fromAweString ( awp.default_encoding );
+
+	cw.enable_app_cache = awp.enable_app_cache;
+	cw.enable_dart = awp.enable_dart;
+	cw.enable_databases = awp.enable_databases;
+	cw.enable_gpu_acceleration = awp.enable_gpu_acceleration;
+	cw.enable_javascript = awp.enable_javascript;
+	cw.enable_local_storage = awp.enable_local_storage;
+	cw.enable_plugins = awp.enable_plugins;
+	cw.enable_remote_fonts = awp.enable_remote_fonts;
+	cw.enable_smooth_scrolling = awp.enable_smooth_scrolling;
+	cw.enable_web_audio = awp.enable_web_audio;
+	cw.enable_web_gl = awp.enable_web_gl;
+	cw.enable_web_security = awp.enable_web_security;
+	cw.load_images_automatically = awp.load_images_automatically;
+	cw.proxy_config = fromAweString ( awp.proxy_config );
+	cw.shrink_standalone_images_to_fit = awp.shrink_standalone_images_to_fit;
+	cw.user_stylesheet = fromAweString ( awp.user_stylesheet );
+
+	return cw;
 }

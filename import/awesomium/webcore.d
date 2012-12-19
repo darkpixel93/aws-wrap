@@ -44,7 +44,6 @@ public:
 						  WebSession session = null,
 						  WebViewType type = WebViewType.OFFSCREEN)
 	{
-		auto view = new WebView();
 		cWebSessionPtr_t ses;
 
 		if  ( session is null )
@@ -52,7 +51,7 @@ public:
 		else
 			ses = session._internal;
 
-		view._internal = aws_webcore_createWebView( this, width, height, ses, type );
+		auto view = new WebView( aws_webcore_createWebView( this, width, height, ses, type ) );
 		return view;
 	}
 	

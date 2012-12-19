@@ -10,7 +10,8 @@ module awesomium.webview;
 
 import awesomium.capi, awesomium.util, 
 	awesomium.inputevt, awesomium.websession,
-	awesomium.surface, awesomium.webstring;
+	awesomium.surface, awesomium.webstring,
+	awesomium.weburl, awesomium.common;
 
 import std.c.string : strlen;
 
@@ -25,14 +26,73 @@ enum WebViewType
 
 enum FocusedElementType
 {
-	XZ
+	NONE = 0,         ///< Nothing is focused
+	TEXT,             ///< A text-node is focused
+	LINK,             ///< A link is focused
+	INPUT,            ///< An input element is focused
+	TEXTINPUT,        ///< A text-input element is focused
+	EDITABLECONTENT,  ///< Some editable content is focused
+	PLUGIN,           ///< A plugin (eg, Flash) is focused
+	OTHER,            ///< Some other element is focused
 }
 
 
+///
+/// An enumeration of all the possible web cursors.
+///
+/// @see WebViewListener.View.OnChangeCursor
+///
+enum Cursor {
+	POINTER,
+	CROSS,
+	HAND,
+	IBEAM,
+	WAIT,
+	HELP,
+	EASTRESIZE,
+	NORTHRESIZE,
+	NORTHEASTRESIZE,
+	NORTHWESTRESIZE,
+	SOUTHRESIZE,
+	SOUTHEASTRESIZE,
+	SOUTHWESTRESIZE,
+	WESTRESIZE,
+	NORTHSOUTHRESIZE,
+	EASTWESTRESIZE,
+	NORTHEASTSOUTHWESTRESIZE,
+	NORTHWESTSOUTHEASTRESIZE,
+	COLUMNRESIZE,
+	ROWRESIZE,
+	MIDDLEPANNING,
+	EASTPANNING,
+	NORTHPANNING,
+	NORTHEASTPANNING,
+	NORTHWESTPANNING,
+	SOUTHPANNING,
+	SOUTHEASTPANNING,
+	SOUTHWESTPANNING,
+	WESTPANNING,
+	MOVE,
+	VERTICALTEXT,
+	CELL,
+	CONTEXTMENU,
+	ALIAS,
+	PROGRESS,
+	NODROP,
+	COPY,
+	NONE,
+	NOTALLOWED,
+	ZOOMIN,
+	ZOOMOUT,
+	GRAB,
+	GRABBING,
+	CUSTOM,
+}
 
 alias int NativeWindow;
 alias int PrintConfig;
 
+// placeholder for JSValue
 struct JSValue
 {
 
@@ -40,6 +100,8 @@ struct JSValue
 
 
 
+
+// TODO: add some map type to track pointer to WebView relations so we don't have lots of reference
 class WebView
 {
 public:
@@ -99,9 +161,9 @@ public:
 	/// the window for this WebView will not be created until the first
 	/// call to set_parent_window on the Windows platform.
 	///
-	@disable void set_parent_window(NativeWindow parent)
+	void set_parent_window(NativeWindow parent)
 	{
-
+		aws_webview_setParentWindow(this, cast(void*)parent);
 	}
 
 	///
@@ -109,7 +171,7 @@ public:
 	///
 	NativeWindow parent_window()
 	{
-		return 0;
+		return cast(NativeWindow)aws_webview_getParentWindow(this);
 	}
 
 	///
@@ -121,15 +183,21 @@ public:
 	///
 	NativeWindow window()
 	{
-		return 0;
+		return cast(NativeWindow)aws_webview_getWindow(this);
 	}
 
 	///
 	/// Register a listener to handle view-related events.
 	///
-	/// @param  listener  The instance to register (you retain ownership).
+	/// @param  listener  The instance to register.
 	///
-	//void set_view_listener(WebViewListener.View listener) = 0;
+	void set_view_listener(WebViewListener.View listener)
+	{
+		Listener lst;
+		lst._listener = listener;
+		lst.type = Listener.Type.VIEW;
+		eventlisteners ~= lst;
+	}
 
 	///
 	/// Register a listener to handle page-load events.
@@ -277,9 +345,14 @@ public:
 	///
 	Surface surface()
 	{
-		// fixme
-		auto surf = new BitmapSurface();
-		surf._parent = this;
+		BitmapSurface surf;
+		
+		if ( _surface is null ) 
+			surf = new BitmapSurface();
+		else
+			surf = cast(BitmapSurface)_surface;
+
+		surf._owner = false;
 		surf._internal = cast(cBitSurfacePtr_t) aws_webview_getSurface(this);
 		return surf;
 	}
@@ -290,31 +363,29 @@ public:
 	}
 
 	/// Get the current page URL.
-	//WebURL url() ;
+	//WebURL url();
 
 	/// Get the current page title.
 	@property string title()
 	{	
-		auto ws = aws_webview_getTitle(this);
-		auto cs = aws_webstring_to_cstring(ws);
-
-		auto len = cs.len;
-
-		char[] tmp;
-		tmp.length = len;
-		tmp = cast(char[])cs.str[0..len];
-
-		string ver = tmp.idup;
-
-		//aws_webstring_delete(ws);
-
-		return ver;
+		return cast(string) new WebString( aws_webview_getTitle(this) );
 	}
 
 	/// Get the session associated with this WebView.
-	@disable WebSession session()
+	WebSession session()
 	{
-		return null;
+		WebSession ses;
+
+		if ( _session is null ) 
+		{
+			_session = new WebSession();
+			ses = _session;
+		}
+
+		ses._owner = false;
+		ses._internal = aws_webview_getSession(this);
+
+		return ses;
 	}
 
 	/// Check whether or not any page resources are loading.
@@ -840,10 +911,397 @@ public:
 package:
 	alias _internal this;
 	cWebViewPtr_t _internal;
+
+	void prepCallbacks()
+	{
+		aws_webview_setInternalViewHandler(this);
+		aws_webview_setListenerView(this,_view);
+	}
+
+	@disable this()
+	{
+
+	}
+	
+	this(cWebViewPtr_t other)
+	{
+		_view = new ViewLsn();
+		_internal = other;
+		prepCallbacks();
+	}
+
+private:
+	/// internal webview objects, because they stored on the C++ side,
+	/// we need to know when they changed to avoid unneeded instantiation
+
+	WebSession _session;
+
+	Surface _surface;
+
+
+	struct Listener
+	{
+		IWebViewListener _listener;
+
+		union callback
+		{
+			cWebView_View view;
+		}
+
+		enum Type
+		{
+			NOT_USED,
+			VIEW,
+			MENU,
+		}
+
+		Type type;
+	}
+
+	final class ViewLsn : WebViewListener.View
+	{
+		alias _cbv this;
+		cWebView_View _cbv;
+
+		
+		this()
+		{
+			_cbv.address = &_onChangeAddressBar;
+			_cbv.cursor = &_onChangeCursor;
+			_cbv.focus = &_onChangeFocus;
+			_cbv.show = &_onShowCreatedWebView;
+			_cbv.title = &_onChangeTitle;
+			_cbv.tooltip = &_onChangeTooltip;
+			_cbv.url = &_onChangeTargetURL;
+			
+			_cbv.userPointer = cast(void*)&this;
+		}
+
+		///
+		/// internal View.OnChangeFocus handler which retransmit this callback
+		static extern(C) void _onChangeFocus(cWebViewPtr_t caller, int focusedtype, void* userPtr)
+		{
+			// get pointer to object
+			auto lst = cast(WebView.ViewLsn)userPtr;
+
+			// check if valid
+			if ( lst !is null )
+			{
+				auto view = cast(WebView)caller;
+				if ( view !is null )
+					lst.OnChangeFocus(view, cast(FocusedElementType) focusedtype);
+			}
+		}
+
+		///
+		/// internal View.OnChangeAddressBar handler which retransmit this callback
+		static extern(C) void _onChangeAddressBar(cWebViewPtr_t caller, const(cWebUrlPtr_t) url, void* userPtr)
+		{
+			// get pointer to object
+			auto lst = cast(WebView.ViewLsn)userPtr;
+
+			// check if valid
+			if ( lst !is null )
+			{
+				auto view = cast(WebView)caller;
+				if ( view !is null )
+					lst.OnChangeAddressBar(view, new WebURL(cast(cWebUrlPtr_t)url));
+			}
+		}
+
+		///
+		/// internal View.OnChangeAddressBar handler which retransmit this callback
+		static extern(C) void _onChangeTitle(cWebViewPtr_t caller, const(cWebStringPtr_t) title, void* userPtr)
+		{
+			// get pointer to object
+			auto lst = cast(WebView.ViewLsn)userPtr;
+
+			// check if valid
+			if ( lst !is null )
+			{
+				auto view = cast(WebView)caller;
+				if ( view !is null )
+					lst.OnChangeTitle(view, cast(string)new WebString(title));
+			}
+		}
+
+		///
+		/// internal View.OnChangeTargetURL handler which retransmit this callback
+		static extern(C) void _onChangeTargetURL(cWebViewPtr_t caller, const(cWebUrlPtr_t) targeturl, void* userPtr)
+		{
+			// get pointer to object
+			auto lst = cast(WebView.ViewLsn)userPtr;
+
+			// check if valid
+			if ( lst !is null )
+			{
+				auto view = cast(WebView)caller;
+				if ( view !is null )
+					lst.OnChangeTargetURL(view, new WebURL(cast(cWebUrlPtr_t)targeturl));
+			}
+		}
+
+		///
+		/// internal View.OnChangeCursor handler which retransmit this callback
+		static extern(C) void _onChangeCursor(cWebViewPtr_t caller, int cursor, void* userPtr)
+		{
+			// get pointer to object
+			auto lst = cast(WebView.ViewLsn)userPtr;
+
+			// check if valid
+			if ( lst !is null )
+			{
+				auto view = cast(WebView)caller;
+				if ( view !is null )
+					lst.OnChangeCursor(view, cast(Cursor)cursor);
+			}
+		}
+
+		///
+		/// internal View.OnChangeFocus handler which retransmit this callback
+		static extern(C) void _onChangeFocus(cWebViewPtr_t caller, FocusedElementType element, void* userPtr)
+		{
+			// get pointer to object
+			auto lst = cast(WebView.ViewLsn)userPtr;
+
+			// check if valid
+			if ( lst !is null )
+			{
+				auto view = cast(WebView)caller;
+				if ( view !is null )
+					lst.OnChangeFocus(view, cast(FocusedElementType)element);
+			}
+		}
+
+		///
+		/// internal View.OnChangeTooltip handler which retransmit this callback
+		static extern(C) void _onChangeTooltip(cWebViewPtr_t caller, const(cWebStringPtr_t) tooltip, void* userPtr)
+		{
+			// get pointer to object
+			auto lst = cast(WebView.ViewLsn)userPtr;
+
+			// check if valid
+			if ( lst !is null )
+			{
+				auto view = cast(WebView)caller;
+				if ( view !is null )
+					lst.OnChangeTooltip(view, cast(string)new WebString(tooltip));
+			}
+		}
+
+		///
+		/// internal View.OnShowCreatedWebView handler which retransmit this callback
+		static extern(C) void _onShowCreatedWebView(cWebViewPtr_t caller, cWebViewPtr_t new_view, 
+													const (cWebUrlPtr_t) opener_url,  const (cWebUrlPtr_t) target_url, 
+													const (cRect) initial_pos, bool is_popup, 
+													void* userPtr)
+		{
+			// get pointer to object
+			auto lst = cast(WebView.ViewLsn)userPtr;
+
+			// check if valid
+			if ( lst !is null )
+			{
+				auto view = cast(WebView)caller;
+				if ( view !is null )
+					lst.OnShowCreatedWebView(new WebView(view), 
+											 new WebView(new_view),
+											 new WebURL(cast(cWebUrlPtr_t)opener_url), 
+											 new WebURL(cast(cWebUrlPtr_t)target_url),
+											 Rect(initial_pos), is_popup);
+			}
+		}
+
+
+		void OnChangeTitle(WebView caller, 
+						   string title)
+		{
+			foreach(lsn; eventlisteners)
+			{
+				if ( lsn.type == Listener.Type.VIEW )
+				{
+					auto viewlsn = cast(WebViewListener.View) lsn._listener;
+
+					if ( viewlsn !is null )
+						viewlsn.OnChangeTitle(caller, title);
+				}
+			}
+		}
+
+		void OnChangeAddressBar(WebView caller,
+								WebURL url)
+		{
+			foreach(lsn; eventlisteners)
+			{
+				if ( lsn.type == Listener.Type.VIEW )
+				{
+					auto viewlsn = cast(WebViewListener.View) lsn._listener;
+
+					if ( viewlsn !is null )
+						viewlsn.OnChangeAddressBar(caller, url);
+				}
+			}
+		}
+
+		void OnChangeTooltip(WebView caller,
+							 string tooltip)
+		{
+			foreach(lsn; eventlisteners)
+			{
+				if ( lsn.type == Listener.Type.VIEW )
+				{
+					auto viewlsn = cast(WebViewListener.View) lsn._listener;
+
+					if ( viewlsn !is null )
+						viewlsn.OnChangeTooltip(caller, tooltip);
+				}
+			}
+		}
+
+		void OnChangeTargetURL(WebView caller,
+							   WebURL url)
+		{
+			foreach(lsn; eventlisteners)
+			{
+				if ( lsn.type == Listener.Type.VIEW )
+				{
+					auto viewlsn = cast(WebViewListener.View) lsn._listener;
+
+					if ( viewlsn !is null )
+						viewlsn.OnChangeTargetURL(caller, url);
+				}
+			}
+		}
+
+
+		void OnChangeCursor(WebView caller,
+							Cursor cursor)
+		{
+			foreach(lsn; eventlisteners)
+			{
+				if ( lsn.type == Listener.Type.VIEW )
+				{
+					auto viewlsn = cast(WebViewListener.View) lsn._listener;
+
+					if ( viewlsn !is null )
+						viewlsn.OnChangeCursor(caller, cursor);
+				}
+			}
+		}
+
+		void OnChangeFocus(WebView caller,
+						   FocusedElementType focused_type)
+		{
+			foreach(lsn; eventlisteners)
+			{
+				if ( lsn.type == Listener.Type.VIEW )
+				{
+					auto viewlsn = cast(WebViewListener.View) lsn._listener;
+
+					if ( viewlsn !is null )
+						viewlsn.OnChangeFocus(caller, focused_type);
+				}
+			}
+		}
+
+		void OnShowCreatedWebView(WebView caller, WebView new_view, WebURL opener_url,
+								  WebURL target_url, Rect initial_pos, bool is_popup)
+		{
+			foreach(lsn; eventlisteners)
+			{
+				if ( lsn.type == Listener.Type.VIEW )
+				{
+					auto viewlsn = cast(WebViewListener.View) lsn._listener;
+
+					if ( viewlsn !is null )
+						viewlsn.OnShowCreatedWebView(caller, new_view, opener_url,
+													 target_url, initial_pos, is_popup);
+				}
+			}
+		}
+	}
+
+	// should it be static? C++ callback handler could access destroyed(!) instance
+	ViewLsn _view;
+
+	/// should this be separated, because anyway in awesomium only one listener for each type active in one time?
+	Listener[] eventlisteners;
 }
 
+/*
+private extern(C) void _onChangeFocus(cWebViewPtr_t caller, int focusedtype, void* userPtr)
+{
+	
+}
+*/
 
 
+/// formal interface for listeners
+interface IWebViewListener {}
+
+/// class containing all WebView event-listeners
+final class WebViewListener
+{
+public:
+
+	@disable this() {}
+
+	///
+	/// @brief  An interface that you can use to handle all View-related events
+	///         for a certain WebView.
+	///
+	/// @note  See WebView.set_view_listener
+	///
+	interface View : IWebViewListener
+	{
+		/// This event occurs when the page title has changed.
+		void OnChangeTitle(WebView caller, 
+									string title);
+
+		/// This event occurs when the page URL has changed.
+		void OnChangeAddressBar(WebView caller,
+										WebURL url);
+
+		/// This event occurs when the tooltip text has changed. You
+		/// should hide the tooltip when the text is empty.
+		void OnChangeTooltip(WebView caller,
+									 string tooltip);
+
+		/// This event occurs when the target URL has changed. This
+		/// is usually the result of hovering over a link on a page.
+		void OnChangeTargetURL(WebView caller,
+									   WebURL url);
+
+		/// This event occurs when the cursor has changed. This is
+		/// is usually the result of hovering over different content.
+		void OnChangeCursor(WebView caller,
+									Cursor cursor);
+
+		/// This event occurs when the focused element changes on the page.
+		/// This is usually the result of textbox being focused or some other
+		/// user-interaction event.
+		void OnChangeFocus(WebView caller,
+								   FocusedElementType focused_type);
+
+		/// This event occurs when a WebView creates a new child WebView
+		/// (usually the result of window.open or an external link). It
+		/// is your responsibility to display this child WebView in your
+		/// application. You should call Resize on the child WebView
+		/// immediately after this event to make it match your container
+		/// size.
+		///
+		/// If this is a child of a Windowed WebView, you should call
+		/// WebView.set_parent_window on the new view immediately within
+		/// this event.
+		///
+		void OnShowCreatedWebView(WebView caller,
+										  WebView new_view,
+										  WebURL opener_url,
+										  WebURL target_url,
+										  Rect initial_pos,
+										  bool is_popup);
+	}
+}
 
 // this is the part of webview config so let it be here for now
 struct WebPreferences {

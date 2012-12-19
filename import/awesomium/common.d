@@ -8,6 +8,9 @@ Copyright (C) 2012 evilrat
 
 module awesomium.common;
 
+
+import awesomium.capi;
+
 /// Represents a generic error.
 enum Error {
 	None = 0,        ///< No error (everything is cool!)
@@ -41,6 +44,12 @@ struct Rect
 		this.y = y;
 		this.width = width;
 		this.height = height;
+	}
+	
+	this(cRect rect)
+	{
+		this(rect.x, rect.y,
+			 rect.width, rect.height);
 	}
 
 	/// Check whether or not this Rect is empty (width and height == 0)

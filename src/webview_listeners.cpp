@@ -5,14 +5,30 @@
 	 void WebViewListener_View::OnChangeTitle(Awesomium::WebView* caller,
 		const Awesomium::WebString& title)
 	 {
-
+		 auto cb = callbacks.find(caller);
+		 if ( cb != callbacks.end() )
+		 {
+			 cb->second.tooltip(
+					reinterpret_cast<cWebViewPtr_t>(caller),
+					reinterpret_cast<const cWebStringPtr_t&>(title),
+					cb->second.userPointer
+				);
+		 }
 	 }
 
 	/// This event occurs when the page URL has changed.
 	 void WebViewListener_View::OnChangeAddressBar(Awesomium::WebView* caller,
 		const Awesomium::WebURL& url)
 	 {
-
+		 auto cb = callbacks.find(caller);
+		 if ( cb != callbacks.end() )
+		 {
+			 cb->second.address(
+					reinterpret_cast<cWebViewPtr_t>(caller),
+					reinterpret_cast<const cWebUrlPtr_t&>(url),
+					cb->second.userPointer
+				);
+		 }
 	 }
 
 	/// This event occurs when the tooltip text has changed. You
@@ -20,7 +36,15 @@
 	 void WebViewListener_View::OnChangeTooltip(Awesomium::WebView* caller,
 		const Awesomium::WebString& tooltip)
 	 {
-
+		 auto cb = callbacks.find(caller);
+		 if ( cb != callbacks.end() )
+		 {
+			 cb->second.tooltip(
+					reinterpret_cast<cWebViewPtr_t>(caller),
+					reinterpret_cast<const cWebStringPtr_t&>(tooltip),
+					cb->second.userPointer
+				);
+		 }
 	 }
 
 	/// This event occurs when the target URL has changed. This
@@ -28,7 +52,15 @@
 	 void WebViewListener_View::OnChangeTargetURL(Awesomium::WebView* caller,
 		const Awesomium::WebURL& url)
 	 {
-
+		 auto cb = callbacks.find(caller);
+		 if ( cb != callbacks.end() )
+		 {
+			 cb->second.url(
+					reinterpret_cast<cWebViewPtr_t>(caller),
+					reinterpret_cast<const cWebUrlPtr_t&>(url),
+					cb->second.userPointer
+				);
+		 }
 	 }
 
 	/// This event occurs when the cursor has changed. This is
@@ -36,7 +68,15 @@
 	 void WebViewListener_View::OnChangeCursor(Awesomium::WebView* caller,
 		Awesomium::Cursor cursor)
 	 {
-
+		 auto cb = callbacks.find(caller);
+		 if ( cb != callbacks.end() )
+		 {
+			 cb->second.cursor(
+					reinterpret_cast<cWebViewPtr_t>(caller),
+					cursor,
+					cb->second.userPointer
+				);
+		 }
 	 }
 
 	/// This event occurs when the focused element changes on the page.
@@ -45,7 +85,15 @@
 	 void WebViewListener_View::OnChangeFocus(Awesomium::WebView* caller,
 		Awesomium::FocusedElementType focused_type)
 	 {
-
+		 auto cb = callbacks.find(caller);
+		 if ( cb != callbacks.end() )
+		 {
+			 cb->second.focus(
+					reinterpret_cast<cWebViewPtr_t>(caller),
+					focused_type,
+					cb->second.userPointer
+				);
+		 }
 	 }
 
 	/// This event occurs when a WebView creates a new child WebView
@@ -66,7 +114,46 @@
 		const Awesomium::Rect& initial_pos,
 		bool is_popup)
 	 {
+		 auto cb = callbacks.find(caller);
+		 if ( cb != callbacks.end() )
+		 {
+			 cRect rect;
+
+			 rect.x = initial_pos.x;
+			 rect.y = initial_pos.y;
+			 rect.width = initial_pos.width;
+			 rect.height = initial_pos.height;
+
+			 // i'm not sure about this casts ...
+			 cb->second.show(
+					reinterpret_cast<cWebViewPtr_t>(caller),
+					reinterpret_cast<cWebViewPtr_t>(new_view),
+					reinterpret_cast<const cWebUrlPtr_t&>(opener_url),
+					reinterpret_cast<const cWebUrlPtr_t&>(target_url),
+					rect,
+					is_popup,
+					cb->second.userPointer
+				);
+		 }
 	 }
+
+	void WebViewListener_View::addCallback(Awesomium::WebView* view, cWebView_View clbk)
+	{
+		callbacks.emplace(view, clbk);
+	}
+
+	void WebViewListener_View::removeCallback(Awesomium::WebView* view)
+	{
+		auto cb = callbacks.find(view);
+
+		if  ( cb != callbacks.end() )
+		{
+			callbacks.erase(cb);
+		}
+	}
+
+
+	 // ------------------ LOAD -------------------------
 
 
 

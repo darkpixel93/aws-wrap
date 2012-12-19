@@ -9,9 +9,8 @@ Copyright (C) 2012 evilrat
 module awesomium.util;
 
 import awesomium.capi, awesomium.webview, awesomium.webcore;
-import std.c.string : strlen;
 
-package @property cString toWebString(string str)
+@disable package @property cString toWebString(string str)
 {
 	return cString(str.length, cast(char*)str.ptr);
 }

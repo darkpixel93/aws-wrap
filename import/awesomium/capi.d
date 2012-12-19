@@ -8,12 +8,28 @@ Copyright (C) 2012 evilrat
 
 module awesomium.capi;
 
+private import core.stdc.stdlib;
+
 extern(C):
 
 struct cString
 {
 	uint len;
 	char* str;
+
+	/*
+	// need to find way to not release active buffer
+	~this()
+	{
+		if ( len )
+			free(str);
+	}
+	*/
+}
+
+struct cRect
+{
+	int x, y, width, height;
 }
 
 struct cStringArray
@@ -167,7 +183,34 @@ alias void function(cWebViewPtr_t caller, uint remoteObjId, cWebStringPtr_t meth
 /// this method gets called on javascript method call which returns value
 alias cJSValuePtr_t function(cWebViewPtr_t caller, uint remoteObjId, cWebStringPtr_t methodName, cJSArrayPtr_t args) jshnd_onMethodCallValue;
 
+// WEBVIEW EVENTS
+// -- view
+alias void function(cWebViewPtr_t caller, const cWebStringPtr_t title, void* userPointer) wvview_onChangeTitle;
+alias void function(cWebViewPtr_t caller, const cWebUrlPtr_t title, void* userPointer) wvview_onChangeAddressBar;
+alias void function(cWebViewPtr_t caller, const cWebStringPtr_t tooltip, void* userPointer) wvview_onChangeTooltip;
+alias void function(cWebViewPtr_t caller, const cWebUrlPtr_t url, void* userPointer) wvview_onChangeTargetURL;
+alias void function(cWebViewPtr_t caller, int cursor, void* userPointer) wvview_onChangeCursor;
+alias void function(cWebViewPtr_t caller, int focused_type, void* userPointer) wvview_onChangeFocus;
+alias void function(cWebViewPtr_t caller, cWebViewPtr_t new_view, 
+											const (cWebUrlPtr_t) opener_url, const (cWebUrlPtr_t) target_url,
+											const (cRect) initial_pos, bool is_popup, void* userPointer) wvview_onShowCreatedWebView;
 
+
+struct _cWebView_View 
+{
+	wvview_onChangeTitle title;
+	wvview_onChangeAddressBar address;
+	wvview_onChangeTooltip tooltip;
+	wvview_onChangeTargetURL url;
+	wvview_onChangeCursor cursor;
+	wvview_onChangeFocus focus;
+	wvview_onShowCreatedWebView show;
+
+	/// you could use this to set object instance or something
+	void* userPointer;
+}
+
+alias _cWebView_View cWebView_View;
 
 // ====== WEB STRING ======
 cWebStringPtr_t         aws_webstring_new ();
@@ -366,8 +409,8 @@ bool                    aws_websession_isOnDisk (cWebSessionPtr_t sess);
 cWebStringPtr_t         aws_websession_getDataPath (cWebSessionPtr_t sess);
 cWebPrefs               aws_websession_getPreferences (cWebSessionPtr_t sess);
 void                    aws_websession_addDataSource (cWebSessionPtr_t sess, cWebStringPtr_t asset_host, cDataSourcePtr_t source);
-void                    aws_websession_setCookie (cWebSessionPtr_t sess, cWebUrlPtr_t url, cWebStringPtr_t asset_host, bool http_onle, bool force_session);
-bool                    aws_websession_clearCookies (cWebSessionPtr_t sess);
+void                    aws_websession_setCookie (cWebSessionPtr_t sess, cWebUrlPtr_t url, cWebStringPtr_t asset_host, bool http_only, bool force_session);
+void                    aws_websession_clearCookies (cWebSessionPtr_t sess);
 
 
 // ====== BITMAP SURFACE =======
@@ -417,11 +460,12 @@ void                    aws_webview_setInternalMenuHandler (cWebViewPtr_t webvie
 void                    aws_webview_setInternalDownloadHandler (cWebViewPtr_t webview);
 void                    aws_webview_setInternalIMEHandler (cWebViewPtr_t webview);
 
+// set view callbacks
+void                    aws_webview_setListenerView (cWebViewPtr_t webview, cWebView_View viewclbks);
+
 //================================
 // RESOURCE INTERCEPTOR STUFF
 
-// this is callback, remove it
-cResResponsePtr_t       aws_resrinterceptor_onRequest (cResInterceptorPtr_t resinterceptor, cResRequestPtr_t request);
 
 // ===== RESOURCE RESPONSE ======
 cResResponsePtr_t       aws_resresponse_create (uint numBytes, ubyte* buffer, cWebStringPtr_t mimeType);

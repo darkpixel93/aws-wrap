@@ -56,6 +56,11 @@ extern "C" {
 		char* str;
 	} cString;
 
+	typedef struct _cRect
+	{
+		int x, y, width, height;
+	} cRect;
+
 	typedef struct _cStringArray
 	{
 		cString** ptr;
@@ -182,12 +187,39 @@ extern "C" {
 
 	// ===== CALLBACKS ======
 
+	// JS EVENTS
 	/// this method gets called on javascript method call which doesn't return value
 	typedef void (*jshnd_onMethodCall)(cWebViewPtr_t caller, unsigned remoteObjId, cWebStringPtr_t methodName, cJSArrayPtr_t args);
 
 	/// this method gets called on javascript method call which returns value
 	typedef cJSValuePtr_t (*jshnd_onMethodCallValue)(cWebViewPtr_t caller, unsigned remoteObjId, cWebStringPtr_t methodName, cJSArrayPtr_t args);
 
+	// WEBVIEW EVENTS
+	// -- view
+	typedef void (*wvview_onChangeTitle)(cWebViewPtr_t caller, const cWebStringPtr_t title, void* userPointer);
+	typedef void (*wvview_onChangeAddressBar)(cWebViewPtr_t caller, const cWebUrlPtr_t title, void* userPointer);
+	typedef void (*wvview_onChangeTooltip)(cWebViewPtr_t caller, const cWebStringPtr_t tooltip, void* userPointer);
+	typedef void (*wvview_onChangeTargetURL)(cWebViewPtr_t caller, const cWebUrlPtr_t url, void* userPointer);
+	typedef void (*wvview_onChangeCursor)(cWebViewPtr_t caller, int cursor, void* userPointer);
+	typedef void (*wvview_onChangeFocus)(cWebViewPtr_t caller, int focused_type, void* userPointer);
+	typedef void (*wvview_onShowCreatedWebView)(cWebViewPtr_t caller, cWebViewPtr_t new_view, 
+												const cWebUrlPtr_t opener_url, const cWebUrlPtr_t target_url,
+												const cRect& initial_pos, bool is_popup, void* userPointer) ;
+
+
+	typedef struct _cWebView_View 
+	{
+		wvview_onChangeTitle title;
+		wvview_onChangeAddressBar address;
+		wvview_onChangeTooltip tooltip;
+		wvview_onChangeTargetURL url;
+		wvview_onChangeCursor cursor;
+		wvview_onChangeFocus focus;
+		wvview_onShowCreatedWebView show;
+
+		/// you could use this to set object instance or something
+		void* userPointer;
+	} cWebView_View;
 
 
 	// ====== WEB STRING ======
@@ -387,8 +419,8 @@ extern "C" {
 	AWS_EXPORT   cWebStringPtr_t         aws_websession_getDataPath (cWebSessionPtr_t sess);
 	AWS_EXPORT   cWebPrefs               aws_websession_getPreferences (cWebSessionPtr_t sess);
 	AWS_EXPORT   void                    aws_websession_addDataSource (cWebSessionPtr_t sess, cWebStringPtr_t asset_host, cDataSourcePtr_t source);
-	AWS_EXPORT   void                    aws_websession_setCookie (cWebSessionPtr_t sess, cWebUrlPtr_t url, cWebStringPtr_t asset_host, bool http_onle, bool force_session);
-	AWS_EXPORT   bool                    aws_websession_clearCookies (cWebSessionPtr_t sess);
+	AWS_EXPORT   void                    aws_websession_setCookie (cWebSessionPtr_t sess, cWebUrlPtr_t url, cWebStringPtr_t asset_host, bool http_only, bool force_session);
+	AWS_EXPORT   void                    aws_websession_clearCookies (cWebSessionPtr_t sess);
 
 
 	// ====== BITMAP SURFACE =======
@@ -438,11 +470,11 @@ extern "C" {
 	AWS_EXPORT   void                    aws_webview_setInternalDownloadHandler (cWebViewPtr_t webview);
 	AWS_EXPORT   void                    aws_webview_setInternalIMEHandler (cWebViewPtr_t webview);
 
+	// set view callbacks
+	AWS_EXPORT   void                    aws_webview_setListenerView (cWebViewPtr_t webview, cWebView_View viewclbks);
+
 	//================================
 	// RESOURCE INTERCEPTOR STUFF
-
-	// this is callback, remove it
-	AWS_EXPORT   cResResponsePtr_t       aws_resrinterceptor_onRequest (cResInterceptorPtr_t resinterceptor, cResRequestPtr_t request);
 
 	// ===== RESOURCE RESPONSE ======
 	AWS_EXPORT   cResResponsePtr_t       aws_resresponse_create (unsigned numBytes, unsigned char* buffer, cWebStringPtr_t mimeType);

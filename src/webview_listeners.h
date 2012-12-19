@@ -1,13 +1,18 @@
 #ifndef _WEBVIEWLISTENER_H_
 #define _WEBVIEWLISTENER_H_
 
+#include "wrap_core.h"
 #include <Awesomium/WebView.h>
 #include <Awesomium/WebString.h>
 #include <Awesomium/WebStringArray.h>
 #include <Awesomium/WebViewListener.h>
 
+#include <map>
 
 using namespace Awesomium;
+
+typedef std::map<Awesomium::WebView*, cWebView_View> viewCallbacks_t;
+
 
 class WebViewListener_View : public Awesomium::WebViewListener::View
 {
@@ -60,6 +65,13 @@ public:
 		const Awesomium::WebURL& target_url,
 		const Awesomium::Rect& initial_pos,
 		bool is_popup);
+
+	void addCallback(Awesomium::WebView* view, cWebView_View clbk);
+
+	void removeCallback(Awesomium::WebView* view);
+
+protected:
+	viewCallbacks_t callbacks;
 };
 
 

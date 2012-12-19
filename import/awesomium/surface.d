@@ -66,6 +66,11 @@ public:
   void Scroll(int dx,
 			    int dy,
 				Rect clip_rect);
+
+ package:
+  ///
+  /// return internal pointer which points to C++ object
+  void* getInternalPointer();
 }
 
 
@@ -84,8 +89,10 @@ public:
 	
 	~this()
 	{
-		if ( _internal !is null && !_parent )
+		if ( _owner )
 			aws_bitmapsurface_delete(this);
+
+		_internal = null;
 	}
 	
 	/// A pointer to the raw pixel buffer (32-bit BGRA format, 4 bpp)
@@ -201,7 +208,15 @@ public:
 
 package:
 	this() {};
+
 	alias _internal this;
 	cBitSurfacePtr_t _internal;
-	WebView _parent;
+
+	void* getInternalPointer()
+	{
+		return _internal;
+	}
+
+	// is the current objects instance owner, used to prevent overreleasing
+	bool _owner = true;
 }
