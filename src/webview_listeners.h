@@ -70,6 +70,8 @@ public:
 
 	void removeCallback(Awesomium::WebView* view);
 
+	virtual ~WebViewListener_View() { callbacks.clear(); }
+
 protected:
 	viewCallbacks_t callbacks;
 };

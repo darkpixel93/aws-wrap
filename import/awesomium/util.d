@@ -34,8 +34,8 @@ package @property cWebPrefs toCWebPrefs(WebPreferences wp)
 
 
 	cw.default_encoding = wp.default_encoding.toCString;
-	cw.proxy_config = wp.proxy_config.toCString;;
-	cw.user_stylesheet = wp.user_stylesheet.toCString;;
+	cw.proxy_config = wp.proxy_config.toCString;
+	cw.user_stylesheet = wp.user_stylesheet.toCString;
 
 	cw.allow_file_access_from_file_url = wp.allow_file_access_from_file_url;
 	cw.allow_running_insecure_content = wp.allow_file_access_from_file_url;

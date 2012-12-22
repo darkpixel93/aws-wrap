@@ -17,6 +17,7 @@
 #include "resinterceptor.h"
 #include "jshandler.h"
 
+#include <assert.h>
 
 // pragma message stuff
 #define STRING2(x) #x
@@ -25,7 +26,9 @@
 
 JSHandler _aws_jshandler;
 
-WebViewListener_View viewLst;
+
+// okay let it be on the stack(for now) because of some undebuggable stuff ...
+WebViewListener_View *viewLst = nullptr;
 
 Awesomium::WebConfig wcToAweConf(cWebConf wc);
 Awesomium::WebPreferences wpToAwePrefs(cWebPrefs wp);
@@ -49,24 +52,47 @@ Awesomium::WebStringArray toAweStrArray(cStringArray sa)
 	return wsa;
 }
 
-extern "C" 
-{
-
-	cString fromAweString(const Awesomium::WebString& ws)
+cString fromAweString(const Awesomium::WebString& ws)
 	{
 		cString ls;
 
 		ls.len = ws.ToUTF8(nullptr,0);
-		ls.str = static_cast<char*>(malloc(ls.len));
-		memset(ls.str, 0, ls.len);
-		ws.ToUTF8(ls.str,ls.len);
+		ls.str = nullptr;
+
+		if ( ls.len > 0 ) {
+			ls.str = static_cast<char*>(malloc(ls.len));
+			assert(ls.str != nullptr);
+			memset(ls.str, 0, ls.len);
+			ws.ToUTF8(ls.str,ls.len);
+		}
 
 		return ls;
 	}
 
+	// this is awkward, need to remove duplicates
+	cString fromAweString(Awesomium::WebString* ws)
+	{
+		cString ls;
+
+		ls.len = ws->ToUTF8(nullptr,0);
+		ls.str = nullptr;
+
+		if ( ls.len > 0 ) {
+			ls.str = static_cast<char*>(malloc(ls.len));
+			assert(ls.str != nullptr);
+			memset(ls.str, 0, ls.len);
+			ws->ToUTF8(ls.str,ls.len);
+		}
+
+		return ls;
+	}
+
+extern "C" 
+{
 	AWS_EXPORT cString aws_webstring_to_cstring (cWebStringPtr_t string)
 	{
-		return fromAweString(*reinterpret_cast<Awesomium::WebString*>(string));
+		assert(string != nullptr);
+		return fromAweString(reinterpret_cast<Awesomium::WebString*>(string));
 	}
 
 	AWS_EXPORT cWebStringPtr_t aws_webstring_new()
@@ -129,16 +155,25 @@ extern "C"
 
 	AWS_EXPORT const cWebCorePtr_t aws_webcore_init(cWebConf wc)
 	{
+		if ( !viewLst )
+			viewLst = new WebViewListener_View();
+
 		return reinterpret_cast<cWebCorePtr_t>(Awesomium::WebCore::Initialize( wcToAweConf(wc) ));
 	}
 
 	AWS_EXPORT const cWebCorePtr_t aws_webcore_initDefault()
 	{
+		if ( !viewLst )
+			viewLst = new WebViewListener_View();
+
 		return reinterpret_cast<cWebCorePtr_t>(Awesomium::WebCore::Initialize( Awesomium::WebConfig() ));
 	}
 
 	AWS_EXPORT void aws_webcore_shutdown()
 	{
+		if ( viewLst )
+			delete viewLst;
+
 		Awesomium::WebCore::Shutdown();
 	}
 
@@ -1016,7 +1051,7 @@ extern "C"
 		auto view = reinterpret_cast<Awesomium::WebView*>(webview);
 
 		if ( view ) {
-			view->set_view_listener(&viewLst);
+			view->set_view_listener(viewLst);
 		}
 	}
 	/*
@@ -1030,7 +1065,7 @@ extern "C"
 	// set view callbacks
 	AWS_EXPORT void aws_webview_setListenerView (cWebViewPtr_t webview, cWebView_View viewclbks)
 	{
-		viewLst.addCallback(reinterpret_cast<Awesomium::WebView*>(webview), viewclbks);
+		viewLst->addCallback(reinterpret_cast<Awesomium::WebView*>(webview), viewclbks);
 	}
 
 	// ===============================================

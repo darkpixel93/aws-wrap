@@ -915,7 +915,7 @@ package:
 	void prepCallbacks()
 	{
 		aws_webview_setInternalViewHandler(this);
-		aws_webview_setListenerView(this,_view);
+		aws_webview_setListenerView(this,_view._cbv);
 	}
 
 	@disable this()
@@ -925,10 +925,16 @@ package:
 	
 	this(cWebViewPtr_t other)
 	{
-		_view = new ViewLsn();
+		if ( _view is null )
+			_view = new ViewLsn();
+
 		_internal = other;
+		_webviews[other] = this;
 		prepCallbacks();
 	}
+
+	// static one-to-one mapping between C++ and D worlds
+	static WebView[cWebViewPtr_t] _webviews;
 
 private:
 	/// internal webview objects, because they stored on the C++ side,
@@ -960,7 +966,7 @@ private:
 
 	final class ViewLsn : WebViewListener.View
 	{
-		alias _cbv this;
+		//alias _cbv this;
 		cWebView_View _cbv;
 
 		
@@ -974,7 +980,7 @@ private:
 			_cbv.tooltip = &_onChangeTooltip;
 			_cbv.url = &_onChangeTargetURL;
 			
-			_cbv.userPointer = cast(void*)&this;
+			_cbv.userPointer = cast(void*)this;
 		}
 
 		///
@@ -987,7 +993,7 @@ private:
 			// check if valid
 			if ( lst !is null )
 			{
-				auto view = cast(WebView)caller;
+				auto view = _webviews[caller];
 				if ( view !is null )
 					lst.OnChangeFocus(view, cast(FocusedElementType) focusedtype);
 			}
@@ -1003,7 +1009,7 @@ private:
 			// check if valid
 			if ( lst !is null )
 			{
-				auto view = cast(WebView)caller;
+				auto view = _webviews[caller];
 				if ( view !is null )
 					lst.OnChangeAddressBar(view, new WebURL(cast(cWebUrlPtr_t)url));
 			}
@@ -1019,7 +1025,7 @@ private:
 			// check if valid
 			if ( lst !is null )
 			{
-				auto view = cast(WebView)caller;
+				auto view = _webviews[caller];
 				if ( view !is null )
 					lst.OnChangeTitle(view, cast(string)new WebString(title));
 			}
@@ -1033,11 +1039,11 @@ private:
 			auto lst = cast(WebView.ViewLsn)userPtr;
 
 			// check if valid
-			if ( lst !is null )
+			if ( lst !is null && lst is _view )
 			{
-				auto view = cast(WebView)caller;
+				auto view = _webviews[caller];
 				if ( view !is null )
-					lst.OnChangeTargetURL(view, new WebURL(cast(cWebUrlPtr_t)targeturl));
+					_view.OnChangeTargetURL(view, new WebURL(cast(cWebUrlPtr_t)targeturl));
 			}
 		}
 
@@ -1051,7 +1057,7 @@ private:
 			// check if valid
 			if ( lst !is null )
 			{
-				auto view = cast(WebView)caller;
+				auto view = _webviews[caller];
 				if ( view !is null )
 					lst.OnChangeCursor(view, cast(Cursor)cursor);
 			}
@@ -1067,7 +1073,7 @@ private:
 			// check if valid
 			if ( lst !is null )
 			{
-				auto view = cast(WebView)caller;
+				auto view = _webviews[caller];
 				if ( view !is null )
 					lst.OnChangeFocus(view, cast(FocusedElementType)element);
 			}
@@ -1083,7 +1089,7 @@ private:
 			// check if valid
 			if ( lst !is null )
 			{
-				auto view = cast(WebView)caller;
+				auto view = _webviews[caller];
 				if ( view !is null )
 					lst.OnChangeTooltip(view, cast(string)new WebString(tooltip));
 			}
@@ -1102,7 +1108,7 @@ private:
 			// check if valid
 			if ( lst !is null )
 			{
-				auto view = cast(WebView)caller;
+				auto view = _webviews[caller];
 				if ( view !is null )
 					lst.OnShowCreatedWebView(new WebView(view), 
 											 new WebView(new_view),
@@ -1222,7 +1228,7 @@ private:
 	}
 
 	// should it be static? C++ callback handler could access destroyed(!) instance
-	ViewLsn _view;
+	static ViewLsn _view;
 
 	/// should this be separated, because anyway in awesomium only one listener for each type active in one time?
 	Listener[] eventlisteners;
