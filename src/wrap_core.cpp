@@ -1968,16 +1968,7 @@ extern "C"
 		}
 	}
 
-	AWS_EXPORT void aws_jshandler_addCallback(cWebViewPtr_t webview, jshnd_onMethodCall callback)
-	{
-		auto view = reinterpret_cast<Awesomium::WebView*>(webview);
-
-		if ( view ){
-			_aws_jshandler.addCallback(view, callback);
-		}
-	}
-
-	AWS_EXPORT void aws_jshandler_addCallbackValue(cWebViewPtr_t webview, jshnd_onMethodCallValue callback)
+	AWS_EXPORT void aws_jshandler_addCallback(cWebViewPtr_t webview, cJSMethodCallback_t callback)
 	{
 		auto view = reinterpret_cast<Awesomium::WebView*>(webview);
 
@@ -1987,33 +1978,20 @@ extern "C"
 	}
 
 
-	AWS_EXPORT void aws_jshandler_removeCallback(cWebViewPtr_t webview, jshnd_onMethodCall callback)
+
+	AWS_EXPORT void aws_jshandler_removeCallback(cWebViewPtr_t webview)
 	{
 		auto view = reinterpret_cast<Awesomium::WebView*>(webview);
 
 		if ( view ){
-			_aws_jshandler.removeCallback(view, callback);
+			_aws_jshandler.removeCallback(view);
 		}
 	}
 
-	AWS_EXPORT void aws_jshandler_removeCallbackAll(cWebViewPtr_t webview)
+	AWS_EXPORT void aws_jshandler_removeCallbackAll()
 	{
-		auto view = reinterpret_cast<Awesomium::WebView*>(webview);
-
-		if ( view ){
-			_aws_jshandler.removeCallbackAll(view);
-		}
+		_aws_jshandler.removeCallbackAll();
 	}
-
-	AWS_EXPORT void aws_jshandler_removeCallbackValue (cWebViewPtr_t webview)
-	{
-		auto view = reinterpret_cast<Awesomium::WebView*>(webview);
-
-		if ( view ){
-			_aws_jshandler.removeCallbackValue(view);
-		}
-	}
-
 
 	// =========================
 	// END

@@ -41,7 +41,9 @@ Copyright (C) 2012 evilrat
 extern "C" {
 #endif
 
-	
+	/// awesomium int64
+	typedef long long aint64;
+
 	/// null terminated wchar16 string
 	typedef unsigned short* nullstr16_t;
 
@@ -116,7 +118,6 @@ extern "C" {
 		bool shrink_standalone_images_to_fit;
 	} cWebPrefs;
 
-
 	// ---------------------------------------
 	// BELOW ARE THE POINTERS TO ACTUAL AWESOMIUM CPP OBJECTS
 	// YOU CAN USE THEM IF UR LANGUAGE SUPPORT CPP CLASSES(MUAHAHAH!!)
@@ -137,6 +138,8 @@ extern "C" {
 	typedef struct _cWebString  *cWebStringPtr_t;
 
 	typedef struct _cWebStringArray  *cWebStringArrayPtr_t;
+
+	typedef struct _cWebMenuItemArray *cWebMenuItemArrayPtr_t;
 
 
 	typedef struct _cJSObject  *cJSObjectPtr_t;
@@ -185,16 +188,87 @@ extern "C" {
 
 	typedef struct _cWebView_onIME *cWebView_onIMEPtr_t;
 
+
+
+	typedef struct _cWebMenuItemArray *cWebMenuItemArrayPtr_t;
+
+
+	// =======================
+
+	typedef struct _cWebPopupMenuInfo {
+		cRect bounds;  ///< The location to display the menu
+		int item_height;         ///< The height of each menu item
+		double item_font_size;   ///< The font-size of each menu item
+		int selected_item;       ///< The index of the currently-selected item
+		cWebMenuItemArrayPtr_t items;  ///< The actual menu items
+		bool right_aligned;      ///< Whether or not the menu is right-aligned
+	} cWebPopupMenuInfo_t;
+
+	typedef struct _cWebContextMenuInfo {
+		int pos_x;                 ///< The x-coordinate of the menu's position.
+		int pos_y;                 ///< The y-coordinate of the menu's position.
+		int media_type;      ///< The type of media (if any) that was clicked.
+		int media_state;           ///< The state of the media (if any).
+		cWebUrlPtr_t link_url;           ///< The URL of the link (if any).
+		cWebUrlPtr_t src_url;            ///< The URL of the media (if any).
+		cWebUrlPtr_t page_url;           ///< The URL of the web-page.
+		cWebUrlPtr_t frame_url;          ///< The URL of the frame.
+		aint64 frame_id;            ///< The ID of the frame.
+		cWebStringPtr_t selection_text;  ///< The selected text (if any).
+		bool is_editable;          ///< Whether or not this node is editable.
+		int edit_flags;            ///< Which edit actions can be performed
+	} cWebContextMenuInfo_t;
+
+	typedef struct _cWebFileChooserInfo {
+		int mode;       ///< The type of dialog to display
+		cWebStringPtr_t title;               ///< Title of the dialog
+		cWebStringPtr_t default_file_name;   ///< Suggested file name for the dialog
+		cWebStringArrayPtr_t accept_types;   ///< Valid mime type
+	} cWebFileChooserInfo_t;
+
+	typedef struct _cWebLoginDialogInfo {
+		int request_id;         ///< The unique ID of the request.
+		cWebStringPtr_t request_url;  ///< The URL of the web-page requesting login.
+		bool is_proxy;          ///< Whether or not this is a proxy auth.
+		cWebStringPtr_t host;         ///< The hostname of the server.
+		unsigned short port;    ///< The port of the server.
+		cWebStringPtr_t scheme;       ///< The scheme of the server.
+		cWebStringPtr_t realm;        ///< The realm of the server
+	} cWebLoginDialogInfo_t;
+
 	// ===== CALLBACKS ======
 
 	// JS EVENTS
 	/// this method gets called on javascript method call which doesn't return value
-	typedef void (*jshnd_onMethodCall)(cWebViewPtr_t caller, unsigned remoteObjId, cWebStringPtr_t methodName, cJSArrayPtr_t args);
+	typedef void (*jshnd_onMethodCall)(cWebViewPtr_t caller, unsigned remoteObjId, cWebStringPtr_t methodName, cJSArrayPtr_t args, void* userPointer);
 
 	/// this method gets called on javascript method call which returns value
-	typedef cJSValuePtr_t (*jshnd_onMethodCallValue)(cWebViewPtr_t caller, unsigned remoteObjId, cWebStringPtr_t methodName, cJSArrayPtr_t args);
+	typedef cJSValuePtr_t (*jshnd_onMethodCallValue)(cWebViewPtr_t caller, unsigned remoteObjId, cWebStringPtr_t methodName, cJSArrayPtr_t args, void* userPointer);
 
+	///
+	/// this structure stores JavaScript callback method handlers
+	typedef struct _cJSMethodCallback_t 
+	{
+		///
+		/// this function will be called whenever JS handler attached to view,
+		/// and javascript function without returning value called.
+		/// it may be NULL, in this case it will be ignored
+		jshnd_onMethodCall call;
+
+		///
+		/// this function will be called whenever JS handler attached to view,
+		/// and javascript function which returns value called.
+		/// it may be NULL, in this case it will be ignored
+		jshnd_onMethodCallValue callval;
+
+		///
+		/// you could use this to set object instance pointer or something
+		void* userptr;
+	} cJSMethodCallback_t;
+
+	// --------------------------------
 	// WEBVIEW EVENTS
+
 	// -- view
 	typedef void (*wvview_onChangeTitle)(cWebViewPtr_t caller, const cWebStringPtr_t title, void* userPointer);
 	typedef void (*wvview_onChangeAddressBar)(cWebViewPtr_t caller, const cWebUrlPtr_t title, void* userPointer);
@@ -207,7 +281,7 @@ extern "C" {
 												const cRect& initial_pos, bool is_popup, void* userPointer) ;
 
 
-	typedef struct _cWebView_View 
+	typedef struct _cWebView_View
 	{
 		wvview_onChangeTitle title;
 		wvview_onChangeAddressBar address;
@@ -221,6 +295,137 @@ extern "C" {
 		void* userPointer;
 	} cWebView_View;
 
+
+
+	// -- load
+	typedef void (*wvload_onBeginLoadingFrame)(cWebViewPtr_t* caller, aint64 frame_id,
+									bool is_main_frame, const cWebUrlPtr_t url,
+									bool is_error_page, void* userptr);
+	typedef void (*wvload_onFailLoadingFrame)(cWebViewPtr_t caller, aint64 frame_id,
+									bool is_main_frame, const cWebUrlPtr_t url,
+									int error_code, const cWebStringPtr_t error_desc,
+									void* userptr);
+	typedef void (*wvload_onFinishLoadingFrame)(cWebViewPtr_t caller, aint64 frame_id, bool is_main_frame,
+                                    const cWebUrlPtr_t url, void* userptr);
+	typedef void (*wvload_onDocumentReady)(cWebViewPtr_t caller, const cWebUrlPtr_t url, void* userptr);
+
+
+	typedef struct _cWebView_Load
+	{
+		wvload_onBeginLoadingFrame begin;
+		wvload_onFailLoadingFrame fail;
+		wvload_onFinishLoadingFrame finish;
+		wvload_onDocumentReady ready;
+
+		void* userPointer;
+	} cWebView_Load;
+
+	
+
+	// -- process
+	typedef void (*wvproc_onUnresponsive)(cWebViewPtr_t caller, void* userptr);
+	typedef void (*wvproc_onResponsive)(cWebViewPtr_t caller, void* userptr);
+	typedef void (*wvproc_onCrashed)(cWebViewPtr_t caller, int status, void* userptr);
+
+
+	typedef struct _cWebView_Process
+	{
+		wvproc_onUnresponsive unresponsive;
+		wvproc_onResponsive responsive;
+		wvproc_onCrashed crashed;
+
+		void* userPointer;
+	} cWebView_Process;
+
+
+	// -- menu
+	typedef void (*wvmenu_onShowPopupMenu)(cWebViewPtr_t caller, cWebPopupMenuInfo_t menu_info, void* userptr);
+	typedef void (*wvmenu_onShowContextMenu)(cWebViewPtr_t caller, cWebContextMenuInfo_t menu_info, void* userptr);
+
+
+	typedef struct _cWebView_Menu
+	{
+		wvmenu_onShowPopupMenu popup;
+		wvmenu_onShowContextMenu context;
+
+		void* userPointer;
+	} cWebView_Menu;
+
+	
+	// -- dialog
+	typedef void (*wvdialog_onShowFileChooser)(cWebViewPtr_t caller, cWebFileChooserInfo_t chooser_info, void* userptr);
+	typedef void (*wvdialog_onShowLoginDialog)(cWebViewPtr_t caller, cWebLoginDialogInfo_t dialog_info, void* userptr);
+
+	typedef struct _cWebView_Dialog
+	{
+		wvdialog_onShowFileChooser file;
+		wvdialog_onShowLoginDialog login;
+
+		void* userPointer;
+	} cWebView_Dialog;
+
+
+	// -- print
+	typedef void (*wvprint_onRequestPrint)(cWebViewPtr_t caller, void* userptr);
+	typedef void (*wvprint_onFailPrint)(cWebViewPtr_t caller, int request_id, void* userptr);
+	typedef void (*wvprint_onFinishPrint)(cWebViewPtr_t caller, int request_id, const cWebStringArrayPtr_t, void* userptr);
+
+	typedef struct _cWebView_Print
+	{
+		wvprint_onRequestPrint request;
+		wvprint_onFailPrint fail;
+		wvprint_onFinishPrint finish;
+
+		void* userPointer;
+	} cWebView_Print;
+
+	// -- download
+	typedef void (*wvdownload_onRequestDownload)(cWebViewPtr_t caller, int download_id,
+													const cWebUrlPtr_t url,
+													const cWebStringPtr_t suggested_filename,
+													const cWebStringPtr_t mime_type,
+													void* userptr);
+	typedef void (*wvdownload_onUpdateDownload)(cWebViewPtr_t caller,
+                                int download_id,
+                                aint64 total_bytes,
+                                aint64 received_bytes,
+                                aint64 current_speed,
+								void* userptr);
+
+	typedef void (*wvdownload_onFinishDownload)(cWebViewPtr_t caller,
+                                int download_id,
+                                const cWebUrlPtr_t url,
+                                const cWebStringPtr_t saved_path,
+								void* userptr);
+
+	typedef struct _cWebView_Download
+	{
+		wvdownload_onRequestDownload request;
+		wvdownload_onUpdateDownload update;
+		wvdownload_onFinishDownload finish;
+
+		void* userPointer;
+	} cWebView_Download;
+
+	
+	// -- IME
+	typedef void (*wvime_onUpdateIME)(cWebViewPtr_t caller, int type, int caret_x, int caret_y, void* userptr);
+	typedef void (*wvime_onCancelIME)(cWebViewPtr_t caller, void* userptr);
+	typedef void (*wvime_onChangeIMERange)(cWebViewPtr_t caller, unsigned int start, 
+									unsigned int end, void* userptr);
+
+
+	typedef struct _cWebView_IME
+	{
+		wvime_onUpdateIME update;
+		wvime_onCancelIME cancel;
+		wvime_onChangeIMERange range;
+
+		void* userPointer;
+	} cWebView_IME;
+
+
+	// --------------------------------
 
 	// ====== WEB STRING ======
 	AWS_EXPORT   cWebStringPtr_t         aws_webstring_new ();
@@ -451,12 +656,9 @@ extern "C" {
 
 	AWS_EXPORT   void                    aws_webview_setInternalJSHandler (cWebViewPtr_t webview);
 
-	AWS_EXPORT   void                    aws_jshandler_addCallback (cWebViewPtr_t webview, jshnd_onMethodCall callback);
-	AWS_EXPORT   void                    aws_jshandler_addCallbackValue (cWebViewPtr_t webview, jshnd_onMethodCallValue callback);
-
-	AWS_EXPORT   void                    aws_jshandler_removeCallback (cWebViewPtr_t webview, jshnd_onMethodCall callback);
-	AWS_EXPORT   void                    aws_jshandler_removeCallbackValue (cWebViewPtr_t webview);
-	AWS_EXPORT   void                    aws_jshandler_removeCallbackAll (cWebViewPtr_t webview);
+	AWS_EXPORT   void                    aws_jshandler_addCallback (cWebViewPtr_t webview, cJSMethodCallback_t callback);
+	AWS_EXPORT   void                    aws_jshandler_removeCallback (cWebViewPtr_t webview);
+	AWS_EXPORT   void                    aws_jshandler_removeCallbackAll ();
 
 	//================================
 	// WEBVIEW HANDLERS STUFF
@@ -468,10 +670,18 @@ extern "C" {
 	AWS_EXPORT   void                    aws_webview_setInternalProcessHandler (cWebViewPtr_t webview);
 	AWS_EXPORT   void                    aws_webview_setInternalMenuHandler (cWebViewPtr_t webview);
 	AWS_EXPORT   void                    aws_webview_setInternalDownloadHandler (cWebViewPtr_t webview);
+	AWS_EXPORT   void                    aws_webview_setInternalDialogHandler (cWebViewPtr_t webview);
 	AWS_EXPORT   void                    aws_webview_setInternalIMEHandler (cWebViewPtr_t webview);
 
-	// set view callbacks
+	// set callbacks
+	AWS_EXPORT   void                    aws_webview_setListenerLoad (cWebViewPtr_t webview, cWebView_Load loadclbks);
 	AWS_EXPORT   void                    aws_webview_setListenerView (cWebViewPtr_t webview, cWebView_View viewclbks);
+	AWS_EXPORT   void                    aws_webview_setListenerPrint (cWebViewPtr_t webview, cWebView_Print prntclbks);
+	AWS_EXPORT   void                    aws_webview_setListenerProcess (cWebViewPtr_t webview, cWebView_Process procclbks);
+	AWS_EXPORT   void                    aws_webview_setListenerMenu (cWebViewPtr_t webview, cWebView_Menu menuclbks);
+	AWS_EXPORT   void                    aws_webview_setListenerDialog (cWebViewPtr_t webview, cWebView_Dialog dlgclbks);
+	AWS_EXPORT   void                    aws_webview_setListenerDownload (cWebViewPtr_t webview, cWebView_Download dlclbks);
+	AWS_EXPORT   void                    aws_webview_setListenerIME (cWebViewPtr_t webview, cWebView_IME imeclbks);
 
 	//================================
 	// RESOURCE INTERCEPTOR STUFF
