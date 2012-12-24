@@ -284,7 +284,7 @@ struct cWebView_View
 
 
 // -- load
-alias void function(cWebViewPtr_t* caller, aint64 frame_id,
+alias void function(cWebViewPtr_t caller, aint64 frame_id,
 										   bool is_main_frame, const cWebUrlPtr_t url,
 										   bool is_error_page, void* userptr) wvload_onBeginLoadingFrame;
 alias void function(cWebViewPtr_t caller, aint64 frame_id,

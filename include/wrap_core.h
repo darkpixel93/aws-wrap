@@ -298,7 +298,7 @@ extern "C" {
 
 
 	// -- load
-	typedef void (*wvload_onBeginLoadingFrame)(cWebViewPtr_t* caller, aint64 frame_id,
+	typedef void (*wvload_onBeginLoadingFrame)(cWebViewPtr_t caller, aint64 frame_id,
 									bool is_main_frame, const cWebUrlPtr_t url,
 									bool is_error_page, void* userptr);
 	typedef void (*wvload_onFailLoadingFrame)(cWebViewPtr_t caller, aint64 frame_id,

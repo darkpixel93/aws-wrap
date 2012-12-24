@@ -12,6 +12,13 @@
 using namespace Awesomium;
 
 typedef std::map<Awesomium::WebView*, cWebView_View> viewCallbacks_t;
+typedef std::map<Awesomium::WebView*, cWebView_Load> loadCallbacks_t;
+typedef std::map<Awesomium::WebView*, cWebView_Menu> menuCallbacks_t;
+typedef std::map<Awesomium::WebView*, cWebView_Process> procCallbacks_t;
+typedef std::map<Awesomium::WebView*, cWebView_Print> prntCallbacks_t;
+typedef std::map<Awesomium::WebView*, cWebView_Dialog> dlgCallbacks_t;
+typedef std::map<Awesomium::WebView*, cWebView_Download> dnldCallbacks_t;
+typedef std::map<Awesomium::WebView*, cWebView_IME> imeCallbacks_t;
 
 
 class WebViewListener_View : public Awesomium::WebViewListener::View
@@ -114,8 +121,14 @@ class WebViewListener_Load : public Awesomium::WebViewListener::Load {
   virtual void OnDocumentReady(Awesomium::WebView* caller,
                                const Awesomium::WebURL& url);
 
+  virtual ~WebViewListener_Load() { callbacks.clear(); }
+
+  void addCallback(Awesomium::WebView* view, cWebView_Load clbk);
+
+  void removeCallback(Awesomium::WebView* view);
+
  protected:
-	 virtual ~WebViewListener_Load() {}
+	 loadCallbacks_t callbacks;
 };
 
 ///
@@ -139,8 +152,14 @@ class WebViewListener_Process : public Awesomium::WebViewListener::Process {
   /// This event occurs when the process crashes.
   virtual void OnCrashed(Awesomium::WebView* caller,
                          Awesomium::TerminationStatus status);
+
+  virtual ~WebViewListener_Process() { callbacks.clear(); }
+
+  void addCallback(Awesomium::WebView* view, cWebView_Process clbk);
+
+  void removeCallback(Awesomium::WebView* view);
  protected:
-  virtual ~WebViewListener_Process() {}
+  procCallbacks_t callbacks;
 };
 
 ///
@@ -171,8 +190,15 @@ class WebViewListener_Menu : public Awesomium::WebViewListener::Menu {
   ///
   virtual void OnShowContextMenu(Awesomium::WebView* caller,
                                  const WebContextMenuInfo& menu_info);
+
+  virtual ~WebViewListener_Menu() { callbacks.clear(); }
+  
+  void addCallback(Awesomium::WebView* view, cWebView_Menu clbk);
+
+  void removeCallback(Awesomium::WebView* view);
+
  protected:
-  virtual ~WebViewListener_Menu() {}
+  menuCallbacks_t callbacks;
 };
 
 ///
@@ -206,8 +232,14 @@ class WebViewListener_Dialog : public Awesomium::WebViewListener::Dialog {
   virtual void OnShowLoginDialog(Awesomium::WebView* caller,
                                  const WebLoginDialogInfo& dialog_info);
 
+  virtual ~WebViewListener_Dialog() { callbacks.clear(); }
+
+  void addCallback(Awesomium::WebView* view, cWebView_Dialog clbk);
+
+  void removeCallback(Awesomium::WebView* view);
+
  protected:
-  virtual ~WebViewListener_Dialog() {}
+  dlgCallbacks_t callbacks;
 };
 
 ///
@@ -252,8 +284,14 @@ class WebViewListener_Print : public Awesomium::WebViewListener::Print {
                              int request_id,
                              const WebStringArray& file_list);
 
+  virtual ~WebViewListener_Print() { callbacks.clear(); }
+
+  void addCallback(Awesomium::WebView* view, cWebView_Print clbk);
+
+  void removeCallback(Awesomium::WebView* view);
+
  protected:
-  virtual ~WebViewListener_Print() {}
+  prntCallbacks_t callbacks;
 };
 
 ///
@@ -314,8 +352,14 @@ class WebViewListener_Download : public Awesomium::WebViewListener::Download {
                                 const Awesomium::WebURL& url,
                                 const Awesomium::WebString& saved_path);
 
+  virtual ~WebViewListener_Download() { callbacks.clear(); }
+
+  void addCallback(Awesomium::WebView* view, cWebView_Download clbk);
+
+  void removeCallback(Awesomium::WebView* view);
+
  protected:
-  virtual ~WebViewListener_Download() {}
+  dnldCallbacks_t callbacks;
 };
 
 ///
@@ -359,8 +403,14 @@ class WebViewListener_IME : public Awesomium::WebViewListener::InputMethodEditor
                                 unsigned int start,
                                 unsigned int end);
 
+  virtual ~WebViewListener_IME() { callbacks.clear(); }
+
+  void addCallback(Awesomium::WebView* view, cWebView_IME clbk);
+
+  void removeCallback(Awesomium::WebView* view);
+
  protected:
-  virtual ~WebViewListener_IME() {}
+  imeCallbacks_t callbacks;
 };
 
 #endif
