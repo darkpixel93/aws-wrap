@@ -962,8 +962,37 @@ package:
 	
 	this(cWebViewPtr_t other)
 	{
+		// view
 		if ( _view is null )
 			_view = new ViewLsn();
+
+		// load
+		if ( _load is null )
+			_load = new LoadLsn();
+
+		// download
+		if ( _download is null )
+			_download = new DownloadLsn();
+
+		// dialog
+		if ( _dialog is null )
+			_dialog = new DialogLsn();
+
+		// process
+		if ( _proc is null )
+			_proc = new ProcLsn();
+
+		// menu
+		if ( _menu is null )
+			_menu = new MenuLsn();
+
+		// print
+		if ( _print is null )
+			_print = new PrintLsn();
+
+		// ime
+		if ( _ime is null )
+			_ime = new IMELsn();
 
 		_internal = other;
 		_webviews[other] = this;

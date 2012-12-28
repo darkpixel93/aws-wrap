@@ -25,18 +25,21 @@ public:
 	/// new empty string
 	this()
 	{
+		_owner = true;
 		_internal = aws_webstring_new();
 	}
 
 	/// new string from utf8 data
 	this(string str)
 	{
+		_owner = true;
 		_internal = aws_webstring_new_utf8(str.ptr, str.length);
 	}
 
 	/// new string from substring
 	this(WebString other, uint start, uint len)
 	{
+		_owner = true;
 		_internal = aws_webstring_new_substring(other, start, len);
 	}
 
@@ -44,14 +47,17 @@ public:
 	{
 		// there should be better way...
 		scope str = aws_webstring_to_cstring(this);
-		return
-			str.str[0 .. str.len].idup;
+
+		if ( str.len > 0 )
+			return str.str[0 .. str.len].idup;
+		
+		return string.init;
 	}
 	
 	~this()
 	{
-		if ( _internal )
-		aws_webstring_delete(this);
+		if ( _internal && _owner )
+			aws_webstring_delete(this);
 		_internal = null;
 	}
 
@@ -70,4 +76,5 @@ package:
 package:
 	alias _internal this;
 	cWebStringPtr_t _internal;
+	bool _owner = false;
 }
