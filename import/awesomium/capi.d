@@ -354,7 +354,7 @@ struct cWebView_Dialog
 // -- print
 alias void function(cWebViewPtr_t caller, void* userptr) wvprint_onRequestPrint;
 alias void function(cWebViewPtr_t caller, int request_id, void* userptr) wvprint_onFailPrint;
-alias void function(cWebViewPtr_t caller, int request_id, const cWebStringArrayPtr_t, void* userptr) wvprint_onFinishPrint;
+alias void function(cWebViewPtr_t caller, int request_id, const cWebStringArrayPtr_t file_list, void* userptr) wvprint_onFinishPrint;
 
 struct cWebView_Print
 {

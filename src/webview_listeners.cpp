@@ -387,6 +387,21 @@
 		 }
    }
 
+   void WebViewListener_Menu::addCallback(Awesomium::WebView* view, cWebView_Menu clbk)
+	{
+		callbacks.emplace(view, clbk);
+	}
+
+	void WebViewListener_Menu::removeCallback(Awesomium::WebView* view)
+	{
+		auto cb = callbacks.find(view);
+
+		if  ( cb != callbacks.end() )
+		{
+			callbacks.erase(cb);
+		}
+	}
+
   ///
   /// This event occurs when the page requests to display a file chooser
   /// dialog. This is usually the result of a user clicking on an HTML

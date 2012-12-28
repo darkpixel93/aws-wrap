@@ -29,6 +29,13 @@ JSHandler _aws_jshandler;
 
 // okay let it be on the stack(for now) because of some undebuggable stuff ...
 WebViewListener_View *viewLst = nullptr;
+WebViewListener_Load loadLst;
+WebViewListener_Print printLst;
+WebViewListener_Menu menuLst;
+WebViewListener_Dialog dialogLst;
+WebViewListener_Download downloadLst;
+WebViewListener_Process procLst;
+WebViewListener_IME imeLst;
 
 Awesomium::WebConfig wcToAweConf(cWebConf wc);
 Awesomium::WebPreferences wpToAwePrefs(cWebPrefs wp);
@@ -1041,7 +1048,16 @@ extern "C"
 		auto view = reinterpret_cast<Awesomium::WebView*>(webview);
 
 		if ( view ) {
-			//view->set_load_listener(&loadLst);
+			view->set_load_listener(&loadLst);
+		}
+	}
+
+	AWS_EXPORT void aws_webview_setInternalDialogHandler (cWebViewPtr_t webview) 
+	{
+		auto view = reinterpret_cast<Awesomium::WebView*>(webview);
+
+		if ( view ) {
+			view->set_dialog_listener(&dialogLst);
 		}
 	}
 
@@ -1054,18 +1070,92 @@ extern "C"
 			view->set_view_listener(viewLst);
 		}
 	}
-	/*
-	AWS_EXPORT void aws_webview_setInternalPrintHandler (cWebViewPtr_t webview);
-	AWS_EXPORT void aws_webview_setInternalProcessHandler (cWebViewPtr_t webview);
-	AWS_EXPORT void aws_webview_setInternalMenuHandler (cWebViewPtr_t webview);
-	AWS_EXPORT void aws_webview_setInternalDownloadHandler (cWebViewPtr_t webview);
-	AWS_EXPORT void aws_webview_setInternalIMEHandler (cWebViewPtr_t webview);
-	*/
+	
+	AWS_EXPORT void aws_webview_setInternalPrintHandler (cWebViewPtr_t webview)
+	{
+		auto view = reinterpret_cast<Awesomium::WebView*>(webview);
+
+		if ( view ) {
+			view->set_print_listener(&printLst);
+		}
+	}
+
+	AWS_EXPORT void aws_webview_setInternalProcessHandler (cWebViewPtr_t webview)
+	{
+		auto view = reinterpret_cast<Awesomium::WebView*>(webview);
+
+		if ( view ) {
+			view->set_process_listener(&procLst);
+		}
+	}
+
+	AWS_EXPORT void aws_webview_setInternalMenuHandler (cWebViewPtr_t webview)
+	{
+		auto view = reinterpret_cast<Awesomium::WebView*>(webview);
+
+		if ( view ) {
+			view->set_menu_listener(&menuLst);
+		}
+	}
+
+	AWS_EXPORT void aws_webview_setInternalDownloadHandler (cWebViewPtr_t webview)
+	{
+		auto view = reinterpret_cast<Awesomium::WebView*>(webview);
+
+		if ( view ) {
+			view->set_download_listener(&downloadLst);
+		}
+	}
+
+	AWS_EXPORT void aws_webview_setInternalIMEHandler (cWebViewPtr_t webview)
+	{
+		auto view = reinterpret_cast<Awesomium::WebView*>(webview);
+
+		if ( view ) {
+			view->set_input_method_editor_listener(&imeLst);
+		}
+	}
+	
 
 	// set view callbacks
 	AWS_EXPORT void aws_webview_setListenerView (cWebViewPtr_t webview, cWebView_View viewclbks)
 	{
 		viewLst->addCallback(reinterpret_cast<Awesomium::WebView*>(webview), viewclbks);
+	}
+
+	AWS_EXPORT void aws_webview_setListenerLoad (cWebViewPtr_t webview, cWebView_Load loadclbks)
+	{
+		loadLst.addCallback(reinterpret_cast<Awesomium::WebView*>(webview), loadclbks);
+	}
+
+	AWS_EXPORT void aws_webview_setListenerPrint (cWebViewPtr_t webview, cWebView_Print prntclbks)
+	{
+		printLst.addCallback(reinterpret_cast<Awesomium::WebView*>(webview), prntclbks);
+	}
+
+	AWS_EXPORT void aws_webview_setListenerProcess (cWebViewPtr_t webview, cWebView_Process procclbks)
+	{
+		procLst.addCallback(reinterpret_cast<Awesomium::WebView*>(webview), procclbks);
+	}
+
+	AWS_EXPORT void aws_webview_setListenerMenu (cWebViewPtr_t webview, cWebView_Menu menuclbks)
+	{
+		menuLst.addCallback(reinterpret_cast<Awesomium::WebView*>(webview), menuclbks);
+	}
+
+	AWS_EXPORT void aws_webview_setListenerDialog (cWebViewPtr_t webview, cWebView_Dialog dlgclbks)
+	{
+		dialogLst.addCallback(reinterpret_cast<Awesomium::WebView*>(webview), dlgclbks);
+	}
+
+	AWS_EXPORT void aws_webview_setListenerDownload (cWebViewPtr_t webview, cWebView_Download dlclbks)
+	{
+		downloadLst.addCallback(reinterpret_cast<Awesomium::WebView*>(webview), dlclbks);
+	}
+
+	AWS_EXPORT void aws_webview_setListenerIME (cWebViewPtr_t webview, cWebView_IME imeclbks)
+	{
+		imeLst.addCallback(reinterpret_cast<Awesomium::WebView*>(webview), imeclbks);
 	}
 
 	// ===============================================
