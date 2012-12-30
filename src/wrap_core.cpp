@@ -17,8 +17,6 @@
 #include "resinterceptor.h"
 #include "jshandler.h"
 
-#include <iostream>
-
 #include <assert.h>
 
 // pragma message stuff
@@ -29,8 +27,8 @@
 JSHandler _aws_jshandler;
 
 
-// okay let it be on the stack(for now) because of some undebuggable stuff ...
-WebViewListener_View *viewLst = nullptr;
+// internal callbacks
+WebViewListener_View viewLst;
 WebViewListener_Load loadLst;
 WebViewListener_Print printLst;
 WebViewListener_Menu menuLst;
@@ -53,7 +51,7 @@ Awesomium::WebString toAweString(cString str)
 Awesomium::WebStringArray toAweStrArray(cStringArray sa)
 {
 	Awesomium::WebStringArray wsa;
-	
+
 	for( unsigned i = 0; i < sa.size; ++i ) {
 		wsa.Push( toAweString(*sa.ptr[i]) );
 	}
@@ -62,39 +60,26 @@ Awesomium::WebStringArray toAweStrArray(cStringArray sa)
 }
 
 cString fromAweString(const Awesomium::WebString& ws)
-	{
-		cString ls;
+{
+	cString ls;
 
-		ls.len = ws.ToUTF8(nullptr,0);
-		ls.str = nullptr;
+	ls.len = ws.ToUTF8(nullptr,0);
+	ls.str = nullptr;
 
-		if ( ls.len > 0 ) {
-			ls.str = static_cast<char*>(malloc(ls.len));
-			assert(ls.str != nullptr);
-			memset(ls.str, 0, ls.len);
-			ws.ToUTF8(ls.str,ls.len);
-		}
-
-		return ls;
+	if ( ls.len > 0 ) {
+		ls.str = static_cast<char*>(malloc(ls.len));
+		assert(ls.str != nullptr);
+		memset(ls.str, 0, ls.len);
+		ws.ToUTF8(ls.str,ls.len);
 	}
 
-	// this is awkward, need to remove duplicates
-	cString fromAweString(Awesomium::WebString* ws)
-	{
-		cString ls;
+	return ls;
+}
 
-		ls.len = ws->ToUTF8(nullptr,0);
-		ls.str = nullptr;
-
-		if ( ls.len > 0 ) {
-			ls.str = static_cast<char*>(malloc(ls.len));
-			assert(ls.str != nullptr);
-			memset(ls.str, 0, ls.len);
-			ws->ToUTF8(ls.str,ls.len);
-		}
-
-		return ls;
-	}
+cString fromAweString(Awesomium::WebString* ws)
+{
+	return fromAweString( reinterpret_cast<const Awesomium::WebString&>(ws) );
+}
 
 extern "C" 
 {
@@ -107,7 +92,7 @@ extern "C"
 	AWS_EXPORT cWebStringPtr_t aws_webstring_new()
 	{
 		return reinterpret_cast<cWebStringPtr_t>(
-				new Awesomium::WebString()
+			new Awesomium::WebString()
 			);
 	}
 
@@ -115,14 +100,14 @@ extern "C"
 	{
 		return reinterpret_cast<cWebStringPtr_t>(
 			new Awesomium::WebString( Awesomium::WebString::CreateFromUTF8(str.str, str.len) )
-		);
+			);
 	}
 
 	AWS_EXPORT cWebStringPtr_t aws_webstring_new_webstring (cWebStringPtr_t string)
 	{
 		return reinterpret_cast<cWebStringPtr_t>(
 			new Awesomium::WebString( reinterpret_cast<const Awesomium::WebString&>(string) )
-		);
+			);
 	}
 
 	AWS_EXPORT void aws_webstring_delete(cWebStringPtr_t string)
@@ -137,9 +122,9 @@ extern "C"
 	AWS_EXPORT cWebStringPtr_t aws_webstring_new_utf8(const char* string, unsigned len)
 	{
 		return reinterpret_cast<cWebStringPtr_t>(
-				new Awesomium::WebString(
-					Awesomium::WebString::CreateFromUTF8(string, len)
-				)
+			new Awesomium::WebString(
+			Awesomium::WebString::CreateFromUTF8(string, len)
+			)
 			);
 	}
 
@@ -148,14 +133,9 @@ extern "C"
 		auto str = reinterpret_cast<Awesomium::WebString*>(string);
 
 		if ( str ) {
-
-			// a self-destruct, some kind of...
-			if ( dest == nullptr && length != 0 )
-				delete (void*)0;
-
 			return str->ToUTF8(dest,length);
 		}
-		
+
 		return 0;
 	}
 
@@ -166,7 +146,7 @@ extern "C"
 		if ( str ) {
 			return str->data();
 		}
-		
+
 		return 0;
 	}
 
@@ -186,25 +166,16 @@ extern "C"
 
 	AWS_EXPORT const cWebCorePtr_t aws_webcore_init(cWebConf wc)
 	{
-		if ( !viewLst )
-			viewLst = new WebViewListener_View();
-
 		return reinterpret_cast<cWebCorePtr_t>(Awesomium::WebCore::Initialize( wcToAweConf(wc) ));
 	}
 
 	AWS_EXPORT const cWebCorePtr_t aws_webcore_initDefault()
 	{
-		if ( !viewLst )
-			viewLst = new WebViewListener_View();
-
 		return reinterpret_cast<cWebCorePtr_t>(Awesomium::WebCore::Initialize( Awesomium::WebConfig() ));
 	}
 
 	AWS_EXPORT void aws_webcore_shutdown()
 	{
-		if ( viewLst )
-			delete viewLst;
-
 		Awesomium::WebCore::Shutdown();
 	}
 
@@ -220,7 +191,7 @@ extern "C"
 		if ( wc ) {
 			return reinterpret_cast<cWebSessionPtr_t>( wc->CreateWebSession(*reinterpret_cast<Awesomium::WebString*>(path), wpToAwePrefs(wp)) );
 		}
-		
+
 		return nullptr;
 	}
 
@@ -234,8 +205,8 @@ extern "C"
 			auto viewtype = static_cast<Awesomium::WebViewType>(type);
 
 			return reinterpret_cast<cWebViewPtr_t>( wc->CreateWebView( w, h,
-								session ? session : nullptr,
-								viewtype) );
+				session ? session : nullptr,
+				viewtype) );
 		}
 
 		return nullptr;
@@ -344,7 +315,8 @@ extern "C"
 		auto view = reinterpret_cast<Awesomium::WebView*>(webview);
 
 		if ( view ) {
-			return view->process_handle();
+			// OSX little fix
+			return reinterpret_cast<void*>(view->process_handle());
 		}
 
 		return nullptr;
@@ -521,7 +493,7 @@ extern "C"
 
 		return nullptr;
 	}
-	
+
 	AWS_EXPORT cWebView_onPrintPtr_t aws_webview_getPrintListener(cWebViewPtr_t webview)
 	{
 		auto view = reinterpret_cast<Awesomium::WebView*>(webview);
@@ -651,8 +623,8 @@ extern "C"
 
 		if ( view ) {
 			return reinterpret_cast<cWebUrlPtr_t>(
-						new Awesomium::WebURL(view->url())
-					);
+				new Awesomium::WebURL(view->url())
+				);
 		}
 
 		return nullptr;
@@ -664,8 +636,8 @@ extern "C"
 
 		if ( view ) {
 			return reinterpret_cast<cWebStringPtr_t>(
-						new Awesomium::WebString(view->title())
-					);
+				new Awesomium::WebString(view->title())
+				);
 		}
 
 		return nullptr;
@@ -813,14 +785,11 @@ extern "C"
 
 	AWS_EXPORT void aws_webview_injectKeyboardEvent(cWebViewPtr_t webview, cKeyboardEvtPtr_t keyevent)
 	{
-#pragma message (__FILE__ "[" STRING(__LINE__) "]: function not tested")
 		auto view = reinterpret_cast<Awesomium::WebView*>(webview);
 
 		if ( view ) {
-			//auto evt = reinterpret_cast<const Awesomium::WebKeyboardEvent&>(keyevent);
-			auto evt = reinterpret_cast<Awesomium::WebKeyboardEvent*>(keyevent);
-			const Awesomium::WebKeyboardEvent& ref = *evt;
-			view->InjectKeyboardEvent(ref);
+			auto evt = reinterpret_cast<const Awesomium::WebKeyboardEvent&>(keyevent);
+			view->InjectKeyboardEvent(evt);
 		}
 	}
 
@@ -963,7 +932,7 @@ extern "C"
 		if ( view ) {
 			return reinterpret_cast <cJSValuePtr_t>(
 				new Awesomium::JSValue(view->CreateGlobalJavascriptObject( *reinterpret_cast<Awesomium::WebString*>(objname) ))
-			);
+				);
 		}
 
 		return nullptr;
@@ -984,10 +953,9 @@ extern "C"
 
 		if ( view ) {
 			return reinterpret_cast<cJSValuePtr_t>(
-					new Awesomium::JSValue(
-						view->ExecuteJavascriptWithResult( *reinterpret_cast<Awesomium::WebString*>(script), 
-							*reinterpret_cast<Awesomium::WebString*>(fxpath) )
-					)
+				new Awesomium::JSValue(
+				view->ExecuteJavascriptWithResult( *reinterpret_cast<Awesomium::WebString*>(script), 
+				*reinterpret_cast<Awesomium::WebString*>(fxpath) ) )
 				);
 		}
 
@@ -1087,16 +1055,16 @@ extern "C"
 		}
 	}
 
-	
+
 	AWS_EXPORT void aws_webview_setInternalViewHandler (cWebViewPtr_t webview)
 	{
 		auto view = reinterpret_cast<Awesomium::WebView*>(webview);
 
 		if ( view ) {
-			view->set_view_listener(viewLst);
+			view->set_view_listener(&viewLst);
 		}
 	}
-	
+
 	AWS_EXPORT void aws_webview_setInternalPrintHandler (cWebViewPtr_t webview)
 	{
 		auto view = reinterpret_cast<Awesomium::WebView*>(webview);
@@ -1141,12 +1109,12 @@ extern "C"
 			view->set_input_method_editor_listener(&imeLst);
 		}
 	}
-	
+
 
 	// set view callbacks
 	AWS_EXPORT void aws_webview_setListenerView (cWebViewPtr_t webview, cWebView_View viewclbks)
 	{
-		viewLst->addCallback(reinterpret_cast<Awesomium::WebView*>(webview), viewclbks);
+		viewLst.addCallback(reinterpret_cast<Awesomium::WebView*>(webview), viewclbks);
 	}
 
 	AWS_EXPORT void aws_webview_setListenerLoad (cWebViewPtr_t webview, cWebView_Load loadclbks)
@@ -1473,7 +1441,7 @@ extern "C"
 
 		if ( jsv ) {
 			return reinterpret_cast <cJSArrayPtr_t>(
-					new Awesomium::JSArray( jsv->ToArray() )
+				new Awesomium::JSArray( jsv->ToArray() )
 				);
 		}
 
@@ -1486,7 +1454,7 @@ extern "C"
 
 		if ( jsv ) {
 			return reinterpret_cast <cJSObjectPtr_t>(
-					new Awesomium::JSObject( jsv->ToObject() )
+				new Awesomium::JSObject( jsv->ToObject() )
 				);
 		}
 
@@ -1571,7 +1539,7 @@ extern "C"
 
 		if ( jso ) {
 			return reinterpret_cast<cJSValuePtr_t>(
-					new Awesomium::JSValue(jso->GetProperty( *reinterpret_cast<Awesomium::WebString*>(name) ))
+				new Awesomium::JSValue(jso->GetProperty( *reinterpret_cast<Awesomium::WebString*>(name) ))
 				);
 		}
 
@@ -1603,8 +1571,8 @@ extern "C"
 
 		if ( jso ) {
 			return reinterpret_cast<cJSArrayPtr_t>(
-						new Awesomium::JSArray(jso->GetPropertyNames())
-					);
+				new Awesomium::JSArray(jso->GetPropertyNames())
+				);
 		}
 
 		return nullptr;
@@ -1616,8 +1584,8 @@ extern "C"
 
 		if ( jso ) {
 			return reinterpret_cast<cJSArrayPtr_t>(
-						new Awesomium::JSArray(jso->GetMethodNames())
-					);
+				new Awesomium::JSArray(jso->GetMethodNames())
+				);
 		}
 
 		return nullptr;
@@ -1642,8 +1610,8 @@ extern "C"
 			auto arg = Awesomium::JSArray();
 
 			return reinterpret_cast<cJSValuePtr_t>(
-						new Awesomium::JSValue(jso->Invoke( *reinterpret_cast<Awesomium::WebString*>(name), arg ))
-					);
+				new Awesomium::JSValue(jso->Invoke( *reinterpret_cast<Awesomium::WebString*>(name), arg ))
+				);
 		}
 
 		return nullptr;
@@ -1787,9 +1755,9 @@ extern "C"
 	AWS_EXPORT cWebUrlPtr_t aws_weburl_new_webstring(cWebStringPtr_t str)
 	{
 		return reinterpret_cast<cWebUrlPtr_t>(
-				new Awesomium::WebURL(
-					*reinterpret_cast<Awesomium::WebString*>(str)
-				)
+			new Awesomium::WebURL(
+			*reinterpret_cast<Awesomium::WebString*>(str)
+			)
 			);
 	}
 
@@ -2114,6 +2082,7 @@ extern "C"
 
 
 	// not yet finished
+	// TODO: remove mem allocation
 	AWS_EXPORT cKeyboardEvtPtr_t aws_keyboardevent_from_keycode(int virtkey, int scancode, int mods, int type, wchar16 text)
 	{
 		WebKeyboardEvent *evt = new WebKeyboardEvent();
@@ -2124,21 +2093,21 @@ extern "C"
 		// -------------------------
 
 		GetKeyIdentifierFromVirtualKeyCode(virtkey, &buf);
-		
+
 		strcpy(evt->key_identifier, buf);
-		
+
 		evt->modifiers = mods;
 		evt->type = static_cast<Awesomium::WebKeyboardEvent::Type>(type);
 		evt->virtual_key_code = virtkey;
 		evt->native_key_code = scancode;
-		
+
 		if ( text != 0 )
 		{
 			wchar16 buf[4] = { text, 0, 0, 0 };
 			memcpy(evt->text, buf, sizeof(wchar16) * 4 );
 			memcpy(evt->unmodified_text, buf, sizeof(wchar16) * 4 );
 		}
-		
+
 		delete [] buf;
 
 		return reinterpret_cast<cKeyboardEvtPtr_t>(evt);
