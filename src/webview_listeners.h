@@ -92,43 +92,43 @@ protected:
 /// @note: See WebView::SetLoadListener
 ///
 class WebViewListener_Load : public Awesomium::WebViewListener::Load {
- public:
-  /// This event occurs when the page begins loading a frame.
-  virtual void OnBeginLoadingFrame(Awesomium::WebView* caller,
-                                   int64 frame_id,
-                                   bool is_main_frame,
-                                   const Awesomium::WebURL& url,
-                                   bool is_error_page);
+public:
+	/// This event occurs when the page begins loading a frame.
+	virtual void OnBeginLoadingFrame(Awesomium::WebView* caller,
+		int64 frame_id,
+		bool is_main_frame,
+		const Awesomium::WebURL& url,
+		bool is_error_page);
 
-  /// This event occurs when a frame fails to load. See error_desc
-  /// for additional information.
-  virtual void OnFailLoadingFrame(Awesomium::WebView* caller,
-                                  int64 frame_id,
-                                  bool is_main_frame,
-                                  const Awesomium::WebURL& url,
-                                  int error_code,
-                                  const Awesomium::WebString& error_desc);
+	/// This event occurs when a frame fails to load. See error_desc
+	/// for additional information.
+	virtual void OnFailLoadingFrame(Awesomium::WebView* caller,
+		int64 frame_id,
+		bool is_main_frame,
+		const Awesomium::WebURL& url,
+		int error_code,
+		const Awesomium::WebString& error_desc);
 
-  /// This event occurs when the page finishes loading a frame.
-  /// The main frame always finishes loading last for a given page load.
-  virtual void OnFinishLoadingFrame(Awesomium::WebView* caller,
-                                    int64 frame_id,
-                                    bool is_main_frame,
-                                    const Awesomium::WebURL& url) ;
+	/// This event occurs when the page finishes loading a frame.
+	/// The main frame always finishes loading last for a given page load.
+	virtual void OnFinishLoadingFrame(Awesomium::WebView* caller,
+		int64 frame_id,
+		bool is_main_frame,
+		const Awesomium::WebURL& url) ;
 
-  /// This event occurs when the DOM has finished parsing and the
-  /// window object is available for JavaScript execution.
-  virtual void OnDocumentReady(Awesomium::WebView* caller,
-                               const Awesomium::WebURL& url);
+	/// This event occurs when the DOM has finished parsing and the
+	/// window object is available for JavaScript execution.
+	virtual void OnDocumentReady(Awesomium::WebView* caller,
+		const Awesomium::WebURL& url);
 
-  virtual ~WebViewListener_Load() { callbacks.clear(); }
+	virtual ~WebViewListener_Load() { callbacks.clear(); }
 
-  void addCallback(Awesomium::WebView* view, cWebView_Load clbk);
+	void addCallback(Awesomium::WebView* view, cWebView_Load clbk);
 
-  void removeCallback(Awesomium::WebView* view);
+	void removeCallback(Awesomium::WebView* view);
 
- protected:
-	 loadCallbacks_t callbacks;
+protected:
+	loadCallbacks_t callbacks;
 };
 
 ///
@@ -141,25 +141,25 @@ class WebViewListener_Load : public Awesomium::WebViewListener::Load {
 /// @note  See WebView::set_process_listener
 ///
 class WebViewListener_Process : public Awesomium::WebViewListener::Process {
- public:
-  /// This event occurs when the process hangs.
-  virtual void OnUnresponsive(Awesomium::WebView* caller);
+public:
+	/// This event occurs when the process hangs.
+	virtual void OnUnresponsive(Awesomium::WebView* caller);
 
-  /// This event occurs when the process becomes responsive after
-  /// a hang.
-  virtual void OnResponsive(Awesomium::WebView* caller);
+	/// This event occurs when the process becomes responsive after
+	/// a hang.
+	virtual void OnResponsive(Awesomium::WebView* caller);
 
-  /// This event occurs when the process crashes.
-  virtual void OnCrashed(Awesomium::WebView* caller,
-                         Awesomium::TerminationStatus status);
+	/// This event occurs when the process crashes.
+	virtual void OnCrashed(Awesomium::WebView* caller,
+		Awesomium::TerminationStatus status);
 
-  virtual ~WebViewListener_Process() { callbacks.clear(); }
+	virtual ~WebViewListener_Process() { callbacks.clear(); }
 
-  void addCallback(Awesomium::WebView* view, cWebView_Process clbk);
+	void addCallback(Awesomium::WebView* view, cWebView_Process clbk);
 
-  void removeCallback(Awesomium::WebView* view);
- protected:
-  procCallbacks_t callbacks;
+	void removeCallback(Awesomium::WebView* view);
+protected:
+	procCallbacks_t callbacks;
 };
 
 ///
@@ -169,36 +169,36 @@ class WebViewListener_Process : public Awesomium::WebViewListener::Process {
 /// @note  See WebView::set_menu_listener
 ///
 class WebViewListener_Menu : public Awesomium::WebViewListener::Menu {
- public:
-  ///
-  /// This event occurs when the page requests to display a dropdown
-  /// (popup) menu. This is usually the result of a user clicking on
-  /// a "select" HTML input element. It is your responsibility to
-  /// display this menu in your application. This event is not modal.
-  ///
-  /// @see WebView::DidSelectPopupMenuItem
-  /// @see WebView::DidCancelPopupMenu
-  ///
-  virtual void OnShowPopupMenu(Awesomium::WebView* caller,
-                               const WebPopupMenuInfo& menu_info);
+public:
+	///
+	/// This event occurs when the page requests to display a dropdown
+	/// (popup) menu. This is usually the result of a user clicking on
+	/// a "select" HTML input element. It is your responsibility to
+	/// display this menu in your application. This event is not modal.
+	///
+	/// @see WebView::DidSelectPopupMenuItem
+	/// @see WebView::DidCancelPopupMenu
+	///
+	virtual void OnShowPopupMenu(Awesomium::WebView* caller,
+		const WebPopupMenuInfo& menu_info);
 
-  ///
-  /// This event occurs when the page requests to display a context menu.
-  /// This is usually the result of a user right-clicking somewhere on the
-  /// page. It is your responsibility to display this menu in your
-  /// application and perform the selected actions. This event is not modal.
-  ///
-  virtual void OnShowContextMenu(Awesomium::WebView* caller,
-                                 const WebContextMenuInfo& menu_info);
+	///
+	/// This event occurs when the page requests to display a context menu.
+	/// This is usually the result of a user right-clicking somewhere on the
+	/// page. It is your responsibility to display this menu in your
+	/// application and perform the selected actions. This event is not modal.
+	///
+	virtual void OnShowContextMenu(Awesomium::WebView* caller,
+		const WebContextMenuInfo& menu_info);
 
-  virtual ~WebViewListener_Menu() { callbacks.clear(); }
-  
-  void addCallback(Awesomium::WebView* view, cWebView_Menu clbk);
+	virtual ~WebViewListener_Menu() { callbacks.clear(); }
 
-  void removeCallback(Awesomium::WebView* view);
+	void addCallback(Awesomium::WebView* view, cWebView_Menu clbk);
 
- protected:
-  menuCallbacks_t callbacks;
+	void removeCallback(Awesomium::WebView* view);
+
+protected:
+	menuCallbacks_t callbacks;
 };
 
 ///
@@ -208,38 +208,38 @@ class WebViewListener_Menu : public Awesomium::WebViewListener::Menu {
 /// @see  WebView::set_dialog_listener
 ///
 class WebViewListener_Dialog : public Awesomium::WebViewListener::Dialog {
- public:
-  ///
-  /// This event occurs when the page requests to display a file chooser
-  /// dialog. This is usually the result of a user clicking on an HTML
-  /// input element with `type='file`. It is your responsibility to display
-  /// this menu in your application. This event is not modal.
-  ///
-  /// @see WebView::DidChooseFiles
-  ///
-  virtual void OnShowFileChooser(Awesomium::WebView* caller,
-                                 const WebFileChooserInfo& chooser_info);
+public:
+	///
+	/// This event occurs when the page requests to display a file chooser
+	/// dialog. This is usually the result of a user clicking on an HTML
+	/// input element with `type='file`. It is your responsibility to display
+	/// this menu in your application. This event is not modal.
+	///
+	/// @see WebView::DidChooseFiles
+	///
+	virtual void OnShowFileChooser(Awesomium::WebView* caller,
+		const WebFileChooserInfo& chooser_info);
 
-  ///
-  /// This event occurs when the page needs authentication from the user (for
-  /// example, Basic HTTP Auth, NTLM Auth, etc). It is your responsibility to
-  /// display a dialog so that users can input their username and password.
-  /// This event is not modal.
-  ///
-  /// @see WebView::DidLogin
-  /// @see WebView::DidCancelLogin
-  ///
-  virtual void OnShowLoginDialog(Awesomium::WebView* caller,
-                                 const WebLoginDialogInfo& dialog_info);
+	///
+	/// This event occurs when the page needs authentication from the user (for
+	/// example, Basic HTTP Auth, NTLM Auth, etc). It is your responsibility to
+	/// display a dialog so that users can input their username and password.
+	/// This event is not modal.
+	///
+	/// @see WebView::DidLogin
+	/// @see WebView::DidCancelLogin
+	///
+	virtual void OnShowLoginDialog(Awesomium::WebView* caller,
+		const WebLoginDialogInfo& dialog_info);
 
-  virtual ~WebViewListener_Dialog() { callbacks.clear(); }
+	virtual ~WebViewListener_Dialog() { callbacks.clear(); }
 
-  void addCallback(Awesomium::WebView* view, cWebView_Dialog clbk);
+	void addCallback(Awesomium::WebView* view, cWebView_Dialog clbk);
 
-  void removeCallback(Awesomium::WebView* view);
+	void removeCallback(Awesomium::WebView* view);
 
- protected:
-  dlgCallbacks_t callbacks;
+protected:
+	dlgCallbacks_t callbacks;
 };
 
 ///
@@ -249,49 +249,49 @@ class WebViewListener_Dialog : public Awesomium::WebViewListener::Dialog {
 /// @see  WebView::set_print_listener
 ///
 class WebViewListener_Print : public Awesomium::WebViewListener::Print {
- public:
-  ///
-  /// This event occurs when the page requests to print itself. (Usually
-  /// the result of `window.print()` being called from JavaScript.) It is
-  /// your responsiblity to print the WebView to a file and handle the
-  /// actual device printing.
-  ///
-  /// @see  WebView::PrintToFile
-  ///
-  virtual void OnRequestPrint(Awesomium::WebView* caller);
+public:
+	///
+	/// This event occurs when the page requests to print itself. (Usually
+	/// the result of `window.print()` being called from JavaScript.) It is
+	/// your responsiblity to print the WebView to a file and handle the
+	/// actual device printing.
+	///
+	/// @see  WebView::PrintToFile
+	///
+	virtual void OnRequestPrint(Awesomium::WebView* caller);
 
-  ///
-  /// This event occurs when WebView::PrintToFile fails. Typically because of
-  /// bad printer configuration or invalid output path (it must be writable).
-  ///
-  /// @param  request_id  The unique request ID (returned from
-  ///                     WebView::PrintToFile earlier).
-  ///
-  virtual void OnFailPrint(Awesomium::WebView* caller,
-                           int request_id);
+	///
+	/// This event occurs when WebView::PrintToFile fails. Typically because of
+	/// bad printer configuration or invalid output path (it must be writable).
+	///
+	/// @param  request_id  The unique request ID (returned from
+	///                     WebView::PrintToFile earlier).
+	///
+	virtual void OnFailPrint(Awesomium::WebView* caller,
+		int request_id);
 
-  ///
-  /// This event occurs when WebView::PrintToFile succeeds.
-  ///
-  /// @param  request_id  The unique request ID (returned from
-  ///                     WebView::PrintToFile earlier).
-  ///
-  /// @param  file_list  The list of file-paths written. There may be multiple
-  ///                    files written if split_pages_into_multiple_files was
-  ///                    set to true in PrintConfig.
-  ///
-  virtual void OnFinishPrint(Awesomium::WebView* caller,
-                             int request_id,
-                             const WebStringArray& file_list);
+	///
+	/// This event occurs when WebView::PrintToFile succeeds.
+	///
+	/// @param  request_id  The unique request ID (returned from
+	///                     WebView::PrintToFile earlier).
+	///
+	/// @param  file_list  The list of file-paths written. There may be multiple
+	///                    files written if split_pages_into_multiple_files was
+	///                    set to true in PrintConfig.
+	///
+	virtual void OnFinishPrint(Awesomium::WebView* caller,
+		int request_id,
+		const WebStringArray& file_list);
 
-  virtual ~WebViewListener_Print() { callbacks.clear(); }
+	virtual ~WebViewListener_Print() { callbacks.clear(); }
 
-  void addCallback(Awesomium::WebView* view, cWebView_Print clbk);
+	void addCallback(Awesomium::WebView* view, cWebView_Print clbk);
 
-  void removeCallback(Awesomium::WebView* view);
+	void removeCallback(Awesomium::WebView* view);
 
- protected:
-  prntCallbacks_t callbacks;
+protected:
+	prntCallbacks_t callbacks;
 };
 
 ///
@@ -301,65 +301,65 @@ class WebViewListener_Print : public Awesomium::WebViewListener::Print {
 /// @see  WebView::set_download_listener
 ///
 class WebViewListener_Download : public Awesomium::WebViewListener::Download {
- public:
-  ///
-  /// This event occurs when the page requests to begin downloading a certain
-  /// file. It is your responsiblity to call WebView::DidChooseDownloadPath or
-  /// WebView::DidCancelDownload as a result of this event.
-  ///
-  /// @param  download_id  The unique ID of the download.
-  ///
-  /// @param  url  The URL that initiated the download.
-  ///
-  /// @param  suggested_filename  The suggested name for the file.
-  ///
-  /// @param  mime_type  The mime type of the file.
-  ///
-  virtual void OnRequestDownload(Awesomium::WebView* caller,
-                                 int download_id,
-                                 const Awesomium::WebURL& url,
-                                 const Awesomium::WebString& suggested_filename,
-                                 const Awesomium::WebString& mime_type);
+public:
+	///
+	/// This event occurs when the page requests to begin downloading a certain
+	/// file. It is your responsiblity to call WebView::DidChooseDownloadPath or
+	/// WebView::DidCancelDownload as a result of this event.
+	///
+	/// @param  download_id  The unique ID of the download.
+	///
+	/// @param  url  The URL that initiated the download.
+	///
+	/// @param  suggested_filename  The suggested name for the file.
+	///
+	/// @param  mime_type  The mime type of the file.
+	///
+	virtual void OnRequestDownload(Awesomium::WebView* caller,
+		int download_id,
+		const Awesomium::WebURL& url,
+		const Awesomium::WebString& suggested_filename,
+		const Awesomium::WebString& mime_type);
 
-  ///
-  /// This event occurs when the progress of the download is updated.
-  ///
-  /// @param  download_id  The unique ID of the download.
-  ///
-  /// @param  total_bytes  The total number of bytes (may be 0 if unknown).
-  ///
-  /// @param  received_bytes  The number of bytes received so far.
-  ///
-  /// @param  current_speed  The current speed in bytes per second.
-  ///
-  virtual void OnUpdateDownload(Awesomium::WebView* caller,
-                                int download_id,
-                                int64 total_bytes,
-                                int64 received_bytes,
-                                int64 current_speed);
+	///
+	/// This event occurs when the progress of the download is updated.
+	///
+	/// @param  download_id  The unique ID of the download.
+	///
+	/// @param  total_bytes  The total number of bytes (may be 0 if unknown).
+	///
+	/// @param  received_bytes  The number of bytes received so far.
+	///
+	/// @param  current_speed  The current speed in bytes per second.
+	///
+	virtual void OnUpdateDownload(Awesomium::WebView* caller,
+		int download_id,
+		int64 total_bytes,
+		int64 received_bytes,
+		int64 current_speed);
 
-  ///
-  /// This event occurs when the download is finished.
-  ///
-  /// @param  download_id  The unique ID of the download.
-  ///
-  /// @param  url  The URL that initiated the download.
-  ///
-  /// @param  saved_path  The path that the download was saved to.
-  ///
-  virtual void OnFinishDownload(Awesomium::WebView* caller,
-                                int download_id,
-                                const Awesomium::WebURL& url,
-                                const Awesomium::WebString& saved_path);
+	///
+	/// This event occurs when the download is finished.
+	///
+	/// @param  download_id  The unique ID of the download.
+	///
+	/// @param  url  The URL that initiated the download.
+	///
+	/// @param  saved_path  The path that the download was saved to.
+	///
+	virtual void OnFinishDownload(Awesomium::WebView* caller,
+		int download_id,
+		const Awesomium::WebURL& url,
+		const Awesomium::WebString& saved_path);
 
-  virtual ~WebViewListener_Download() { callbacks.clear(); }
+	virtual ~WebViewListener_Download() { callbacks.clear(); }
 
-  void addCallback(Awesomium::WebView* view, cWebView_Download clbk);
+	void addCallback(Awesomium::WebView* view, cWebView_Download clbk);
 
-  void removeCallback(Awesomium::WebView* view);
+	void removeCallback(Awesomium::WebView* view);
 
- protected:
-  dnldCallbacks_t callbacks;
+protected:
+	dnldCallbacks_t callbacks;
 };
 
 ///
@@ -369,48 +369,48 @@ class WebViewListener_Download : public Awesomium::WebViewListener::Download {
 /// @see  WebView::set_input_method_editor_listener
 ///
 class WebViewListener_IME : public Awesomium::WebViewListener::InputMethodEditor {
- public:
-  ///
-  /// You should handle this message if you are displaying your
-  /// own IME (input method editor) widget.
-  ///
-  /// This event is fired whenever the user does something that may change
-  /// the position, visiblity, or type of the IME Widget. This event is only
-  /// active when IME is active (please see WebView::ActivateIME).
-  ///
-  /// @param  caller  The WebView that fired this event.
-  ///
-  /// @param  type  The type of IME widget that should be displayed (if any).
-  ///
-  /// @param  caret_x  The x-position of the caret (relative to the View).
-  /// @param  caret_y  The y-position of the caret (relative to the View).
-  ///
-  virtual void OnUpdateIME(Awesomium::WebView* caller,
-                           Awesomium::TextInputType type,
-                           int caret_x,
-                           int caret_y);
+public:
+	///
+	/// You should handle this message if you are displaying your
+	/// own IME (input method editor) widget.
+	///
+	/// This event is fired whenever the user does something that may change
+	/// the position, visiblity, or type of the IME Widget. This event is only
+	/// active when IME is active (please see WebView::ActivateIME).
+	///
+	/// @param  caller  The WebView that fired this event.
+	///
+	/// @param  type  The type of IME widget that should be displayed (if any).
+	///
+	/// @param  caret_x  The x-position of the caret (relative to the View).
+	/// @param  caret_y  The y-position of the caret (relative to the View).
+	///
+	virtual void OnUpdateIME(Awesomium::WebView* caller,
+		Awesomium::TextInputType type,
+		int caret_x,
+		int caret_y);
 
-  ///
-  /// This event is fired when the page cancels the IME composition.
-  ///
-  virtual void OnCancelIME(Awesomium::WebView* caller);
+	///
+	/// This event is fired when the page cancels the IME composition.
+	///
+	virtual void OnCancelIME(Awesomium::WebView* caller);
 
-  ///
-  /// This event is fired when the page changes the displayed range
-  /// of the IME composition.
-  ///
-  virtual void OnChangeIMERange(Awesomium::WebView* caller,
-                                unsigned int start,
-                                unsigned int end);
+	///
+	/// This event is fired when the page changes the displayed range
+	/// of the IME composition.
+	///
+	virtual void OnChangeIMERange(Awesomium::WebView* caller,
+		unsigned int start,
+		unsigned int end);
 
-  virtual ~WebViewListener_IME() { callbacks.clear(); }
+	virtual ~WebViewListener_IME() { callbacks.clear(); }
 
-  void addCallback(Awesomium::WebView* view, cWebView_IME clbk);
+	void addCallback(Awesomium::WebView* view, cWebView_IME clbk);
 
-  void removeCallback(Awesomium::WebView* view);
+	void removeCallback(Awesomium::WebView* view);
 
- protected:
-  imeCallbacks_t callbacks;
+protected:
+	imeCallbacks_t callbacks;
 };
 
 #endif

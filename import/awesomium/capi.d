@@ -15,7 +15,7 @@ extern(C):
 /// awesomium int64
 alias long aint64;
 
-import std.c.windows.windows;
+version(Windows) import std.c.windows.windows;
 
 struct cString
 {

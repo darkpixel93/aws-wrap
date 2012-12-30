@@ -18,7 +18,7 @@ string fromWebString(cWebStringPtr_t wstr)
 	if ( len > 0 )
 	{
 		str.length = len;
-		aws_webstring_to_utf8(wstr,str.ptr, len);
+		aws_webstring_to_utf8(wstr, str.ptr, len);
 		return str.idup;
 	}
 	return string.init;
@@ -49,20 +49,10 @@ public:
 		_internal = aws_webstring_new_substring(other, start, len);
 	}
 
+	/// cast webstring to D string
 	string opCast(T)() if (is(T == string)) 
 	{
-		char[] str;
-		auto len = aws_webstring_to_utf8(this, null, 0);
-
-		if ( len > 0 )
-		{
-			str.length = len + 1;
-			aws_webstring_to_utf8(this,str.ptr, len);
-
-			return str.idup;
-		}
-		
-		return string.init;
+		return fromWebString(this);
 	}
 	
 	~this()
@@ -78,9 +68,9 @@ package:
 		_internal = other;
 	}
 
+	// c++ copy constructor
 	this(const(cWebStringPtr_t) other)
 	{
-		//core.thread.Thread.sleep( core.thread.dur!"msecs"(20) ); // let's hope it's enough
 		_internal = aws_webstring_new_webstring(cast(cWebStringPtr_t)other);
 		_owner = true;
 	}

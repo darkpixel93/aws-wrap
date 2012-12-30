@@ -16,15 +16,15 @@ class JSHandler : public Awesomium::JSMethodHandler
 {
 public:
 	virtual void OnMethodCall(Awesomium::WebView* caller,
-                            unsigned int remote_object_id, 
-                            const Awesomium::WebString& method_name,
-                            const Awesomium::JSArray& args);
+		unsigned int remote_object_id, 
+		const Awesomium::WebString& method_name,
+		const Awesomium::JSArray& args);
 
-	
+
 	virtual Awesomium::JSValue OnMethodCallWithReturnValue(Awesomium::WebView* caller,
-                                              unsigned int remote_object_id,
-                                              const Awesomium::WebString& method_name,
-                                              const Awesomium::JSArray& args);
+		unsigned int remote_object_id,
+		const Awesomium::WebString& method_name,
+		const Awesomium::JSArray& args);
 
 	virtual void addCallback(Awesomium::WebView* view, cJSMethodCallback_t clbk);
 
