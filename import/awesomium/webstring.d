@@ -13,11 +13,17 @@ import awesomium.capi, awesomium.util;
 
 string fromWebString(cWebStringPtr_t wstr)
 {
-	char[] buf;
-	auto len = aws_webstring_to_utf8(wstr, buf.ptr);
-
-	return buf[0..len].idup;
+	char[] str;
+	auto len = aws_webstring_to_utf8(wstr, null, 0);
+	if ( len > 0 )
+	{
+		str.length = len;
+		aws_webstring_to_utf8(wstr,str.ptr, len);
+		return str.idup;
+	}
+	return string.init;
 }
+
 
 final class WebString
 {
@@ -45,11 +51,16 @@ public:
 
 	string opCast(T)() if (is(T == string)) 
 	{
-		// there should be better way...
-		scope str = aws_webstring_to_cstring(this);
+		char[] str;
+		auto len = aws_webstring_to_utf8(this, null, 0);
 
-		if ( str.len > 0 )
-			return str.str[0 .. str.len].idup;
+		if ( len > 0 )
+		{
+			str.length = len + 1;
+			aws_webstring_to_utf8(this,str.ptr, len);
+
+			return str.idup;
+		}
 		
 		return string.init;
 	}
@@ -67,10 +78,11 @@ package:
 		_internal = other;
 	}
 
-	// quite a hack
 	this(const(cWebStringPtr_t) other)
 	{
-		this(cast(cWebStringPtr_t) other);
+		//core.thread.Thread.sleep( core.thread.dur!"msecs"(20) ); // let's hope it's enough
+		_internal = aws_webstring_new_webstring(cast(cWebStringPtr_t)other);
+		_owner = true;
 	}
 
 package:

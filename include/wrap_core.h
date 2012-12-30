@@ -37,6 +37,14 @@ Copyright (C) 2012 evilrat
 # endif
 #endif
 
+#ifdef _WIN32
+#	include <Windows.h>
+#endif
+
+#ifdef _OBJC_
+#	import <Cocoa/Cocoa.h>
+#endif
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -46,6 +54,8 @@ extern "C" {
 
 	/// null terminated wchar16 string
 	typedef unsigned short* nullstr16_t;
+	
+	typedef unsigned short wchar16;
 
 
 
@@ -117,6 +127,23 @@ extern "C" {
 
 		bool shrink_standalone_images_to_fit;
 	} cWebPrefs;
+
+	/// this structure holds Awesomium WebKeyboardEvent data
+	typedef struct _cKeyEventData
+	{
+		int type;
+		int modifiers;
+
+		int virtual_key_code;
+		int native_key_code;
+
+		char key_identifier[20];
+
+		wchar16 text[4];
+		wchar16 unmodified_text[4];
+
+		bool is_system_key;
+	} cKeyEventData;
 
 	// ---------------------------------------
 	// BELOW ARE THE POINTERS TO ACTUAL AWESOMIUM CPP OBJECTS
@@ -431,10 +458,12 @@ extern "C" {
 	AWS_EXPORT   cWebStringPtr_t         aws_webstring_new ();
 	AWS_EXPORT   cWebStringPtr_t         aws_webstring_new_substring (cWebStringPtr_t srcstring, unsigned start, unsigned len);
 	AWS_EXPORT   cWebStringPtr_t         aws_webstring_new_utf8 (const char* string, unsigned len);
+	AWS_EXPORT   cWebStringPtr_t         aws_webstring_new_webstring (cWebStringPtr_t string);
 
 	AWS_EXPORT   void                    aws_webstring_delete (cWebStringPtr_t string);
 
-	AWS_EXPORT   unsigned                aws_webstring_to_utf8 (cWebStringPtr_t string, char* dest);
+	AWS_EXPORT   unsigned                aws_webstring_to_utf8 (cWebStringPtr_t string, char* dest, unsigned length);
+	AWS_EXPORT   const wchar16*          aws_webstring_data (cWebStringPtr_t string);
 	AWS_EXPORT   cString                 aws_webstring_to_cstring (cWebStringPtr_t string);
 
 	// ====== WEB CORE =======
@@ -713,6 +742,23 @@ extern "C" {
 	AWS_EXPORT   unsigned                aws_uploadelem_getNumBytes (cUploadElementPtr_t upelem);
 	AWS_EXPORT   unsigned char*          aws_uploadelem_getBytes (cUploadElementPtr_t upelem);
 	AWS_EXPORT   cWebStringPtr_t         aws_uploadelem_getFilePath (cUploadElementPtr_t upelem);
+
+	// ===== OTHER STUFF ======
+	/// type = awesomium keyboard event type
+	AWS_EXPORT   cKeyboardEvtPtr_t       aws_keyboardevent_from_keycode (int virtkey, int scancode, int modifiers, int type, wchar16 text);
+	AWS_EXPORT   void                    aws_keyboardevent_set_data (cKeyboardEvtPtr_t evt, cKeyEventData data);
+	AWS_EXPORT   cKeyEventData           aws_keyboardevent_get_data (cKeyboardEvtPtr_t evt);
+
+#ifdef __APPLE__
+	AWS_EXPORT   cKeyboardEvtPtr_t       aws_keyboardevent_from_system (NSEvent* evt);
+#elif defined _WIN32
+	AWS_EXPORT   cKeyboardEvtPtr_t       aws_keyboardevent_from_system (UINT msg, WPARAM wparam, LPARAM lparam);
+#else // other placeholders(x11/wayland, if any ...)
+
+#endif 
+
+	AWS_EXPORT   void                    aws_keyboardevent_delete (cKeyboardEvtPtr_t evt);
+
 
 #ifdef __cplusplus
 }

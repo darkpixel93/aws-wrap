@@ -17,6 +17,8 @@
 #include "resinterceptor.h"
 #include "jshandler.h"
 
+#include <iostream>
+
 #include <assert.h>
 
 // pragma message stuff
@@ -116,6 +118,13 @@ extern "C"
 		);
 	}
 
+	AWS_EXPORT cWebStringPtr_t aws_webstring_new_webstring (cWebStringPtr_t string)
+	{
+		return reinterpret_cast<cWebStringPtr_t>(
+			new Awesomium::WebString( reinterpret_cast<const Awesomium::WebString&>(string) )
+		);
+	}
+
 	AWS_EXPORT void aws_webstring_delete(cWebStringPtr_t string)
 	{
 		auto str = reinterpret_cast<Awesomium::WebString*>(string);
@@ -134,13 +143,28 @@ extern "C"
 			);
 	}
 
-	AWS_EXPORT unsigned aws_webstring_to_utf8(cWebStringPtr_t string, char* dest)
+	AWS_EXPORT unsigned aws_webstring_to_utf8(cWebStringPtr_t string, char* dest, unsigned length)
 	{
 		auto str = reinterpret_cast<Awesomium::WebString*>(string);
 
 		if ( str ) {
-			unsigned len = str->ToUTF8(nullptr, 0);
-			return str->ToUTF8(dest,len);
+
+			// a self-destruct, some kind of...
+			if ( dest == nullptr && length != 0 )
+				delete (void*)0;
+
+			return str->ToUTF8(dest,length);
+		}
+		
+		return 0;
+	}
+
+	AWS_EXPORT const wchar16* aws_webstring_data(cWebStringPtr_t string)
+	{
+		auto str = reinterpret_cast<Awesomium::WebString*>(string);
+
+		if ( str ) {
+			return str->data();
 		}
 		
 		return 0;
@@ -789,12 +813,14 @@ extern "C"
 
 	AWS_EXPORT void aws_webview_injectKeyboardEvent(cWebViewPtr_t webview, cKeyboardEvtPtr_t keyevent)
 	{
-#pragma message (__FILE__ "[" STRING(__LINE__) "]: function not implemented")
+#pragma message (__FILE__ "[" STRING(__LINE__) "]: function not tested")
 		auto view = reinterpret_cast<Awesomium::WebView*>(webview);
 
 		if ( view ) {
-			auto evt = Awesomium::WebKeyboardEvent();
-			view->InjectKeyboardEvent(evt);
+			//auto evt = reinterpret_cast<const Awesomium::WebKeyboardEvent&>(keyevent);
+			auto evt = reinterpret_cast<Awesomium::WebKeyboardEvent*>(keyevent);
+			const Awesomium::WebKeyboardEvent& ref = *evt;
+			view->InjectKeyboardEvent(ref);
 		}
 	}
 
@@ -2081,6 +2107,97 @@ extern "C"
 	AWS_EXPORT void aws_jshandler_removeCallbackAll()
 	{
 		_aws_jshandler.removeCallbackAll();
+	}
+
+	//================================
+	// OTHER STUFF
+
+
+	// not yet finished
+	AWS_EXPORT cKeyboardEvtPtr_t aws_keyboardevent_from_keycode(int virtkey, int scancode, int mods, int type, wchar16 text)
+	{
+		WebKeyboardEvent *evt = new WebKeyboardEvent();
+
+		// -------------------------
+		// oh noes
+		char* buf = new char[20];			
+		// -------------------------
+
+		GetKeyIdentifierFromVirtualKeyCode(virtkey, &buf);
+		
+		strcpy(evt->key_identifier, buf);
+		
+		evt->modifiers = mods;
+		evt->type = static_cast<Awesomium::WebKeyboardEvent::Type>(type);
+		evt->virtual_key_code = virtkey;
+		evt->native_key_code = scancode;
+		
+		if ( text != 0 )
+		{
+			wchar16 buf[4] = { text, 0, 0, 0 };
+			memcpy(evt->text, buf, sizeof(wchar16) * 4 );
+			memcpy(evt->unmodified_text, buf, sizeof(wchar16) * 4 );
+		}
+		
+		delete [] buf;
+
+		return reinterpret_cast<cKeyboardEvtPtr_t>(evt);
+	}
+
+	AWS_EXPORT void aws_keyboardevent_set_data(cKeyboardEvtPtr_t evt, cKeyEventData data)
+	{
+		auto webkeyevent = reinterpret_cast<WebKeyboardEvent*>(evt);
+
+		if ( webkeyevent )
+		{
+			memcpy(webkeyevent->key_identifier, data.key_identifier, sizeof(char) * 20 );
+			memcpy(webkeyevent->text, data.text, sizeof(wchar16) * 4 );
+			memcpy(webkeyevent->unmodified_text, data.unmodified_text, sizeof(wchar16) * 4 );
+
+			webkeyevent -> is_system_key = data.is_system_key;
+			webkeyevent -> type = static_cast<Awesomium::WebKeyboardEvent::Type>(data.type);
+			webkeyevent -> modifiers = data.modifiers;
+			webkeyevent -> virtual_key_code = data.virtual_key_code;
+			webkeyevent -> native_key_code = data.native_key_code;
+		}
+	}
+
+	AWS_EXPORT cKeyEventData aws_keyboardevent_get_data(cKeyboardEvtPtr_t evt)
+	{
+		cKeyEventData data;
+		auto webkeyevent = reinterpret_cast<WebKeyboardEvent*>(evt);
+
+		if ( webkeyevent )
+		{
+			memcpy(data.key_identifier, webkeyevent->key_identifier, sizeof(char) * 20 );
+			memcpy(data.text, webkeyevent->text, sizeof(wchar16) * 4 );
+			memcpy(data.unmodified_text, webkeyevent->unmodified_text, sizeof(wchar16) * 4 );
+
+			data.is_system_key =  webkeyevent -> is_system_key;
+			data.type = webkeyevent -> type;
+			data.modifiers = webkeyevent -> modifiers;
+			data.virtual_key_code = webkeyevent -> virtual_key_code;
+			data.native_key_code = webkeyevent -> native_key_code;
+		}
+
+		return data;
+	}
+
+#ifdef __APPLE__
+	AWS_EXPORT cKeyboardEvtPtr_t aws_keyboardevent_from_system (NSEvent* evt);
+#elif defined _WIN32
+	AWS_EXPORT cKeyboardEvtPtr_t aws_keyboardevent_from_system(UINT msg, WPARAM wparam, LPARAM lparam)
+	{
+		return reinterpret_cast<cKeyboardEvtPtr_t>(new WebKeyboardEvent(msg, wparam, lparam));
+	}
+#endif
+
+	AWS_EXPORT void aws_keyboardevent_delete (cKeyboardEvtPtr_t evt)
+	{
+		auto webkeyevent = reinterpret_cast<WebKeyboardEvent*>(evt);
+
+		if ( webkeyevent )
+			delete webkeyevent;
 	}
 
 	// =========================

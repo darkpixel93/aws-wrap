@@ -13,4 +13,5 @@ public import awesomium.webcore,
 	awesomium.webview,
 	awesomium.common,
 	awesomium.surface,
-	awesomium.websession;
+	awesomium.websession,
+	awesomium.inputevt;

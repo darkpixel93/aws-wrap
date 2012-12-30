@@ -1,6 +1,6 @@
 #include "jshandler.h"
 #include <algorithm>
-#include <thread>
+//#include <thread>
 
 void JSHandler::OnMethodCall(Awesomium::WebView* caller,
                             unsigned int remote_object_id, 
@@ -52,7 +52,7 @@ Awesomium::JSValue JSHandler::OnMethodCallWithReturnValue(Awesomium::WebView* ca
 
 void JSHandler::addCallback(Awesomium::WebView* view, cJSMethodCallback_t clbk)
 {
-	_callbacks.emplace( view,clbk );
+	_callbacks.emplace( std::make_pair(view, clbk) );
 }
 
 void JSHandler::removeCallback(Awesomium::WebView* view)

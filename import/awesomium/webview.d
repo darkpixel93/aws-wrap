@@ -570,9 +570,9 @@ public:
 	///
 	/// @param  key_event  The keyboard event.
 	///
-	@disable void InjectKeyboardEvent(WebKeyboardEvent key_event)
+	void InjectKeyboardEvent(WebKeyboardEvent key_event)
 	{
-
+		aws_webview_injectKeyboardEvent(this, key_event._internal);
 	}
 
 	///
@@ -1137,8 +1137,9 @@ private:
 			if ( lst !is null )
 			{
 				auto view = _webviews[caller];
-				if ( view !is null )
+				if ( view !is null ) {
 					lst.OnChangeTooltip(view, cast(string)new WebString(tooltip));
+				}
 			}
 		}
 

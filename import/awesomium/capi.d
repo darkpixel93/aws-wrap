@@ -15,6 +15,8 @@ extern(C):
 /// awesomium int64
 alias long aint64;
 
+import std.c.windows.windows;
+
 struct cString
 {
 	uint len;
@@ -129,6 +131,23 @@ struct cWebLoginDialogInfo_t {
 	ushort port;    ///< The port of the server.
 	cWebStringPtr_t scheme;       ///< The scheme of the server.
 	cWebStringPtr_t realm;        ///< The realm of the server
+}
+
+/// this structure holds Awesomium WebKeyboardEvent data
+struct cKeyEventData
+{
+	int type;
+	int modifiers;
+
+	int virtual_key_code;
+	int native_key_code;
+
+	char[20] key_identifier;
+
+	wchar[4] text;
+	wchar[4] unmodified_text;
+
+	bool is_system_key;
 }
 
 // ====================================
@@ -417,10 +436,12 @@ struct cWebView_IME
 cWebStringPtr_t         aws_webstring_new ();
 cWebStringPtr_t         aws_webstring_new_substring (cWebStringPtr_t srcstring, uint start, uint len);
 cWebStringPtr_t         aws_webstring_new_utf8 (const char* string, uint len);
+cWebStringPtr_t         aws_webstring_new_webstring (cWebStringPtr_t string);
 
 void                    aws_webstring_delete (cWebStringPtr_t string);
 
-uint                    aws_webstring_to_utf8 (cWebStringPtr_t string, char* dest);
+uint                    aws_webstring_to_utf8 (cWebStringPtr_t string, char* dest, uint length);
+const (wchar)*          aws_webstring_data (cWebStringPtr_t string);
 cString                 aws_webstring_to_cstring (cWebStringPtr_t string);
 
 // ====== WEB CORE =======
@@ -700,3 +721,18 @@ bool                    aws_uploadelem_isBytes (cUploadElementPtr_t upelem);
 uint                    aws_uploadelem_getNumBytes (cUploadElementPtr_t upelem);
 ubyte*                  aws_uploadelem_getBytes (cUploadElementPtr_t upelem);
 cWebStringPtr_t         aws_uploadelem_getFilePath (cUploadElementPtr_t upelem);
+
+
+// ===== OTHER STUFF ======
+cKeyboardEvtPtr_t       aws_keyboardevent_from_keycode (int virtkey, int scancode, int modifiers, int type, char text);
+void                    aws_keyboardevent_set_data (cKeyboardEvtPtr_t evt, cKeyEventData data);
+cKeyEventData           aws_keyboardevent_get_data (cKeyboardEvtPtr_t evt);
+
+version(OSX)
+cKeyboardEvtPtr_t       aws_keyboardevent_from_system (NSEvent* evt);
+
+version(Windows)
+cKeyboardEvtPtr_t       aws_keyboardevent_from_system (UINT msg, WPARAM wparam, LPARAM lparam);
+
+
+void                    aws_keyboardevent_delete (cKeyboardEvtPtr_t evt);

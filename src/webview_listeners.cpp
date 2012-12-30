@@ -139,7 +139,7 @@
 
 	void WebViewListener_View::addCallback(Awesomium::WebView* view, cWebView_View clbk)
 	{
-		callbacks.emplace(view, clbk);
+		callbacks.emplace( std::make_pair(view, clbk) );
 	}
 
 	void WebViewListener_View::removeCallback(Awesomium::WebView* view)
@@ -240,7 +240,7 @@
 
    	void WebViewListener_Load::addCallback(Awesomium::WebView* view, cWebView_Load clbk)
 	{
-		callbacks.emplace(view, clbk);
+		callbacks.emplace( std::make_pair(view, clbk) );
 	}
 
 	void WebViewListener_Load::removeCallback(Awesomium::WebView* view)
@@ -299,7 +299,7 @@
 
    void WebViewListener_Process::addCallback(Awesomium::WebView* view, cWebView_Process clbk)
 	{
-		callbacks.emplace(view, clbk);
+		callbacks.emplace(std::make_pair(view, clbk));
 	}
 
 	void WebViewListener_Process::removeCallback(Awesomium::WebView* view)
@@ -389,7 +389,7 @@
 
    void WebViewListener_Menu::addCallback(Awesomium::WebView* view, cWebView_Menu clbk)
 	{
-		callbacks.emplace(view, clbk);
+		callbacks.emplace(std::make_pair(view, clbk));
 	}
 
 	void WebViewListener_Menu::removeCallback(Awesomium::WebView* view)
@@ -466,7 +466,7 @@
 
    void WebViewListener_Dialog::addCallback(Awesomium::WebView* view, cWebView_Dialog clbk)
 	{
-		callbacks.emplace(view, clbk);
+		callbacks.emplace(std::make_pair(view, clbk));
 	}
 
 	void WebViewListener_Dialog::removeCallback(Awesomium::WebView* view)
@@ -551,7 +551,7 @@
 
    void WebViewListener_Print::addCallback(Awesomium::WebView* view, cWebView_Print clbk)
 	{
-		callbacks.emplace(view, clbk);
+		callbacks.emplace(std::make_pair(view, clbk));
 	}
 
 	void WebViewListener_Print::removeCallback(Awesomium::WebView* view)
@@ -660,7 +660,7 @@
 
    void WebViewListener_Download::addCallback(Awesomium::WebView* view, cWebView_Download clbk)
 	{
-		callbacks.emplace(view, clbk);
+		callbacks.emplace(std::make_pair(view, clbk));
 	}
 
 	void WebViewListener_Download::removeCallback(Awesomium::WebView* view)
@@ -746,7 +746,7 @@
 
    void WebViewListener_IME::addCallback(Awesomium::WebView* view, cWebView_IME clbk)
 	{
-		callbacks.emplace(view, clbk);
+		callbacks.emplace(std::make_pair(view, clbk));
 	}
 
 	void WebViewListener_IME::removeCallback(Awesomium::WebView* view)
