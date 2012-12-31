@@ -283,7 +283,7 @@ alias void function(cWebViewPtr_t caller, int cursor, void* userPointer) wvview_
 alias void function(cWebViewPtr_t caller, int focused_type, void* userPointer) wvview_onChangeFocus;
 alias void function(cWebViewPtr_t caller, cWebViewPtr_t new_view, 
 											const (cWebUrlPtr_t) opener_url, const (cWebUrlPtr_t) target_url,
-											const (cRect) initial_pos, bool is_popup, void* userPointer) wvview_onShowCreatedWebView;
+											ref const (cRect) initial_pos, bool is_popup, void* userPointer) wvview_onShowCreatedWebView;
 
 
 struct cWebView_View
