@@ -788,7 +788,7 @@ extern "C"
 		auto view = reinterpret_cast<Awesomium::WebView*>(webview);
 
 		if ( view ) {
-			auto evt = reinterpret_cast<const Awesomium::WebKeyboardEvent&>(keyevent);
+			const Awesomium::WebKeyboardEvent &evt = *reinterpret_cast<Awesomium::WebKeyboardEvent*>(keyevent);
 			view->InjectKeyboardEvent(evt);
 		}
 	}
@@ -2153,7 +2153,10 @@ extern "C"
 	}
 
 #ifdef __APPLE__
-	AWS_EXPORT cKeyboardEvtPtr_t aws_keyboardevent_from_system (NSEvent* evt);
+	AWS_EXPORT cKeyboardEvtPtr_t aws_keyboardevent_from_system (NSEvent* evt)
+    {
+        return reinterpret_cast<cKeyboardEvtPtr_t>(new WebKeyboardEvent(evt));
+    }
 #elif defined _WIN32
 	AWS_EXPORT cKeyboardEvtPtr_t aws_keyboardevent_from_system(UINT msg, WPARAM wparam, LPARAM lparam)
 	{

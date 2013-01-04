@@ -130,7 +130,7 @@ void WebViewListener_View::OnShowCreatedWebView(Awesomium::WebView* caller,
 			reinterpret_cast<cWebViewPtr_t>(new_view),
 			reinterpret_cast<const cWebUrlPtr_t&>(opener_url),
 			reinterpret_cast<const cWebUrlPtr_t&>(target_url),
-			rect,
+			&rect,
 			is_popup,
 			cb->second.userPointer
 			);

@@ -4,3 +4,5 @@ bin
 /lib
 /solutions/aws_wrap.sdf
 /solutions/Release
+/solutions/OSX/Build
+/solutions/OSX/.DS_Store

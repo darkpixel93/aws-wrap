@@ -1147,7 +1147,7 @@ private:
 		/// internal View.OnShowCreatedWebView handler which retransmit this callback
 		static extern(C) void _onShowCreatedWebView(cWebViewPtr_t caller, cWebViewPtr_t new_view, 
 													const (cWebUrlPtr_t) opener_url,  const (cWebUrlPtr_t) target_url, 
-													ref const (cRect) initial_pos, bool is_popup, 
+													const (cRect)* initial_pos, bool is_popup, 
 													void* userPtr)
 		{
 			// get pointer to object
@@ -1164,7 +1164,7 @@ private:
 											 _webviews[new_view],
 											 new WebURL(cast(cWebUrlPtr_t)opener_url), 
 											 new WebURL(cast(cWebUrlPtr_t)target_url),
-											 Rect(initial_pos), is_popup);
+											 Rect(*initial_pos), is_popup);
 				}
 			}
 		}

@@ -41,7 +41,7 @@ Copyright (C) 2012 evilrat
 #	include <Windows.h>
 #endif
 
-#ifdef _OBJC_
+#ifdef __APPLE__
 #	import <Cocoa/Cocoa.h>
 #endif
 
@@ -217,9 +217,6 @@ extern "C" {
 
 
 
-	typedef struct _cWebMenuItemArray *cWebMenuItemArrayPtr_t;
-
-
 	// =======================
 
 	typedef struct _cWebPopupMenuInfo {
@@ -305,7 +302,7 @@ extern "C" {
 	typedef void (*wvview_onChangeFocus)(cWebViewPtr_t caller, int focused_type, void* userPointer);
 	typedef void (*wvview_onShowCreatedWebView)(cWebViewPtr_t caller, cWebViewPtr_t new_view, 
 												const cWebUrlPtr_t opener_url, const cWebUrlPtr_t target_url,
-												const cRect& initial_pos, bool is_popup, void* userPointer) ;
+												const cRect* initial_pos, bool is_popup, void* userPointer) ;
 
 
 	typedef struct _cWebView_View

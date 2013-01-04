@@ -1,0 +1,276 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 46;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		D0E9DCF31693F719002CA7EB /* jshandler.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D0E9DCEA1693F6CB002CA7EB /* jshandler.cpp */; };
+		D0E9DCF41693F71D002CA7EB /* jshandler.h in Headers */ = {isa = PBXBuildFile; fileRef = D0E9DCEB1693F6CB002CA7EB /* jshandler.h */; };
+		D0E9DCF51693F720002CA7EB /* resinterceptor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D0E9DCEC1693F6CB002CA7EB /* resinterceptor.cpp */; };
+		D0E9DCF61693F72D002CA7EB /* resinterceptor.h in Headers */ = {isa = PBXBuildFile; fileRef = D0E9DCED1693F6CB002CA7EB /* resinterceptor.h */; };
+		D0E9DCF71693F733002CA7EB /* webview_listeners.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D0E9DCEE1693F6CB002CA7EB /* webview_listeners.cpp */; };
+		D0E9DCF81693F736002CA7EB /* webview_listeners.h in Headers */ = {isa = PBXBuildFile; fileRef = D0E9DCEF1693F6CB002CA7EB /* webview_listeners.h */; };
+		D0E9DCF91693F73A002CA7EB /* wrap_core.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D0E9DCF01693F6CB002CA7EB /* wrap_core.cpp */; };
+		D0E9DCFB1693F767002CA7EB /* Awesomium.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D0E9DCFA1693F767002CA7EB /* Awesomium.framework */; };
+		D0E9DCFD1693F7B4002CA7EB /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D0E9DCFC1693F7B4002CA7EB /* Cocoa.framework */; };
+		D0E9DCFF1693F7C2002CA7EB /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D0E9DCFE1693F7C2002CA7EB /* Foundation.framework */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		D0E9DCDC1693F5FC002CA7EB /* libaws_wrap.dylib */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.dylib"; includeInIndex = 0; path = libaws_wrap.dylib; sourceTree = BUILT_PRODUCTS_DIR; };
+		D0E9DCEA1693F6CB002CA7EB /* jshandler.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = jshandler.cpp; sourceTree = "<group>"; };
+		D0E9DCEB1693F6CB002CA7EB /* jshandler.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = jshandler.h; sourceTree = "<group>"; };
+		D0E9DCEC1693F6CB002CA7EB /* resinterceptor.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = resinterceptor.cpp; sourceTree = "<group>"; };
+		D0E9DCED1693F6CB002CA7EB /* resinterceptor.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = resinterceptor.h; sourceTree = "<group>"; };
+		D0E9DCEE1693F6CB002CA7EB /* webview_listeners.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = webview_listeners.cpp; sourceTree = "<group>"; };
+		D0E9DCEF1693F6CB002CA7EB /* webview_listeners.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = webview_listeners.h; sourceTree = "<group>"; };
+		D0E9DCF01693F6CB002CA7EB /* wrap_core.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = wrap_core.cpp; sourceTree = "<group>"; };
+		D0E9DCF21693F6E7002CA7EB /* wrap_core.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = wrap_core.h; sourceTree = "<group>"; };
+		D0E9DCFA1693F767002CA7EB /* Awesomium.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Awesomium.framework; path = ../../../Frameworks/Awesomium.framework; sourceTree = "<group>"; };
+		D0E9DCFC1693F7B4002CA7EB /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = System/Library/Frameworks/Cocoa.framework; sourceTree = SDKROOT; };
+		D0E9DCFE1693F7C2002CA7EB /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		D0E9DCD91693F5FC002CA7EB /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				D0E9DCFF1693F7C2002CA7EB /* Foundation.framework in Frameworks */,
+				D0E9DCFD1693F7B4002CA7EB /* Cocoa.framework in Frameworks */,
+				D0E9DCFB1693F767002CA7EB /* Awesomium.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		D0E9DCD11693F5FC002CA7EB = {
+			isa = PBXGroup;
+			children = (
+				D0E9DCFE1693F7C2002CA7EB /* Foundation.framework */,
+				D0E9DCFC1693F7B4002CA7EB /* Cocoa.framework */,
+				D0E9DCFA1693F767002CA7EB /* Awesomium.framework */,
+				D0E9DCF11693F6E7002CA7EB /* include */,
+				D0E9DCE91693F6CB002CA7EB /* src */,
+				D0E9DCDD1693F5FC002CA7EB /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		D0E9DCDD1693F5FC002CA7EB /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				D0E9DCDC1693F5FC002CA7EB /* libaws_wrap.dylib */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		D0E9DCE91693F6CB002CA7EB /* src */ = {
+			isa = PBXGroup;
+			children = (
+				D0E9DCEA1693F6CB002CA7EB /* jshandler.cpp */,
+				D0E9DCEB1693F6CB002CA7EB /* jshandler.h */,
+				D0E9DCEC1693F6CB002CA7EB /* resinterceptor.cpp */,
+				D0E9DCED1693F6CB002CA7EB /* resinterceptor.h */,
+				D0E9DCEE1693F6CB002CA7EB /* webview_listeners.cpp */,
+				D0E9DCEF1693F6CB002CA7EB /* webview_listeners.h */,
+				D0E9DCF01693F6CB002CA7EB /* wrap_core.cpp */,
+			);
+			name = src;
+			path = ../../src;
+			sourceTree = "<group>";
+		};
+		D0E9DCF11693F6E7002CA7EB /* include */ = {
+			isa = PBXGroup;
+			children = (
+				D0E9DCF21693F6E7002CA7EB /* wrap_core.h */,
+			);
+			name = include;
+			path = ../../include;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXHeadersBuildPhase section */
+		D0E9DCDA1693F5FC002CA7EB /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				D0E9DCF41693F71D002CA7EB /* jshandler.h in Headers */,
+				D0E9DCF61693F72D002CA7EB /* resinterceptor.h in Headers */,
+				D0E9DCF81693F736002CA7EB /* webview_listeners.h in Headers */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXHeadersBuildPhase section */
+
+/* Begin PBXNativeTarget section */
+		D0E9DCDB1693F5FC002CA7EB /* aws_wrap */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = D0E9DCE01693F5FC002CA7EB /* Build configuration list for PBXNativeTarget "aws_wrap" */;
+			buildPhases = (
+				D0E9DCD81693F5FC002CA7EB /* Sources */,
+				D0E9DCD91693F5FC002CA7EB /* Frameworks */,
+				D0E9DCDA1693F5FC002CA7EB /* Headers */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = aws_wrap;
+			productName = aws_wrap;
+			productReference = D0E9DCDC1693F5FC002CA7EB /* libaws_wrap.dylib */;
+			productType = "com.apple.product-type.library.dynamic";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		D0E9DCD31693F5FC002CA7EB /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastUpgradeCheck = 0450;
+				ORGANIZATIONNAME = evilrat;
+			};
+			buildConfigurationList = D0E9DCD61693F5FC002CA7EB /* Build configuration list for PBXProject "aws_wrap" */;
+			compatibilityVersion = "Xcode 3.2";
+			developmentRegion = English;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+			);
+			mainGroup = D0E9DCD11693F5FC002CA7EB;
+			productRefGroup = D0E9DCDD1693F5FC002CA7EB /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				D0E9DCDB1693F5FC002CA7EB /* aws_wrap */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXSourcesBuildPhase section */
+		D0E9DCD81693F5FC002CA7EB /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				D0E9DCF31693F719002CA7EB /* jshandler.cpp in Sources */,
+				D0E9DCF51693F720002CA7EB /* resinterceptor.cpp in Sources */,
+				D0E9DCF71693F733002CA7EB /* webview_listeners.cpp in Sources */,
+				D0E9DCF91693F73A002CA7EB /* wrap_core.cpp in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		D0E9DCDE1693F5FC002CA7EB /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.8;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = macosx;
+			};
+			name = Debug;
+		};
+		D0E9DCDF1693F5FC002CA7EB /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = YES;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.8;
+				SDKROOT = macosx;
+			};
+			name = Release;
+		};
+		D0E9DCE11693F5FC002CA7EB /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
+				EXECUTABLE_PREFIX = lib;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(SRCROOT)/../../../Frameworks\"",
+				);
+				GCC_INPUT_FILETYPE = sourcecode.cpp.objcpp;
+				INSTALL_PATH = "@executable_path";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				VALID_ARCHS = i386;
+			};
+			name = Debug;
+		};
+		D0E9DCE21693F5FC002CA7EB /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
+				EXECUTABLE_PREFIX = lib;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(SRCROOT)/../../../Frameworks\"",
+				);
+				GCC_INPUT_FILETYPE = sourcecode.cpp.objcpp;
+				INSTALL_PATH = "@executable_path";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				VALID_ARCHS = i386;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		D0E9DCD61693F5FC002CA7EB /* Build configuration list for PBXProject "aws_wrap" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				D0E9DCDE1693F5FC002CA7EB /* Debug */,
+				D0E9DCDF1693F5FC002CA7EB /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		D0E9DCE01693F5FC002CA7EB /* Build configuration list for PBXNativeTarget "aws_wrap" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				D0E9DCE11693F5FC002CA7EB /* Debug */,
+				D0E9DCE21693F5FC002CA7EB /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = D0E9DCD31693F5FC002CA7EB /* Project object */;
+}
